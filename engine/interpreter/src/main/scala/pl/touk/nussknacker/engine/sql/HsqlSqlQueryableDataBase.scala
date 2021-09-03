@@ -100,6 +100,10 @@ class HsqlSqlQueryableDataBase(query: String, tables: Map[String, ColumnModel]) 
     TypedObjectTypingResult(toTypedMapDefinition(metaData))
   }
 
+  def parameterMetaData: ParameterMetaData = queryStatement.getParameterMetaData
+
+  def resultSetMetaData: ResultSetMetaData = queryStatement.getMetaData
+
   override def close(): Unit = {
     connection.close()
   }
