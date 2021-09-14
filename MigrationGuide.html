@@ -1,0 +1,938 @@
+
+<!DOCTYPE HTML>
+<html lang="" >
+    <head>
+        <meta charset="UTF-8">
+        <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+        <title>Migration guide · GitBook</title>
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="description" content="">
+        <meta name="generator" content="GitBook 3.2.3">
+        
+        
+        
+    
+    <link rel="stylesheet" href="gitbook/style.css">
+
+    
+            
+                
+                <link rel="stylesheet" href="gitbook/gitbook-plugin-highlight/website.css">
+                
+            
+                
+                <link rel="stylesheet" href="gitbook/gitbook-plugin-search/search.css">
+                
+            
+                
+                <link rel="stylesheet" href="gitbook/gitbook-plugin-fontsettings/website.css">
+                
+            
+        
+
+    
+
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+
+        
+    
+    
+    <meta name="HandheldFriendly" content="true"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <link rel="apple-touch-icon-precomposed" sizes="152x152" href="gitbook/images/apple-touch-icon-precomposed-152.png">
+    <link rel="shortcut icon" href="gitbook/images/favicon.ico" type="image/x-icon">
+
+    
+    <link rel="next" href="GLOSSARY.html" />
+    
+    
+    <link rel="prev" href="Changelog.html" />
+    
+
+    </head>
+    <body>
+        
+<div class="book">
+    <div class="book-summary">
+        
+            
+<div id="book-search-input" role="search">
+    <input type="text" placeholder="Type to search" />
+</div>
+
+            
+                <nav role="navigation">
+                
+
+
+<ul class="summary">
+    
+    
+
+    
+
+    
+        
+        
+    
+        <li class="chapter " data-level="1.1" data-path="./">
+            
+                <a href="./">
+            
+                    
+                    Introduction
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.2" data-path="Why.html">
+            
+                <a href="Why.html">
+            
+                    
+                    Why Nussknacker
+            
+                </a>
+            
+
+            
+        </li>
+    
+
+    
+        
+        <li class="divider"></li>
+        
+        
+    
+        <li class="chapter " data-level="2.1" data-path="Quickstart.html">
+            
+                <a href="Quickstart.html">
+            
+                    
+                    Quickstart
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="2.2" data-path="UI.html">
+            
+                <a href="UI.html">
+            
+                    
+                    UI Manual
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="2.3" data-path="DesigningProcesses.html">
+            
+                <a href="DesigningProcesses.html">
+            
+                    
+                    Designing processes
+            
+                </a>
+            
+
+            
+            <ul class="articles">
+                
+    
+        <li class="chapter " data-level="2.3.1" data-path="designingProcesses/BasicNodes.html">
+            
+                <a href="designingProcesses/BasicNodes.html">
+            
+                    
+                    Basic nodes
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="2.3.2" data-path="designingProcesses/Subprocesses.html">
+            
+                <a href="designingProcesses/Subprocesses.html">
+            
+                    
+                    Subprocesses
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="2.3.3" data-path="designingProcesses/FlinkCustomTransformers.html">
+            
+                <a href="designingProcesses/FlinkCustomTransformers.html">
+            
+                    
+                    Flink custom transformers
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="2.3.4" data-path="designingProcesses/Spel.html">
+            
+                <a href="designingProcesses/Spel.html">
+            
+                    
+                    SpEL
+            
+                </a>
+            
+
+            
+        </li>
+    
+
+            </ul>
+            
+        </li>
+    
+        <li class="chapter " data-level="2.4" data-path="Configuration.html">
+            
+                <a href="Configuration.html">
+            
+                    
+                    Configuration
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="2.5" data-path="Security.html">
+            
+                <a href="Security.html">
+            
+                    
+                    Security
+            
+                </a>
+            
+
+            
+        </li>
+    
+
+    
+        
+        <li class="divider"></li>
+        
+        
+    
+        <li class="chapter " data-level="3.1" data-path="Architecture.html">
+            
+                <a href="Architecture.html">
+            
+                    
+                    Architecture
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="3.2" data-path="Engines.html">
+            
+                <a href="Engines.html">
+            
+                    
+                    Engines
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="3.3" data-path="API.html">
+            
+                <a href="API.html">
+            
+                    
+                    API
+            
+                </a>
+            
+
+            
+        </li>
+    
+
+    
+        
+        <li class="divider"></li>
+        
+        
+    
+        <li class="chapter " data-level="4.1" data-path="Metrics.html">
+            
+                <a href="Metrics.html">
+            
+                    
+                    Monitoring
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="4.2" data-path="Install.html">
+            
+                <a href="Install.html">
+            
+                    
+                    How to install
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="4.3" data-path="Resources.html">
+            
+                <a href="Resources.html">
+            
+                    
+                    Resources
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="4.4" data-path="PoweredBy.html">
+            
+                <a href="PoweredBy.html">
+            
+                    
+                    Powered by Nussknacker
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="4.5" data-path="Roadmap.html">
+            
+                <a href="Roadmap.html">
+            
+                    
+                    Roadmap
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="4.6" data-path="Changelog.html">
+            
+                <a href="Changelog.html">
+            
+                    
+                    Changelog
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter active" data-level="4.7" data-path="MigrationGuide.html">
+            
+                <a href="MigrationGuide.html">
+            
+                    
+                    Migration guide
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="4.8" data-path="GLOSSARY.html">
+            
+                <a href="GLOSSARY.html">
+            
+                    
+                    Glossary
+            
+                </a>
+            
+
+            
+        </li>
+    
+
+    
+
+    <li class="divider"></li>
+
+    <li>
+        <a href="https://www.gitbook.com" target="blank" class="gitbook-link">
+            Published with GitBook
+        </a>
+    </li>
+</ul>
+
+
+                </nav>
+            
+        
+    </div>
+
+    <div class="book-body">
+        
+            <div class="body-inner">
+                
+                    
+
+<div class="book-header" role="navigation">
+    
+
+    <!-- Title -->
+    <h1>
+        <i class="fa fa-circle-o-notch fa-spin"></i>
+        <a href="." >Migration guide</a>
+    </h1>
+</div>
+
+
+
+
+                    <div class="page-wrapper" tabindex="-1" role="main">
+                        <div class="page-inner">
+                            
+<div id="book-search-results">
+    <div class="search-noresults">
+    
+                                <section class="normal markdown-section">
+                                
+                                <h1 id="migration-guide">Migration guide</h1>
+<p>To see biggest differences please consult the <a href="Changelog.html">changelog</a>.</p>
+<h2 id="in-version-040">In version 0.4.0</h2>
+<ul>
+<li><a href="https://github.com/TouK/nussknacker/pull/1845" target="_blank">#1845</a>
+<code>AuthenticatorData</code> has been renamed to <code>AuthenticationResources</code> and changed into a trait, <code>apply</code> construction has
+been preserved. <code>AuthenticatorFactory</code> and its <code>createAuthenticator</code>  method has been renamed to
+<code>AuthenticationProvider</code> and <code>createAuthenticationResources</code>. It is recommended to rename the main class of any custom
+authentication module to <code>&lt;Something&gt;AuthenticationProvider</code> accordingly.</li>
+<li><a href="https://github.com/TouK/nussknacker/pull/1542" target="_blank">#1542</a>
+<code>KafkaConfig</code> now has new parameter <code>topicsExistenceValidationConfig</code>. When <code>topicsExistenceValidationConfig.enabled = true</code>
+Kafka sources/sinks do not validate if provided topic does not exist and cluster is configured with <code>auto.create.topics.enable=false</code></li>
+<li><a href="https://github.com/TouK/nussknacker/pull/1416" target="_blank">#1416</a>
+<code>OAuth2Service</code> has changed. You can still use your old implementation by importing <code>OAuth2OldService</code> with an alias.
+<code>OAuth2ServiceFactory.create</code> method now accepts implicit parameters for an <code>ExecutionContext</code> and <code>sttp.HttpBackend</code>.
+You can ignore them to maintain previous behaviour, but it is always better to use them instead of locally defined ones.   </li>
+<li><a href="https://github.com/TouK/nussknacker/pull/1346" target="_blank">#1346</a> <code>AggregatorFunction</code> now takes type of stored state that can be 
+<code>immutable.SortedMap</code> (previous behaviour) or <code>java.util.Map</code> (using <a href="GLOSSARY.html#flink" class="glossary-term" title="Apache Flink&#xAE; is an open-source stream processing framework for distributed, high-performing, always-available, and accurate data streaming applications. See https://flink.apache.org/">Flink</a>&apos;s serialization) and <code>validatedStoredType</code> parameter for 
+providing better <code>TypeInformation</code> for aggregated values</li>
+<li><a href="https://github.com/TouK/nussknacker/pull/1343" target="_blank">#1343</a> <code>FirstAggregator</code> changed serialized state, it is not compatible, 
+<code>Aggregator</code> trait has new method <code>computeStoredType</code> </li>
+<li><a href="https://github.com/TouK/nussknacker/pull/1352" target="_blank">#1352</a> and <a href="https://github.com/TouK/nussknacker/pull/1568" target="_blank">#1568</a> AvroStringSettings class has been introduced, which allows control
+whether Avro type <code>string</code> is represented by <code>java.lang.String</code> (also in runtime) or <code>java.lang.CharSequence</code>
+(implemented in runtime by <code>org.apache.avro.util.Utf8</code>). This setting is available through environment variable 
+<code>AVRO_USE_STRING_FOR_STRING_TYPE</code> - default is <code>true</code>. Please mind that this setting is global - it applies to all processes running on <a href="GLOSSARY.html#flink" class="glossary-term" title="Apache Flink&#xAE; is an open-source stream processing framework for distributed, high-performing, always-available, and accurate data streaming applications. See https://flink.apache.org/">Flink</a>
+and also requires restarting TaskManager when changing the value.</li>
+<li><a href="https://github.com/TouK/nussknacker/pull/1361" target="_blank">#1361</a> Lazy variables are removed, you should use standard enrichers for those cases.
+Their handling has been source of many problems and they made it harder to reason about the exeuction of process.   </li>
+<li><a href="https://github.com/TouK/nussknacker/pull/1373" target="_blank">#1373</a> Creating <code>ClassLoaderModelData</code> directly is not allowed, use
+<code>ModelData.apply</code> with plain config, wrapping with ModelConfigToLoad by yourself is not needed.</li>
+<li><a href="https://github.com/TouK/nussknacker/pull/1406" target="_blank">#1406</a> <code>ServiceReturningType</code> is deprecated in favour of <code>EagerService</code> </li>
+<li><a href="https://gihub.com/TouK/nussknacker/pull/1445" target="_blank">#1445</a> <code>RecordFormatter</code> now handles <code>TestDataSplit</code> for Kafka sources. It is required in <code>KafkaSource</code> creation, instead of <code>TestDataSplit</code> </li>
+<li><a href="https://github.com/TouK/nussknacker/pull/1433" target="_blank">#1433</a> Pass DeploymentData to process via JobData, additional parameters to deployment methods are needed. Separate <code>ExternalDeploymentId</code> from <code>DeploymentId</code> (generated by NK)</li>
+<li><a href="https://github.com/TouK/nussknacker/pull/1466" target="_blank">#1466</a> <code>ProcessManager.deploy</code> can return <code>ExternalDeploymentId</code>       </li>
+<li><a href="https://github.com/TouK/nussknacker/pull/1464" target="_blank">#1464</a> <ul>
+<li>Slight change of API of <code>StringKeyedValueMapper</code></li>
+<li>Change of semantics of some parameters of <code>AggregatorFunction</code>, <code>AggregatorFunctionMixin</code> (storedAggregateType becomes aggregateElementType)  </li>
+</ul>
+</li>
+<li><a href="https://github.com/TouK/nussknacker/pull/1405" target="_blank">#1405</a> &apos;KafkaAvroSink&apos; requires more generic &apos;AvroSinkValue&apos; as value parameter</li>
+<li><a href="https://github.com/TouK/nussknacker/pull/1510" target="_blank">#1510</a><ul>
+<li>Change of <code>FlinkSource</code> API: sourceStream produces stream of initialized <code>Context</code> (<code>DataStream[Context]</code>)
+This initialization step was previously performed within <code>FlinkProcessRegistrar.registerSourcePart</code>. Now it happens explicitly within the <a href="GLOSSARY.html#flink" class="glossary-term" title="Apache Flink&#xAE; is an open-source stream processing framework for distributed, high-performing, always-available, and accurate data streaming applications. See https://flink.apache.org/">flink</a> source.</li>
+<li><code>FlinkIntermediateRawSource</code> is used as an extension to <a href="GLOSSARY.html#flink" class="glossary-term" title="Apache Flink&#xAE; is an open-source stream processing framework for distributed, high-performing, always-available, and accurate data streaming applications. See https://flink.apache.org/">flink</a> sources, it prepares source with typical stream transformations (add source function, set uid, assign timestamp, initialize <code>Context</code>)</li>
+<li><code>FlinkContextInitializer</code> is used to initialize <code>Context</code>. It provides map function that transforms raw event (produced by <a href="GLOSSARY.html#flink" class="glossary-term" title="Apache Flink&#xAE; is an open-source stream processing framework for distributed, high-performing, always-available, and accurate data streaming applications. See https://flink.apache.org/">flink</a> source function) into <code>Context</code> variable.
+Default implementation of <code>FlinkContextInitializer</code>, see <code>BasicFlinkContextInitializer</code>, sets raw event value to singe &quot;input&quot; variable.</li>
+<li>For sources based on <code>GenericNodeTransformation</code> it allows to initialize <code>Context</code> with more than one variable.
+Default implementation of initializer, see <code>BasicFlinkGenericContextInitializer</code>, provides default definition of variables as a <code>ValidationContext</code> with single &quot;input&quot; variable.
+The implementation requires to provide separately the definition of &quot;input&quot; variable type (<code>TypingResult</code>).
+See <code>GenericSourceWithCustomVariablesSample</code>.</li>
+<li>To enable &quot;test source&quot; functionality, a source needs to be extended with <code>SourceTestSupport</code>.</li>
+<li>For <a href="GLOSSARY.html#flink" class="glossary-term" title="Apache Flink&#xAE; is an open-source stream processing framework for distributed, high-performing, always-available, and accurate data streaming applications. See https://flink.apache.org/">flink</a> sources that use <code>TestDataParserProvider</code> switch to <code>FlinkSourceTestSupport</code> (which is used to provide &quot;test source&quot; functionality for <a href="GLOSSARY.html#flink" class="glossary-term" title="Apache Flink&#xAE; is an open-source stream processing framework for distributed, high-performing, always-available, and accurate data streaming applications. See https://flink.apache.org/">flink</a> sources).</li>
+<li>Old <code>TestDataParserProvider</code> is renamed to <code>SourceTestSupport</code></li>
+<li>To enable test data generator for &quot;test source&quot; , a source needs to be extended with both <code>SourceTestSupport</code> and <code>TestDataGenerator</code>.
+What was related to &quot;test source&quot; functionality and was obsolete in <code>FlinkSource</code> now is excluded to <code>FlinkSourceTestSupport</code>.</li>
+<li><code>FlinkCustomNodeContext</code> has access to <code>TypeInformationDetection</code>, it allows to get TypeInformation for the node stream mapping from ValidationContext.</li>
+<li>For kafka sources <code>RecordFormatter</code> parses raw test data to <code>ConsumerRecord</code> which fits into deserializer (instead of <code>ProducerRecord</code> that required another transformation).</li>
+<li>Definitions of names of common <code>Context</code> variables are moved to <code>VariableConstants</code> (instead of <code>Interpreter</code>).</li>
+</ul>
+</li>
+<li><a href="https://github.com/TouK/nussknacker/pull/1497" target="_blank">#1497</a> Changes in <code>PeriodicProcessManager</code>, change <code>PeriodicProperty</code> to <code>ScheduleProperty</code></li>
+<li><a href="https://github.com/TouK/nussknacker/pull/1499" target="_blank">#1499</a><ul>
+<li>trait <code>KafkaAvroDeserializationSchemaFactory</code> uses both key and value ClassTags and schemas (instead of value-only), check the order of parameters.</li>
+<li>ClassTag is provided in params in avro key-value deserialization schema factory: <code>KafkaAvroKeyValueDeserializationSchemaFactory</code></li>
+<li><code>BaseKafkaAvroSourceFactory</code> is able to read both key and value schema determiner to build proper DeserializationSchema (support for keys is not fully introduced in this change)</li>
+</ul>
+</li>
+<li><a href="https://github.com/TouK/nussknacker/pull/1514" target="_blank">#1514</a> <code>ExecutionConfigPreparer</code> has different method parameter - <code>JobData</code>, which has more info than previous parameters</li>
+<li><a href="https://github.com/TouK/nussknacker/pull/1532" target="_blank">#1532</a> <code>TypedObjectTypingResult#fields</code> uses now <code>scala.collection.immutable.ListMap</code> to keep fields order</li>
+<li><a href="https://github.com/TouK/nussknacker/pull/1546" target="_blank">#1546</a> <code>StandaloneCustomTransformer</code> now takes a list of <code>Context</code> objects, to process them in one go</li>
+<li><a href="https://github.com/TouK/nussknacker/pull/1556" target="_blank">#1557</a> Some classes from standalone engine were moved to standalone api to remove engine to (<a href="GLOSSARY.html#model" class="glossary-term" title="Model describes your processes, includes data structures, and nodes definitions.  ">model</a>) utils dependency:
+<code>StandaloneContext</code>, <code>StandaloneContextLifecycle</code>, <code>MetricsProvider</code></li>
+<li><a href="https://github.com/TouK/nussknacker/pull/1558" target="_blank">#1558</a> <code>FlinkProcessRegistrar</code> takes configuration directly from <code>FlinkProcessCompiler</code> (this can affect some tests setup)</li>
+<li><a href="https://github.com/TouK/nussknacker/pull/1631" target="_blank">#1631</a> Introduction of <code>nussknacker.config.locations</code> property, drop use of standard <code>config.file</code> property. <a href="GLOSSARY.html#model" class="glossary-term" title="Model describes your processes, includes data structures, and nodes definitions.  ">Model</a> configuration no longer has direct access to root UI config.</li>
+<li><p><a href="https://github.com/TouK/nussknacker/pull/1512" target="_blank">#1512</a></p>
+<ul>
+<li>Replaced <code>KafkaSourceFactory</code> with source based on <code>GenericNodeTransformation</code>, which gives access to setup of <code>ValidationContext</code> and <code>Context</code> initialization.
+To migrate <code>KafkaSourceFactory</code>:<ul>
+<li>provide deserializer factory (source factory requires deserialization to <code>ConsumerRecord</code>):<ul>
+<li>use <code>ConsumerRecordDeserializationSchemaFactory</code> with current <code>DeserializationSchema</code> as a value deserializer, add key deserializer (e.g. org.apache.kafka.common.serialization.StringDeserializer)</li>
+<li>or use <code>FixedValueDeserializationSchemaFactory</code> with simple key-as-string deserializer</li>
+</ul>
+</li>
+<li>provide RecordFormatterFactory<ul>
+<li>use <code>ConsumerRecordToJsonFormatterFactory</code> for whole key-value-and-metadata serialization</li>
+<li>or, for value-only-and-without-metadata scenario, you can use current <code>RecordFormater</code> wrapped in <code>FixedRecordFormatterFactoryWrapper</code></li>
+</ul>
+</li>
+<li>provide timestampAssigner that is able to extract time from <code>ConsumerRecord[K, V]</code></li>
+</ul>
+</li>
+<li>Removed <code>BaseKafkaSourceFactory</code> with multiple topics support:
+use <code>KafkaSourceFactory</code> instead, see &quot;source with two input topics&quot; test case</li>
+<li>Removed <code>SingleTopicKafkaSourceFactory</code>:
+use <code>KafkaSourceFactory</code> with custom <code>prepareInitialParameters</code>, <code>contextTransformation</code> and <code>extractTopics</code> to alter parameter list and provide constant topic value.</li>
+<li><code>TypingResultAwareTypeInformationCustomisation</code> is moved to package pl.touk.nussknacker.engine.<a href="GLOSSARY.html#flink" class="glossary-term" title="Apache Flink&#xAE; is an open-source stream processing framework for distributed, high-performing, always-available, and accurate data streaming applications. See https://flink.apache.org/">flink</a>.api.typeinformation</li>
+</ul>
+<p>Example of source with value-only deserialization and custom timestampAssigner:</p>
+<pre><code>// provide new deserializer factory with old schema definition for event&apos;s value
+val oldSchema = new EspDeserializationSchema[SampleValue](bytes =&gt; io.circe.parser.decode[SampleValue](new String(bytes)).right.get)
+val schemaFactory: KafkaDeserializationSchemaFactory[ConsumerRecord[String, SampleValue]] = new FixedValueDeserializationSchemaFactory(oldSchema)
+
+// ... provide timestampAssigner that extracts timestamp from SampleValue.customTimestampField
+// ... or use event&apos;s metadata: record.timestamp()
+def timestampExtractor(record: ConsumerRecord[String, SampleValue]): Long = record.value().customTimestampField
+val watermarkHandler = StandardTimestampWatermarkHandler.boundedOutOfOrderness[ConsumerRecord[String, SampleValue]](timestampExtractor, java.time.Duration.ofMinutes(10L))
+val timestampAssigner: Option[TimestampWatermarkHandler[ConsumerRecord[String, SampleValue]]] = Some(watermarkHandler)
+
+// ... provide RecordFormatterFactory that allows to generate and parse test data with key, headers and other metadata
+val formatterFactory: RecordFormatterFactory = new ConsumerRecordToJsonFormatterFactory[String, SampleValue]
+
+// ... and finally
+val sourceFactory = new KafkaSourceFactory[String, SampleValue](schemaFactory, timestampAssigner, formatterFactory, dummyProcessObjectDependencies)
+</code></pre></li>
+<li><p><a href="https://github.com/TouK/nussknacker/pull/1651" target="_blank">#1651</a> <code>KafkaAvroSourceFactory</code> provides additional #inputMeta variable with event&apos;s metadata.</p>
+<ul>
+<li>That source now has key and value type parameters. That parameters are relevant for sources handling <code>SpecificRecord</code>s. For <code>GenericRecords</code> use explicitly <code>KafkaAvroSourceFactory[Any, Any]</code>.</li>
+<li><code>SpecificRecordKafkaAvroSourceFactory</code> extends whole <code>KafkaAvroSourceFactory</code> with context validation and initialization</li>
+<li>New flag in <code>KafkaConfig</code>: <code>useStringForKey</code> determines if event&apos;s key should be intepreted as ordinary String (which is default scenario). It is used in deserialization and for generating/parsing test data.</li>
+<li><code>SchemaRegistryProvider</code> now provides factories to produce SchemaRegistryClient and RecordFormatter.</li>
+<li>For <code>ConfluentSchemaRegistryProvider</code> KafkaConfig and ProcessObjectDependencies (that contains KafkaConfig data) are no longer required. That configuration is required by factories in the moment the creation of requested objects
+that happens in <code>KafkaAvroSourceFactory</code> (and that makes that all objects within <code>KafkaAvroSourceFactory</code> see the same kafka configuration).</li>
+<li>Removed:<ul>
+<li><code>BaseKafkaAvroSourceFactory</code>, the class is incorporated into <code>KafkaAvroSourceFactory</code> to provide elastic approach to create KafkaSource</li>
+<li><code>with ReturningType</code> for generic types (this is defined by ValidationContext, see also <code>KafkaContextInitializer</code> that allows to return more than one variable)</li>
+<li><code>KafkaAvroValueDeserializationSchemaFactory</code> (source requires deserialization to <code>ConsumerRecord[K, V]</code>, there are only deserializers based on <code>KafkaAvroKeyValueDeserializationSchemaFactory</code>)</li>
+<li><code>ConfluentKafkaAvroDeserializationSchemaFactory</code>, use <code>ConfluentKeyValueKafkaAvroDeserializationFactory</code></li>
+<li><code>TupleAvroKeyValueKafkaAvroDeserializerSchemaFactory</code>, this approach is deprecated due to #inputMeta variable that contains key data</li>
+</ul>
+</li>
+</ul>
+<p>To migrate <code>KafkaAvroSourceFactory</code>:</p>
+<ul>
+<li>Provide <code>KafkaConfig</code> with correct <code>useStringForKey</code> flag value. By default we want to EvictableStatehandle keys as ordinary String and all topics related to such config require only value schema definitions (key schemas are ignored).
+For specific scenario, when complex key with its own schema is provided, this flag is false and all topics related to this config require both key and value schema definitions.
+Example of default KafkaConfig override:
+<code>override protected def prepareKafkaConfig: KafkaConfig = super.prepareKafkaConfig.copy(useStringForKey = false)</code></li>
+<li>provide your own <code>SchemaRegistryProvider</code> (or use <code>ConfluentSchemaRegistryProvider</code>)</li>
+<li>custom RecordFormatter can be wrapped in <code>FixedRecordFormatterFactoryWrapper</code> (or keep <code>ConfluentAvroToJsonFormatterFactory</code>)</li>
+<li>provide timestampAssigner that is able to extract time from <code>ConsumerRecord[K, V]</code> (see example above)</li>
+</ul>
+</li>
+<li><a href="https://github.com/TouK/nussknacker/pull/1741" target="_blank">#1741</a> Minor changes in <code>KafkaUtils</code>, <code>NonTransientException</code> uses <code>Instant</code> instead of <code>LocalDateTime</code></li>
+<li><a href="https://github.com/TouK/nussknacker/pull/1806" target="_blank">#1806</a> Remove old, deprecated API:<ul>
+<li><code>EvictableState</code>, <code>RichEvictableState</code> - use <code>EvictableStateFunction</code></li>
+<li><code>checkpointInterval</code> - use <code>checkpointConfig.checkpointInterval</code></li>
+<li>old versions of <code>sampleTransformers</code> - use newer ones</li>
+<li><code>MiniClusterExecutionEnvironment.runningJobs()</code> - use <code>flinkMiniClusterHolder.runningJobs()</code>  </li>
+</ul>
+</li>
+<li><a href="https://github.com/TouK/nussknacker/pull/1807" target="_blank">#1807</a> Removed <code>jdbcServer</code>, please use Postgres for production-ready setups</li>
+<li><a href="https://github.com/TouK/nussknacker/pull/1799" target="_blank">#1799</a><ul>
+<li>RecordFormatterFactory instead of one, uses two type parameters: K, V</li>
+<li>ConfluentAvroToJsonFormatter is produced by ConfluentAvroToJsonFormatterFactory</li>
+<li>ConfluentAvroToJsonFormatter produces test data in valid json format, does not use Separator</li>
+<li>ConfluentAvroMessageFormatter has asJson method instead of writeTo</li>
+<li>ConfluentAvroMessageReader has readJson method instead of readMessage
+Example test data object:<pre><code>{&quot;keySchemaId&quot;:null,&quot;valueSchemaId&quot;:1,&quot;consumerRecord&quot;:{&quot;key&quot;:null,&quot;value&quot;:{&quot;first&quot;:&quot;Jan&quot;,&quot;last&quot;:&quot;Kowalski&quot;},&quot;topic&quot;:&quot;testAvroRecordTopic1&quot;,&quot;partition&quot;:0,&quot;offset&quot;:0,&quot;timestamp&quot;:1624279687756,&quot;timestampType&quot;:&quot;CreateTime&quot;,&quot;headers&quot;:{},&quot;leaderEpoch&quot;:0}}
+</code></pre></li>
+</ul>
+</li>
+<li><a href="https://github.com/TouK/nussknacker/pull/1663" target="_blank">#1663</a> Default <code>FlinkExceptionHandler</code> implementations are deprecated, use <code>ConfigurableExceptionHandler</code> instead.</li>
+<li><a href="https://github.com/TouK/nussknacker/pull/1731" target="_blank">#1731</a> RockDB config&apos;s flag <code>incrementalCheckpoints</code> is turned on by default.</li>
+<li><a href="https://github.com/TouK/nussknacker/pull/1825" target="_blank">#1825</a> Default dashboard renamed from <code>flink-esp</code> to <code>nussknacker-scenario</code></li>
+<li><a href="https://github.com/TouK/nussknacker/pull/1836" target="_blank">#1836</a> Change default <code>kafka.consumerGroupNamingStrategy</code> to <code>processId-nodeId</code>.     </li>
+<li><a href="https://github.com/TouK/nussknacker/pull/1357" target="_blank">#1357</a> Run mode added to nodes. <code>ServiceInvoker</code> interface was extended with new, implicit <code>runMode</code> parameter. </li>
+<li><a href="https://github.com/TouK/nussknacker/pull/1836" target="_blank">#1836</a> Change default <code>kafka.consumerGroupNamingStrategy</code> to <code>processId-nodeId</code>.</li>
+<li><a href="https://github.com/TouK/nussknacker/pull/1886" target="_blank">#1886</a> aggregate-sliding with emitWhenEventLeft = true, aggregate-tumbling and aggregate-session components now
+doesn&apos;t emit full context of variables that were before node (because of performance reasons and because that wasn&apos;t obvious which one context is emitted).
+If you want to emit some information other than aggregated value and key (availabled via new <code>#key</code> variable), you should use <code>#AGG.map</code> expression in <code>aggregateBy</code>.</li>
+<li><a href="https://github.com/TouK/nussknacker/pull/1910" target="_blank">#1910</a> <code>processTypes</code> renamed to <code>scenarioTypes</code>. You can still use old <code>processTypes</code> configuration. Old configuration will be removed in version <code>0.5.0</code>. </li>
+<li>Various naming changes:<ul>
+<li><a href="https://github.com/TouK/nussknacker/pull/1917" target="_blank">#1917</a> configuration of <code>engineConfig</code> to <code>deploymentConfig</code>                           </li>
+<li><a href="https://github.com/TouK/nussknacker/pull/1921" target="_blank">#1921</a> <code>ProcessManager</code> to <code>DeploymentManager</code>                           </li>
+<li><a href="https://github.com/TouK/nussknacker/pull/1927" target="_blank">#1927</a> Rename <code>outer-join</code> to <code>single-side-join</code></li>
+</ul>
+</li>
+</ul>
+<h2 id="in-version-030">In version 0.3.0</h2>
+<ul>
+<li><a href="https://github.com/TouK/nussknacker/pull/1313" target="_blank">#1313</a> Kafka Avro API passes <code>KafkaConfig</code> during <code>TypeInformation</code> determining</li>
+<li><a href="https://github.com/TouK/nussknacker/pull/1305" target="_blank">#1305</a> Kafka Avro API passes <code>RuntimeSchemaData</code> instead of <code>Schema</code> in various places</li>
+<li><a href="https://github.com/TouK/nussknacker/pull/1304" target="_blank">#1304</a> <code>SerializerWithSpecifiedClass</code> was moved to <code>flink-api</code> module.</li>
+<li><a href="https://github.com/TouK/nussknacker/pull/1044" target="_blank">#1044</a> Upgrade to <a href="GLOSSARY.html#flink" class="glossary-term" title="Apache Flink&#xAE; is an open-source stream processing framework for distributed, high-performing, always-available, and accurate data streaming applications. See https://flink.apache.org/">Flink</a> 1.11. Current watermark/timestamp mechanisms are deprectated in <a href="GLOSSARY.html#flink" class="glossary-term" title="Apache Flink&#xAE; is an open-source stream processing framework for distributed, high-performing, always-available, and accurate data streaming applications. See https://flink.apache.org/">Flink</a> 1.11, 
+new API <code>TimestampWatermarkHandler</code> is introduced, with <code>LegacyTimestampWatermarkHandler</code> as wrapper for previous mechanisms.</li>
+<li><a href="https://github.com/TouK/nussknacker/pull/1244" target="_blank">#1244</a> <code>Parameter</code> has new parameter &apos;variablesToHide&apos; with <code>Set</code> of variable names
+that will be hidden before parameter&apos;s evaluation</li>
+<li><a href="https://github.com/TouK/nussknacker/pull/1159" target="_blank">#1159</a> <a href="https://github.com/TouK/nussknacker/pull/1170" target="_blank">#1170</a> Changes in <code>GenericNodeTransformation</code> API:<ul>
+<li>Now <code>implementation</code> takes additional parameter with final state value determined during <code>contextTransformation</code></li>
+<li><code>DefinedLazyParameter</code> and <code>DefinedEagerParameter</code> holds <code>expression: TypedExpression</code> instead of <code>returnType: TypingResult</code></li>
+<li><code>DefinedLazyBranchParameter</code> and <code>DefinedEagerBranchParameter</code> holds <code>expressionByBranchId: Map[String, TypedExpression]</code> instead of <code>returnTypeByBranchId: Map[String, TypingResult]</code></li>
+</ul>
+</li>
+<li><p><a href="https://github.com/TouK/nussknacker/pull/1083" target="_blank">#1083</a></p>
+<ul>
+<li>Now <code>SimpleSlidingAggregateTransformerV2</code> and <code>SlidingAggregateTransformer</code> is deprecated in favour of <code>SlidingAggregateTransformerV2</code></li>
+<li>Now <code>SimpleTumblingAggregateTransformer</code> is deprecated in favour of <code>TumblingAggregateTransformer</code></li>
+<li>Now <code>SumAggregator</code>, <code>MaxAggregator</code> and <code>MinAggregator</code> doesn&apos;t change type of aggregated value (previously was changed to Double)</li>
+<li>Now <code>SumAggregator</code>, <code>MaxAggregator</code> and <code>MinAggregator</code> return null instead of <code>0D</code>/<code>Double.MaxValue</code>/<code>Double.MinValue</code> for case when there was no element added before <code>getResult</code></li>
+</ul>
+</li>
+<li><p><a href="https://github.com/TouK/nussknacker/pull/1149" target="_blank">#1149</a> FlinkProcessRegistrar refactor (can affect test code) </p>
+</li>
+<li><a href="https://github.com/TouK/nussknacker/pull/1166" target="_blank">#1166</a> <code>model.conf</code> should be renamed to <code>defaultModelConfig.conf</code></li>
+<li><a href="https://github.com/TouK/nussknacker/pull/1218" target="_blank">#1218</a> FlinkProcessManager is no longer bundled in ui uber-jar. In docker/tgz distribution</li>
+<li><a href="https://github.com/TouK/nussknacker/pull/1255" target="_blank">#1255</a> Moved displaying <code>Metrics tab</code> to <code>customTabs</code></li>
+<li><a href="https://github.com/TouK/nussknacker/pull/1257" target="_blank">#1257</a> Improvements: <a href="GLOSSARY.html#flink" class="glossary-term" title="Apache Flink&#xAE; is an open-source stream processing framework for distributed, high-performing, always-available, and accurate data streaming applications. See https://flink.apache.org/">Flink</a> test util package<ul>
+<li>Added methods: <code>cancelJob</code>, <code>submitJob</code>, <code>listJobs</code>, <code>runningJobs</code> to <code>FlinkMiniClusterHolder</code></li>
+<li>Deprecated: <code>runningJobs</code>, from <code>MiniClusterExecutionEnvironment</code></li>
+<li>Removed: <code>getClusterClient</code> from <code>FlinkMiniClusterHolder</code> interface, because of <a href="GLOSSARY.html#flink" class="glossary-term" title="Apache Flink&#xAE; is an open-source stream processing framework for distributed, high-performing, always-available, and accurate data streaming applications. See https://flink.apache.org/">flink</a> compatibility at <a href="GLOSSARY.html#flink" class="glossary-term" title="Apache Flink&#xAE; is an open-source stream processing framework for distributed, high-performing, always-available, and accurate data streaming applications. See https://flink.apache.org/">Flink</a> 1.9 </li>
+<li>Renamed: <code>FlinkStreamingProcessRegistrar</code> to <code>FlinkProcessManager</code></li>
+</ul>
+</li>
+<li><a href="https://github.com/TouK/nussknacker/pull/1303" target="_blank">#1303</a> TypedObjectTypingResult has a new field: additionalInfo</li>
+</ul>
+<h2 id="in-version-020">In version 0.2.0</h2>
+<ul>
+<li><a href="https://github.com/TouK/nussknacker/pull/1104" target="_blank">#1104</a> Creation of <code>FlinkMiniCluster</code> is now extracted from <code>StoppableExecutionEnvironment</code>. You should create it using e.g.:<pre><code>val flinkMiniClusterHolder = FlinkMiniClusterHolder(FlinkTestConfiguration.configuration(parallelism))
+flinkMiniClusterHolder.start()
+</code></pre>and then create environment using:<pre><code>flinkMiniClusterHolder.createExecutionEnvironment()
+</code></pre>. At the end you should cleanup <code>flinkMiniClusterHolder</code> by:<pre><code>flinkMiniClusterHolder.stop()
+</code></pre>. <code>FlinkMiniClusterHolder</code> should be created once for test class - it is thread safe and resource expensive. <code>MiniClusterExecutionEnvironment</code> in the other hand should be created for each process.
+It is not thread safe because underlying <code>StreamExecutionEnvironment</code> is not. You can use <code>FlinkSpec</code> to achieve that.</li>
+<li><a href="https://github.com/TouK/nussknacker/pull/1077" target="_blank">#1077</a><ul>
+<li><code>pl.touk.nussknacker.engine.queryablestate.QueryableClient</code> was moved from <code>queryableState</code> module to <code>pl.touk.nussknacker.engine.api.queryablestate</code> package in <code>api</code> module</li>
+<li><code>pl.touk.nussknacker.engine.queryablestate.QueryableState</code> was moved to <code>pl.touk.nussknacker.engine.api.queryablestate</code></li>
+<li>CustomTransformers from <code>pl.touk.nussknacker.engine.flink.util.transformer</code> in <code>flinkUtil</code> module were moved to new <code>flinkModelUtil</code> module.</li>
+<li><code>pl.touk.nussknacker.engine.testing.EmptyProcessConfigCreator</code> was moved from <code>interpreter</code> module to <code>pl.touk.nussknacker.engine.util.process</code> package in <code>util</code> module</li>
+</ul>
+</li>
+<li><a href="https://github.com/TouK/nussknacker/pull/1039" target="_blank">#1039</a> Generic parameter of <code>LazyParameter[T]</code> has upper bound AnyRef now to avoid problems with bad type extraction.
+It caused changes <code>Any</code> to <code>AnyRef</code> in a few places - mainly <code>FlinkLazyParameterFunctionHelper</code> and <code>FlinkCustomStreamTransformation</code></li>
+<li><a href="https://github.com/TouK/nussknacker/pull/1039" target="_blank">#1039</a> <code>FlinkStreamingProcessRegistrar.apply</code> has a new parameter of type <code>ExecutionConfigPreparer</code>.
+In production code you should pass <code>ExecutionConfigPreparer.defaultChain()</code> there and in test code you should pass <code>ExecutionConfigPreparer.unOptimizedChain()</code>. See scaladocs for more info.
+If you already have done some <a href="GLOSSARY.html#flink" class="glossary-term" title="Apache Flink&#xAE; is an open-source stream processing framework for distributed, high-performing, always-available, and accurate data streaming applications. See https://flink.apache.org/">Flink</a>&apos;s <code>ExecutionConfig</code> set up before you&apos;ve registered process, you should consider create your own chain using <code>ExecutionConfigPreparer.chain()</code>.</li>
+<li><a href="https://github.com/TouK/nussknacker/pull/1039" target="_blank">#1039</a> <code>FlinkSourceFactory</code> doesn&apos;t take <code>TypeInformation</code> type class as a generic parameter now. Instead of this, it takes <code>ClassTag</code>.
+<code>TypeInformation</code> is determined during source creation. <code>typeInformation[T]</code> method was moved from <code>BasicFlinkSource</code> to <code>FlinkSource</code> because still must be some place to determine it for tests purpose.</li>
+<li><a href="https://github.com/TouK/nussknacker/pull/965" target="_blank">#965</a> &apos;aggregate&apos; node in generic <a href="GLOSSARY.html#model" class="glossary-term" title="Model describes your processes, includes data structures, and nodes definitions.  ">model</a> was renamed to &apos;aggregate-sliding&apos;</li>
+<li><p><a href="https://github.com/TouK/nussknacker/pull/922" target="_blank">#922</a> HealthCheck API has new structure, naming and json responses:</p>
+<ul>
+<li>old <code>/healthCheck</code> is moved to <code>/healthCheck/process/deployment</code></li>
+<li>old <code>/sanityCheck</code> is moved to <code>/healthCheck/process/validation</code></li>
+<li>top level <code>/healthCheck</code> indicates general &quot;app-is-running&quot; state</li>
+</ul>
+</li>
+<li><p><a href="https://github.com/TouK/nussknacker/pull/879" target="_blank">#879</a> Metrics use variables by default, see <a href="https://github.com/TouK/nussknacker/blob/staging/docs/Metrics.md" target="_blank">docs</a>
+to enable old mode, suitable for graphite protocol. To use old way of sending:</p>
+<ul>
+<li>put <code>globalParameters.useLegacyMetrics = true</code> in each <a href="GLOSSARY.html#model" class="glossary-term" title="Model describes your processes, includes data structures, and nodes definitions.  ">model</a> configuration (to configure metrics sending in <a href="GLOSSARY.html#flink" class="glossary-term" title="Apache Flink&#xAE; is an open-source stream processing framework for distributed, high-performing, always-available, and accurate data streaming applications. See https://flink.apache.org/">Flink</a>)</li>
+<li><p>put: </p>
+<pre><code>countsSettings {
+user: ...
+password: ...
+influxUrl: ...
+metricsConfig {
+  nodeCountMetric: &quot;nodeCount.count&quot;
+  sourceCountMetric: &quot;source.count&quot;
+  nodeIdTag: &quot;action&quot;
+  countField: &quot;value&quot;
+
+}
+}
+</code></pre></li>
+</ul>
+</li>
+<li>Introduction to KafkaAvro API: 
+  <a href="https://github.com/TouK/nussknacker/pull/871" target="_blank">#871</a>, 
+  <a href="https://github.com/TouK/nussknacker/pull/881" target="_blank">#881</a>, 
+  <a href="https://github.com/TouK/nussknacker/pull/903" target="_blank">#903</a>, 
+  <a href="https://github.com/TouK/nussknacker/pull/981" target="_blank">#981</a>, 
+  <a href="https://github.com/TouK/nussknacker/pull/989" target="_blank">#989</a>, 
+  <a href="https://github.com/TouK/nussknacker/pull/998" target="_blank">#998</a>, 
+  <a href="https://github.com/TouK/nussknacker/pull/1007" target="_blank">#1007</a>, 
+  <a href="https://github.com/TouK/nussknacker/pull/1014" target="_blank">#1014</a>,
+  <a href="https://github.com/TouK/nussknacker/pull/1034" target="_blank">#1034</a>,
+  <a href="https://github.com/TouK/nussknacker/pull/1041" target="_blank">#1041</a></li>
+</ul>
+<p>API for <code>KafkaAvroSourceFactory</code> was changed:</p>
+<p><code>KafkaAvroSourceFactory</code> old way:</p>
+<pre><code>val clientFactory = new SchemaRegistryClientFactory
+val source = new KafkaAvroSourceFactory(
+  new AvroDeserializationSchemaFactory[GenericData.Record](clientFactory, useSpecificAvroReader = false),
+  clientFactory,
+  None,
+  processObjectDependencies = processObjectDependencies
+)
+</code></pre><p><code>KafkaAvroSourceFactory</code> new way :</p>
+<pre><code>val schemaRegistryProvider = ConfluentSchemaRegistryProvider(processObjectDependencies)
+val source = new KafkaAvroSourceFactory(schemaRegistryProvider, processObjectDependencies, None)
+</code></pre><p>Provided new API for Kafka Avro Sink:</p>
+<pre><code>val kafkaAvroSinkFactory = new KafkaAvroSinkFactory(schemaRegistryProvider, processObjectDependencies)
+</code></pre><p>Additional changes:</p>
+<ul>
+<li>Bump up confluent package to 5.5.0</li>
+<li>(Refactor Kafka API) Moved <code>KafkaSourceFactory</code> to <code>pl.touk.nussknacker.engine.kafka.sink</code> package</li>
+<li>(Refactor Kafka API) Changed <code>BaseKafkaSourceFactory</code>, now it requires <code>deserializationSchemaFactory: KafkaDeserializationSchemaFactory[T]</code></li>
+<li>(Refactor Kafka API) Moved <code>KafkaSinkFactory</code> to <code>pl.touk.nussknacker.engine.kafka.source</code> package</li>
+<li>(Refactor Kafka API) Renamed <code>SerializationSchemaFactory</code> to <code>KafkaSerializationSchemaFactory</code></li>
+<li>(Refactor Kafka API) Renamed <code>DeserializationSchemaFactory</code> to <code>KafkaDeserializationSchemaFactory</code></li>
+<li>(Refactor Kafka API) Renamed <code>FixedDeserializationSchemaFactory</code> to <code>FixedKafkaDeserializationSchemaFactory</code></li>
+<li>(Refactor Kafka API) Renamed <code>FixedSerializationSchemaFactory</code> to <code>FixedKafkaSerializationSchemaFactory</code></li>
+<li>(Refactor Kafka API) Removed <code>KafkaSerializationSchemaFactoryBase</code></li>
+<li>(Refactor Kafka API) Replaced <code>KafkaKeyValueSerializationSchemaFactoryBase</code> by <code>KafkaAvroKeyValueSerializationSchemaFactory</code> (it handles only avro case now)</li>
+<li>(Refactor Kafka API) Removed <code>KafkaDeserializationSchemaFactoryBase</code></li>
+<li>(Refactor Kafka API) Replaced <code>KafkaKeyValueDeserializationSchemaFactoryBase</code> by <code>KafkaAvroKeyValueDeserializationSchemaFactory</code> (it handles only avro case now)</li>
+<li>(Refactor KafkaAvro API) Renamed <code>AvroDeserializationSchemaFactory</code> to <code>ConfluentKafkaAvroDeserializationSchemaFactory</code> and moved to <code>avro.schemaregistry.confluent</code> package</li>
+<li>(Refactor KafkaAvro API) Renamed <code>AvroKeyValueDeserializationSchemaFactory</code> to <code>ConfluentKafkaAvroDeserializationSchemaFactory</code> and moved to <code>avro.schemaregistry.confluent</code> package</li>
+<li>(Refactor KafkaAvro API) Renamed <code>AvroSerializationSchemaFactory</code> to <code>ConfluentAvroSerializationSchemaFactory</code> and moved to <code>avro.schemaregistry.confluent</code> package</li>
+<li>(Refactor KafkaAvro API) Renamed <code>AvroKeyValueSerializationSchemaFactory</code> to <code>ConfluentAvroKeyValueSerializationSchemaFactory</code> and moved to <code>avro.schemaregistry.confluent</code> package</li>
+<li>(Refactor KafkaAvro API) Removed <code>FixedKafkaAvroSourceFactory</code> and <code>FixedKafkaAvroSinkFactory</code> (now we don&apos;t support fixed schema)</li>
+<li>(Refactor Kafka API) Replaced <code>topics: List[String]</code> by <code>List[PreparedKafkaTopic]</code> and removed <code>processObjectDependencies</code> in <code>KafkaSource</code></li>
+</ul>
+<p>Be aware that we are using avro 1.9.2 instead of default <a href="GLOSSARY.html#flink" class="glossary-term" title="Apache Flink&#xAE; is an open-source stream processing framework for distributed, high-performing, always-available, and accurate data streaming applications. See https://flink.apache.org/">Flink</a>&apos;s 1.8.2 (for java time logical types conversions purpose).</p>
+<ul>
+<li><a href="https://github.com/TouK/nussknacker/pull/1013" target="_blank">#1013</a> Expression evaluation is synchronous now. It shouldn&apos;t cause any problems 
+(all languages were synchronous anyway), but some internal code may have to change.</li>
+</ul>
+<h2 id="in-version-012">In version 0.1.2</h2>
+<ul>
+<li><a href="https://github.com/TouK/nussknacker/pull/957" target="_blank">#957</a> Custom node <code>aggregate</code> from <code>generic</code> <a href="GLOSSARY.html#model" class="glossary-term" title="Model describes your processes, includes data structures, and nodes definitions.  ">model</a> has changed parameter 
+from <code>windowLengthInSeconds</code> to <code>windowLength</code> with human friendly duration input. If you have used it in process, you need
+to insert correct value again.</li>
+<li><a href="https://github.com/TouK/nussknacker/pull/954" target="_blank">#954</a> <code>TypedMap</code> is not a case class wrapping scala Map anymore. If you have
+done some pattern matching on it, you should use <code>case typedMap: TypedMap =&gt; typedMap.asScala</code> instead.</li>
+</ul>
+<h2 id="in-version-011">In version 0.1.1</h2>
+<ul>
+<li><a href="https://github.com/TouK/nussknacker/pull/930" target="_blank">#930</a> <code>DeeplyCheckingExceptionExtractor</code> was moved from <code>nussknacker-flink-util</code>
+module to <code>nussknacker-util</code> module.</li>
+<li><a href="https://github.com/TouK/nussknacker/pull/919" target="_blank">#919</a> <code>KafkaSource</code> constructor now doesn&apos;t take <code>consumerGroup</code>. Instead of this
+it computes <code>consumerGroup</code> on their own based on <code>kafka.consumerGroupNamingStrategy</code> in <code>modelConfig</code> (default set to <code>processId</code>).
+You can also override it by <code>overriddenConsumerGroup</code> optional parameter.
+Regards to this changes, <code>KafkaConfig</code> has new, optional parameter <code>consumerGroupNamingStrategy</code>.</li>
+<li><a href="https://github.com/TouK/nussknacker/pull/920" target="_blank">#920</a> <code>KafkaSource</code> constructor now takes <code>KafkaConfig</code> instead of using one
+that was parsed by <code>BaseKafkaSourceFactory.kafkaConfig</code>. Also if you parse Typesafe Config to <code>KafkaSource</code> on your own, now you should
+use dedicated method <code>KafkaConfig.parseConfig</code> to avoid further problems when parsing strategy will be changed.</li>
+<li><a href="https://github.com/TouK/nussknacker/pull/914" target="_blank">#914</a> <code>pl.touk.nussknacker.engine.api.definition.Parameter</code> has deprecated
+main factory method with <code>runtimeClass</code> parameter. Now should be passed <code>isLazyParameter</code> instead. Also were removed <code>runtimeClass</code>
+from variances of factory methods prepared for easy testing (<code>optional</code> method and so on).</li>
+</ul>
+<h2 id="in-version-010">In version 0.1.0</h2>
+<ul>
+<li><a href="https://github.com/TouK/nussknacker/pull/755" target="_blank">#755</a> Default async execution context does not depend on parallelism.
+<code>asyncExecutionConfig.parallelismMultiplier</code> has been deprecated and should be replaced with <code>asyncExecutionConfig.workers</code>.
+8 should be sane default value.</li>
+<li><a href="https://github.com/TouK/nussknacker/pull/722" target="_blank">#722</a> Old way of configuring <a href="GLOSSARY.html#flink" class="glossary-term" title="Apache Flink&#xAE; is an open-source stream processing framework for distributed, high-performing, always-available, and accurate data streaming applications. See https://flink.apache.org/">Flink</a> and <a href="GLOSSARY.html#model" class="glossary-term" title="Model describes your processes, includes data structures, and nodes definitions.  ">model</a> (via <code>flinkConfig</code> and <code>processConfig</code>) is removed.
+<code>processTypes</code> configuration should be used from now on. Example:<pre><code>  flinkConfig {...}
+  processConfig {...}
+</code></pre>  becomes:<pre><code>  processTypes {
+    &quot;type e.g. streaming&quot; {
+      deploymentConfig { 
+        type: &quot;flinkStreaming&quot;
+        PUT HERE PROPERTIES OF flinkConfig FROM OLD CONFIG 
+      }
+      modelConfig {
+        classPath: PUT HERE VALUE OF flinkConfig.classPath FROM OLD CONFIG
+        PUT HERE PROPERTIES OF processConfig FROM OLD CONFIG
+      }
+    }
+  }
+</code></pre></li>
+<li><a href="https://github.com/TouK/nussknacker/pull/763" target="_blank">#763</a> Some API traits (ProcessManager, DictRegistry DictQueryService, CountsReporter) now extend <code>java.lang.AutoCloseable</code>.</li>
+<li>Old way of additional properties configuration should be replaced by the new one, which is now mapped to <code>Map[String, AdditionalPropertyConfig]</code>. Example in your config:<pre><code>  additionalFieldsConfig: {
+    mySelectProperty {
+      label: &quot;Description&quot;
+      type: &quot;select&quot;
+      isRequired: false
+      values: [&quot;true&quot;, &quot;false&quot;]
+    }
+  }
+</code></pre>  becomes:<pre><code>  additionalPropertiesConfig {
+    mySelectProperty {
+      label: &quot;Description&quot;
+      defaultValue: &quot;false&quot;
+      editor: {
+        type: &quot;FixedValuesParameterEditor&quot;,
+        possibleValues: [
+          {&quot;label&quot;: &quot;Yes&quot;, &quot;expression&quot;: &quot;true&quot;},
+          {&quot;label&quot;: &quot;No&quot;, &quot;expression&quot;: &quot;false&quot;}
+        ]
+      }
+    }
+  }
+</code></pre></li>
+<li><a href="https://github.com/TouK/nussknacker/pull/588" target="_blank">#588</a> <a href="https://github.com/TouK/nussknacker/pull/882" target="_blank">#882</a> <code>FlinkSource</code> API changed, current implementation is now <code>BasicFlinkSource</code></li>
+<li><a href="https://github.com/TouK/nussknacker/pull/839" target="_blank">#839</a> <a href="https://github.com/TouK/nussknacker/pull/882" target="_blank">#882</a> <code>FlinkSink</code> API changed, current implementation is now <code>BasicFlinkSink</code></li>
+<li><a href="https://github.com/TouK/nussknacker/pull/841" target="_blank">#841</a> <code>ProcessConfigCreator</code> API changed; note that currently all process objects are invoked with <code>ProcessObjectDependencies</code> as a parameter. The APIs of <code>KafkaSinkFactory</code>, <code>KafkaSourceFactory</code>, and all their implementations were changed. <code>Config</code> is available as property of <code>ProcessObjectDependencies</code> instance.</li>
+<li><a href="https://github.com/TouK/nussknacker/pull/863" target="_blank">#863</a> <code>restUrl</code> in <code>deploymentConfig</code> need to be preceded with protocol. Host with port only is not allowed anymore.</li>
+<li>Rename <code>grafanaSettings</code> to <code>metricsSettings</code> in configuration.</li>
+</ul>
+<h2 id="in-version-0012">In version 0.0.12</h2>
+<ul>
+<li>Upgrade to <a href="GLOSSARY.html#flink" class="glossary-term" title="Apache Flink&#xAE; is an open-source stream processing framework for distributed, high-performing, always-available, and accurate data streaming applications. See https://flink.apache.org/">Flink</a> 1.7</li>
+<li>Refactor of custom transformations, dictionaries, unions, please look at samples in example or generic to see API changes</li>
+<li>Considerable changes to authorization configuration, please look at sample config to see changes</li>
+<li>Circe is now used by default instead of Argonaut, but still can use Argonaut in Displayable</li>
+</ul>
+<h2 id="in-version-0011">In version 0.0.11</h2>
+<ul>
+<li>Changes in CustomStreamTransformer implementation, LazyInterpreter became LazyParameter, please look at samples to see changes in API</li>
+</ul>
+<h2 id="in-version-008">In version 0.0.8</h2>
+<ul>
+<li>Upgrade to <a href="GLOSSARY.html#flink" class="glossary-term" title="Apache Flink&#xAE; is an open-source stream processing framework for distributed, high-performing, always-available, and accurate data streaming applications. See https://flink.apache.org/">Flink</a> 1.4</li>
+<li>Change of format of <a href="GLOSSARY.html#flink" class="glossary-term" title="Apache Flink&#xAE; is an open-source stream processing framework for distributed, high-performing, always-available, and accurate data streaming applications. See https://flink.apache.org/">Flink</a> cluster configuration</li>
+<li>Parameters of sources and sinks are expressions now - automatic update of DB is available</li>
+<li>Change of configuration of Grafana dashboards</li>
+<li>Custom processes are defined in main configuration file now</li>
+</ul>
+
+                                
+                                </section>
+                            
+    </div>
+    <div class="search-results">
+        <div class="has-results">
+            
+            <h1 class="search-results-title"><span class='search-results-count'></span> results matching "<span class='search-query'></span>"</h1>
+            <ul class="search-results-list"></ul>
+            
+        </div>
+        <div class="no-results">
+            
+            <h1 class="search-results-title">No results matching "<span class='search-query'></span>"</h1>
+            
+        </div>
+    </div>
+</div>
+
+                        </div>
+                    </div>
+                
+            </div>
+
+            
+                
+                <a href="Changelog.html" class="navigation navigation-prev " aria-label="Previous page: Changelog">
+                    <i class="fa fa-angle-left"></i>
+                </a>
+                
+                
+                <a href="GLOSSARY.html" class="navigation navigation-next " aria-label="Next page: Glossary">
+                    <i class="fa fa-angle-right"></i>
+                </a>
+                
+            
+        
+    </div>
+
+    <script>
+        var gitbook = gitbook || [];
+        gitbook.push(function() {
+            gitbook.page.hasChanged({"page":{"title":"Migration guide","level":"4.7","depth":1,"next":{"title":"Glossary","level":"4.8","depth":1,"path":"GLOSSARY.md","ref":"GLOSSARY.md","articles":[]},"previous":{"title":"Changelog","level":"4.6","depth":1,"path":"Changelog.md","ref":"Changelog.md","articles":[]},"dir":"ltr"},"config":{"gitbook":"*","theme":"default","variables":{"nussknackerVersion":"0.0.11","flinkMajorVersion":"1.9"},"plugins":[],"pluginsConfig":{"highlight":{},"search":{},"lunr":{"maxIndexSize":1000000,"ignoreSpecialCharacters":false},"sharing":{"facebook":true,"twitter":true,"google":false,"weibo":false,"instapaper":false,"vk":false,"all":["facebook","google","twitter","weibo","instapaper"]},"fontsettings":{"theme":"white","family":"sans","size":2},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false}},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56}},"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"}},"file":{"path":"MigrationGuide.md","mtime":"2021-09-14T15:14:41.085Z","type":"markdown"},"gitbook":{"version":"3.2.3","time":"2021-09-14T15:15:16.961Z"},"basePath":".","book":{"language":""}});
+        });
+    </script>
+</div>
+
+        
+    <script src="gitbook/gitbook.js"></script>
+    <script src="gitbook/theme.js"></script>
+    
+        
+        <script src="gitbook/gitbook-plugin-search/search-engine.js"></script>
+        
+    
+        
+        <script src="gitbook/gitbook-plugin-search/search.js"></script>
+        
+    
+        
+        <script src="gitbook/gitbook-plugin-lunr/lunr.min.js"></script>
+        
+    
+        
+        <script src="gitbook/gitbook-plugin-lunr/search-lunr.js"></script>
+        
+    
+        
+        <script src="gitbook/gitbook-plugin-sharing/buttons.js"></script>
+        
+    
+        
+        <script src="gitbook/gitbook-plugin-fontsettings/fontsettings.js"></script>
+        
+    
+
+    </body>
+</html>
+

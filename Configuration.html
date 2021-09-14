@@ -1,0 +1,1025 @@
+
+<!DOCTYPE HTML>
+<html lang="" >
+    <head>
+        <meta charset="UTF-8">
+        <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+        <title>Configuration · GitBook</title>
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="description" content="">
+        <meta name="generator" content="GitBook 3.2.3">
+        
+        
+        
+    
+    <link rel="stylesheet" href="gitbook/style.css">
+
+    
+            
+                
+                <link rel="stylesheet" href="gitbook/gitbook-plugin-highlight/website.css">
+                
+            
+                
+                <link rel="stylesheet" href="gitbook/gitbook-plugin-search/search.css">
+                
+            
+                
+                <link rel="stylesheet" href="gitbook/gitbook-plugin-fontsettings/website.css">
+                
+            
+        
+
+    
+
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+
+        
+    
+    
+    <meta name="HandheldFriendly" content="true"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <link rel="apple-touch-icon-precomposed" sizes="152x152" href="gitbook/images/apple-touch-icon-precomposed-152.png">
+    <link rel="shortcut icon" href="gitbook/images/favicon.ico" type="image/x-icon">
+
+    
+    <link rel="next" href="Security.html" />
+    
+    
+    <link rel="prev" href="designingProcesses/Spel.html" />
+    
+
+    </head>
+    <body>
+        
+<div class="book">
+    <div class="book-summary">
+        
+            
+<div id="book-search-input" role="search">
+    <input type="text" placeholder="Type to search" />
+</div>
+
+            
+                <nav role="navigation">
+                
+
+
+<ul class="summary">
+    
+    
+
+    
+
+    
+        
+        
+    
+        <li class="chapter " data-level="1.1" data-path="./">
+            
+                <a href="./">
+            
+                    
+                    Introduction
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.2" data-path="Why.html">
+            
+                <a href="Why.html">
+            
+                    
+                    Why Nussknacker
+            
+                </a>
+            
+
+            
+        </li>
+    
+
+    
+        
+        <li class="divider"></li>
+        
+        
+    
+        <li class="chapter " data-level="2.1" data-path="Quickstart.html">
+            
+                <a href="Quickstart.html">
+            
+                    
+                    Quickstart
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="2.2" data-path="UI.html">
+            
+                <a href="UI.html">
+            
+                    
+                    UI Manual
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="2.3" data-path="DesigningProcesses.html">
+            
+                <a href="DesigningProcesses.html">
+            
+                    
+                    Designing processes
+            
+                </a>
+            
+
+            
+            <ul class="articles">
+                
+    
+        <li class="chapter " data-level="2.3.1" data-path="designingProcesses/BasicNodes.html">
+            
+                <a href="designingProcesses/BasicNodes.html">
+            
+                    
+                    Basic nodes
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="2.3.2" data-path="designingProcesses/Subprocesses.html">
+            
+                <a href="designingProcesses/Subprocesses.html">
+            
+                    
+                    Subprocesses
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="2.3.3" data-path="designingProcesses/FlinkCustomTransformers.html">
+            
+                <a href="designingProcesses/FlinkCustomTransformers.html">
+            
+                    
+                    Flink custom transformers
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="2.3.4" data-path="designingProcesses/Spel.html">
+            
+                <a href="designingProcesses/Spel.html">
+            
+                    
+                    SpEL
+            
+                </a>
+            
+
+            
+        </li>
+    
+
+            </ul>
+            
+        </li>
+    
+        <li class="chapter active" data-level="2.4" data-path="Configuration.html">
+            
+                <a href="Configuration.html">
+            
+                    
+                    Configuration
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="2.5" data-path="Security.html">
+            
+                <a href="Security.html">
+            
+                    
+                    Security
+            
+                </a>
+            
+
+            
+        </li>
+    
+
+    
+        
+        <li class="divider"></li>
+        
+        
+    
+        <li class="chapter " data-level="3.1" data-path="Architecture.html">
+            
+                <a href="Architecture.html">
+            
+                    
+                    Architecture
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="3.2" data-path="Engines.html">
+            
+                <a href="Engines.html">
+            
+                    
+                    Engines
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="3.3" data-path="API.html">
+            
+                <a href="API.html">
+            
+                    
+                    API
+            
+                </a>
+            
+
+            
+        </li>
+    
+
+    
+        
+        <li class="divider"></li>
+        
+        
+    
+        <li class="chapter " data-level="4.1" data-path="Metrics.html">
+            
+                <a href="Metrics.html">
+            
+                    
+                    Monitoring
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="4.2" data-path="Install.html">
+            
+                <a href="Install.html">
+            
+                    
+                    How to install
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="4.3" data-path="Resources.html">
+            
+                <a href="Resources.html">
+            
+                    
+                    Resources
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="4.4" data-path="PoweredBy.html">
+            
+                <a href="PoweredBy.html">
+            
+                    
+                    Powered by Nussknacker
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="4.5" data-path="Roadmap.html">
+            
+                <a href="Roadmap.html">
+            
+                    
+                    Roadmap
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="4.6" data-path="Changelog.html">
+            
+                <a href="Changelog.html">
+            
+                    
+                    Changelog
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="4.7" data-path="MigrationGuide.html">
+            
+                <a href="MigrationGuide.html">
+            
+                    
+                    Migration guide
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="4.8" data-path="GLOSSARY.html">
+            
+                <a href="GLOSSARY.html">
+            
+                    
+                    Glossary
+            
+                </a>
+            
+
+            
+        </li>
+    
+
+    
+
+    <li class="divider"></li>
+
+    <li>
+        <a href="https://www.gitbook.com" target="blank" class="gitbook-link">
+            Published with GitBook
+        </a>
+    </li>
+</ul>
+
+
+                </nav>
+            
+        
+    </div>
+
+    <div class="book-body">
+        
+            <div class="body-inner">
+                
+                    
+
+<div class="book-header" role="navigation">
+    
+
+    <!-- Title -->
+    <h1>
+        <i class="fa fa-circle-o-notch fa-spin"></i>
+        <a href="." >Configuration</a>
+    </h1>
+</div>
+
+
+
+
+                    <div class="page-wrapper" tabindex="-1" role="main">
+                        <div class="page-inner">
+                            
+<div id="book-search-results">
+    <div class="search-noresults">
+    
+                                <section class="normal markdown-section">
+                                
+                                <h1 id="configuration">Configuration</h1>
+<p>Configuration file is read by UI application during startup - currently it&apos;s not possible to change it without restart.
+The format of configuration is <a href="https://github.com/typesafehub/config" target="_blank">Typesafe Config</a>.</p>
+<p>The configuration files defines</p>
+<ul>
+<li>settings of UI itself</li>
+<li>settings of various services used by <a href="GLOSSARY.html#model" class="glossary-term" title="Model describes your processes, includes data structures, and nodes definitions.  ">model</a></li>
+<li>means of communicating with Apache <a href="GLOSSARY.html#flink" class="glossary-term" title="Apache Flink&#xAE; is an open-source stream processing framework for distributed, high-performing, always-available, and accurate data streaming applications. See https://flink.apache.org/">Flink</a> cluster</li>
+</ul>
+<p>Sample configuration looks like this:</p>
+<pre><code class="lang-config">db {
+  url: &quot;jdbc:hsqldb:file:db/db;sql.syntax_ora=true&quot;
+  driver: &quot;org.hsqldb.jdbc.JDBCDriver&quot;
+  user: &quot;SA&quot;
+  password: &quot;&quot;
+  connectionTimeout: 30000
+}
+
+categoriesConfig: {
+  &quot;FraudDetection&quot;: &quot;streaming&quot;,
+  &quot;Recommendations&quot;: &quot;streaming&quot;,
+  &quot;Default&quot;: &quot;streaming&quot;
+}
+
+usersFile: &quot;./conf/users.conf&quot;
+environment: &quot;demo&quot;
+attachmentsPath: &quot;/tmp/touk/esp-frontend/attachments&quot;
+
+scenarioTypes {
+  streaming {
+    deploymentConfig {    
+      type: &quot;flinkStreaming&quot;
+      restUrl: &quot;http://localhost:8081&quot;
+      parallelism: 4
+      jobManagerTimeout: 1m
+    } 
+    modelConfig {
+      classPath: [&quot;code-assembly.jar&quot;]
+      timeout: 10s
+      checkpointConfig {
+          checkpointInterval: 10m
+          minPauseBetweenCheckpoints: 5m
+          maxConcurrentCheckpoints: 1
+          tolerableCheckpointFailureNumber: 6
+      }
+      delayBetweenAttempts: &quot;10s&quot;
+      kafka = {
+        kafkaAddress = &quot;kafka:9092&quot;
+      }
+    }
+  }
+}
+
+
+metricsSettings {
+  url: &quot;http://localhost:3000/d/$dashboard?theme=dark&amp;var-processName=$process&amp;var-env=demo&quot;
+  defaultDashboard: &quot;nussknacker-scenario&quot;
+  processingTypeToDashboard: {
+    &quot;request-response&quot;: &quot;standalone&quot;,
+    &quot;streaming&quot;: &quot;nussknacker-scenario&quot;
+  }
+}
+
+countsSettings {
+  influxUrl: &quot;http://localhost:3000/api/datasources/proxy/1/query&quot;
+  user: &quot;admin&quot;
+  password: &quot;admin&quot;
+}
+</code></pre>
+<h3 id="default-configurations-and-overriding-them">Default configurations and overriding them</h3>
+<p>Default configuration for UI is in <a href="https://github.com/TouK/nussknacker/blob/staging/ui/server/src/main/resources/defaultUiConfig.conf" target="_blank">defaultUiConfig.conf</a>.
+We don&apos;t use <code>reference.conf</code> at the moment, as classloaders of <a href="GLOSSARY.html#model" class="glossary-term" title="Model describes your processes, includes data structures, and nodes definitions.  ">model</a> and ui are not separated, and we don&apos;t want UI config to be passed to <a href="GLOSSARY.html#model" class="glossary-term" title="Model describes your processes, includes data structures, and nodes definitions.  ">model</a>. </p>
+<p>Default configuration of models is taken from <code>defaultModelConfig.conf</code> files in <a href="GLOSSARY.html#model" class="glossary-term" title="Model describes your processes, includes data structures, and nodes definitions.  ">model</a> jar (see e.g. <a href="https://github.com/TouK/nussknacker/blob/staging/engine/flink/generic/src/main/resources/defaultModelConfig.conf" target="_blank">defaultModelConfig.conf</a>).
+You can also use <code>reference.conf</code> in <a href="GLOSSARY.html#model" class="glossary-term" title="Model describes your processes, includes data structures, and nodes definitions.  ">model</a> jars, however we found some problems with substitutions (see docs in <a href="https://github.com/TouK/nussknacker/blob/staging/engine/interpreter/src/main/scala/pl/touk/nussknacker/engine/modelconfig/ModelConfigLoader.scala" target="_blank">ModelConfigLoader</a>).</p>
+<p>How can you override default configuration? 
+Detailed rules are described in <a href="https://github.com/lightbend/config#merging-config-trees" target="_blank">documentation</a>. For example, if in the <code>defaultModelConfig.conf</code> we have following entries: </p>
+<pre><code class="lang-hocon">{
+   timeout: 10s
+   delayBetweenAttempts: 10s
+   customProperties {
+    property1: 11
+   } 
+}
+</code></pre>
+<p>you can override them in <code>application.conf</code> like this:</p>
+<pre><code class="lang-hocon">scenarioTypes {
+  type1 {
+    modelConfig {
+      timeout: 20s
+      customProperties {
+        property1: 13
+      }
+    }
+  }
+}
+</code></pre>
+<p>Please note that you have to define overridden properties in appropriate <code>modelConfig</code> section. If you would need to
+modify the config while loading the <a href="GLOSSARY.html#model" class="glossary-term" title="Model describes your processes, includes data structures, and nodes definitions.  ">model</a>, you can provide your own implementation of <code>ModelConfigLoader</code>.</p>
+<p>Overriding UI configuration is straightforward: </p>
+<pre><code class="lang-hocon">  environmentAlert {
+    content: &quot;DEVELOPMENT ENVIRONMENT&quot; 
+  }
+</code></pre>
+<p>All configurations can also be overridden with environmental variables. Please consult <a href="https://github.com/lightbend/config#optional-system-or-env-variable-overrides" target="_blank">TypesafeConfig documentation</a>.
+In particular, Nussknacker docker image is executed with <code>-Dconfig.override_with_env_vars=true</code><br>For example, to override samples above you would have to define:
+```shell script
+   CONFIG_FORCE_scenarioTypes_type1_modelConfig_timeout=30s
+   CONFIG_FORCE_environmentAlert_content=&quot;MY environment&quot;  </p>
+<pre><code>
+##UI configuration
+
+###Database
+
+###Categories
+Every process has to belong to a group called category. For example, in one Nussknacker installation you can 
+have processes detecting frauds and those implementing marketing campaigns. Category configuration looks like this:
+</code></pre><p>categoriesConfig: {
+  &quot;marketing&quot;: &quot;streaming&quot;,
+  &quot;fraud&quot;: &quot;streaming&quot;,
+}</p>
+<pre><code>For each category you have to define its scenario type (`streaming` in examples above). You can read about processing
+types and their configurations below.
+
+### Process Toolbar Configuration
+
+Toolbars and buttons at process window are configurable, you can configure params:
+
+* uuid - optional uuid identifier which determines unique code for FE localstorage cache, 
+  default: null - we generate uuid from hashcode config
+* topLeft - optional top left panel, default: empty list
+* bottomLeft - optional bottom left panel, default: empty list
+* topRight - optional top right panel, default: empty list
+* bottomRight - optional bottom right panel, default: empty list
+
+Example configuration:
+</code></pre><p>processToolbarConfig {
+  defaultConfig {
+    topLeft: [
+      { type: &quot;tips-panel&quot; }
+    ]
+    topRight: [
+      {
+        type: &quot;process-info-panel&quot;
+        buttons: [
+          { type: &quot;process-save&quot;, disabled: { subprocess: false, archived: true, type: &quot;oneof&quot; } }
+          { type: &quot;custom-link&quot;, title: &quot;Metrics for $processName&quot;, url: &quot;/metrics/$processId&quot; }
+        ]
+      }
+    ]
+  }
+}</p>
+<pre><code>
+We can also create special configuration for each category by:
+</code></pre><p>processToolbarConfig {
+  categoryConfig {
+   &quot;CategoryName&quot; {
+        id: &quot;58f1acff-d864-4d66-9f86-0fa7319f7043&quot;
+        topLeft: [
+          { type: &quot;creator-panel&quot;, hidden: {subprocess: true, archived: false, type: &quot;allof&quot;} }
+        ]
+    } 
+  }
+}</p>
+<pre><code>
+#### Toolbar Panel Conditioning
+
+Configuration allow us to:
+* hiding panels
+* hiding or disabling buttons
+
+Each of this function can be configured by condition expression where we can use three parameters:
+* `subprocess: boolean` - if true then condition match only subprocess, by default ignored
+* `archived: boolean` - if true then condition match only archived, by default ignored
+* `type: allof / oneof` - information about that checked will be only one condition or all conditions
+
+#### Toolbar Panel Templating
+
+Configuration allows to templating params like: 
+* `name` - available only on Buttons
+* `title`- available on Panels and  Buttons 
+* `url` - available only on CustomLink and CustomAction buttons 
+* `icon`- available only on Buttons
+
+Right now we allow to template two elements:
+* process id -`$processId`
+* process name - `$processName`
+
+Example usage:
+* `title: &quot;Metrics for $processName&quot;`
+* `name: &quot;deploy $processName&quot;`
+* `url: &quot;/metrics/$processId&quot; `
+* `icon: &quot;/assets/process-icon-$processId&quot;`
+
+#### Default Process Panel Configuration
+</code></pre><p>processToolbarConfig {
+  defaultConfig {
+    topLeft: [
+      { type: &quot;tips-panel&quot; }
+      { type: &quot;creator-panel&quot;, hidden: { archived: true } }
+      { type: &quot;versions-panel&quot; }
+      { type: &quot;comments-panel&quot; }
+      { type: &quot;attachments-panel&quot; }
+    ]
+    topRight: [
+      {
+        type: &quot;process-info-panel&quot;
+        buttons: [
+          { type: &quot;process-save&quot;, title: &quot;Save changes&quot;, disabled: { archived: true } }
+          { type: &quot;process-deploy&quot;, disabled: { subprocess: true, archived: true, type: &quot;oneof&quot; } }
+          { type: &quot;process-cancel&quot;, disabled: { subprocess: true, archived: true, type: &quot;oneof&quot; } }
+          { type: &quot;custom-link&quot;, name: &quot;metrics&quot;, icon: &quot;/assets/buttons/metrics.svg&quot;, url: &quot;/metrics/$processName&quot;, disabled: { subprocess: true } }
+        ]
+      }
+      {
+        id: &quot;view-panel&quot;
+        type: &quot;buttons-panel&quot;
+        title: &quot;view&quot;
+        buttons: [
+          { type: &quot;view-business-view&quot; }
+          { type: &quot;view-zoom-in&quot; }
+          { type: &quot;view-zoom-out&quot; }
+          { type: &quot;view-reset&quot; }
+        ]
+      }
+      {
+        id: &quot;edit-panel&quot;
+        type: &quot;buttons-panel&quot;
+        title: &quot;edit&quot;
+        hidden: { archived: true }
+        buttonsVariant: &quot;small&quot;
+        buttons: [
+          { type: &quot;edit-undo&quot; }
+          { type: &quot;edit-redo&quot; }
+          { type: &quot;edit-copy&quot; }
+          { type: &quot;edit-paste&quot; }
+          { type: &quot;edit-delete&quot; }
+          { type: &quot;edit-layout&quot; }
+        ]
+      }
+      {
+        id: &quot;process-panel&quot;
+        type: &quot;buttons-panel&quot;
+        title: &quot;process&quot;
+        buttons: [
+          { type: &quot;process-properties&quot;, hidden: { subprocess: true } }
+          { type: &quot;process-compare&quot; }
+          { type: &quot;process-migrate&quot;, disabled: { archived: true } }
+          { type: &quot;process-import&quot;, disabled: { archived: true } }
+          { type: &quot;process-json&quot; }
+          { type: &quot;process-pdf&quot; }
+          { type: &quot;process-archive&quot;, hidden: { archived: true } }
+          { type: &quot;process-unarchive&quot;, hidden: { archived: false } }
+        ]
+      }
+      {
+        id: &quot;test-panel&quot;
+        type: &quot;buttons-panel&quot;
+        title: &quot;test&quot;
+        hidden: { subprocess: true }
+        buttons: [
+          { type: &quot;test-from-file&quot;, disabled: { archived: true } }
+          { type: &quot;test-generate&quot;, disabled: { archived: true } }
+          { type: &quot;test-counts&quot; }
+          { type: &quot;test-hide&quot; }
+        ]
+      }
+      {
+        id: &quot;group-panel&quot;
+        type: &quot;buttons-panel&quot;
+        title: &quot;group&quot;
+        hidden: { archived: true }
+        buttons: [
+          { type: &quot;group&quot; }
+          { type: &quot;ungroup&quot; }
+        ]
+      }
+      { type: &quot;details-panel&quot; }
+    ]
+  }
+}</p>
+<pre><code>
+###Monitoring config
+</code></pre><p>metricsSettings {
+  url: &quot;<a href="http://localhost:3000/d/$dashboard?theme=dark&amp;var-processName=$process&amp;var-env=demo" target="_blank">http://localhost:3000/d/$dashboard?theme=dark&amp;var-processName=$process&amp;var-env=demo</a>&quot;
+  defaultDashboard: &quot;nussknacker-scenario&quot;
+  processingTypeToDashboard: {
+    &quot;request-response&quot;: &quot;standalone&quot;,
+    &quot;streaming&quot;: &quot;nussknacker-scenario&quot;
+  }
+}</p>
+<pre><code>
+###Akka configuration
+
+In `akka` section you can configure actor system used by GUI, e.g:
+</code></pre><p>akka {
+  http {
+    server.parsing.max-content-length = 300000000 #300MB
+  }
+}</p>
+<pre><code>
+###Other configurations
+
+* `usersFile` - location of file with user configuration
+* `environment` - key of environment (used e.g. for alerts) - e.g. test or production
+* `attachmentsPath` - location on disk where attachments will be stored
+
+##Scenario types 
+One installation of Nussknacker can handle many different processing engines - currently the main supported engine is
+Flink in streaming mode. Processing engines are defined in `scenarioTypes` section. You can e.g. have two processing
+types pointing to separate Flink clusters. Each processing engine has its name (e.g. `flinkStreaming`). 
+Scenario type configuration consists of two main parts:
+* engine configuration
+* model configuration
+
+We describe them below
+
+###Engine configuration
+Configuration of communication with processing engine. Below we present Flink engine configuration as an example:
+</code></pre><p>engingConfig {<br>  type: &quot;flinkStreaming&quot;
+  restUrl: &quot;<a href="http://localhost:8081" target="_blank">http://localhost:8081</a>&quot;
+  parallelism: 4
+  jobManagerTimeout: 1m
+}</p>
+<pre><code>In this section you can put all configuration values for Flink client. We are using Flink REST API so the only
+required parameter is `restUrl` - which defines location of Flink JobManager
+* `jobManagerTimeout` (e.g. 1m) - timeout used in communication with Flink cluster
+
+### Process configuration
+
+Configuration of processes has few common keys:
+*  `classPath` - list of files/URLs with jars with model for processes
+*  `timeout` (e.g. 10s)- for synchronous services
+*  `checkpointConfig` (more about checkpoint configuration you can find in [Flink Documentation](https://ci.apache.org/projects/flink/flink-docs-release-{{book.flinkMajorVersion}}/api/java/org/apache/flink/streaming/api/environment/CheckpointConfig.html) - only some options are available)
+    * `checkpointInterval` - e.g. 10m
+    * `minPauseBetweenCheckpoints` - optional, default to half of `checkpointInterval`, e.g. 5m
+    * `maxConcurrentCheckpoints` - optional, default to 1, e.g. 4
+    * `tolerableCheckpointFailureNumber` - optional, default 0, e.g. 6
+
+If configuration does not contain `checkpointConfig`, `checkpointInterval` and process does not contain `checkpointInterval` in its properties then checkpoints are not enabled for process.
+
+The rest of model configuration depends on your needs - all the properties defined here will be passed to ```ProcessConfigCreator``` as explained in [API](API.md) documentation.
+
+#### Configuring exception handling (Flink only)
+
+Exception handling can be customized using provided `EspExceptionConsumer`. By default, there are two available:
+- `BrieflyLogging`
+- `VerboselyLogging`
+More of them can be added with custom extensions. By default, basic error metrics are collected. If for some reason
+  it&apos;s not desirable, metrics collector can be turned off with `withRateMeter: false` setting.
+
+Some handlers can have additional properties, e.g. built in logging handlers can add custom parameters to log. See example below.
+</code></pre><p>exceptionHandler {
+  type: BrieflyLogging
+  withRateMeter: false
+  params: {
+    additional: &quot;value1&quot;
+  }
+}    </p>
+<pre><code>
+Out of the box, Nussknacker provides following ExceptionHandler types:
+- BrieflyLogging - log error to Flink logs (on `info` level, with stacktrace on `debug` level)
+- VerboselyLogging - log error to Flink logs on `error` level, together with all variables (should be used mainly for debugging)
+- Kafka - send errors to Kafka topic
+
+##### Kafka exception handling
+
+Errors can be sent to specified Kafka topic in following json format (see below for format configuration options): 
+```json
+{
+  &quot;processName&quot; : &quot;Premium Customer Scenario&quot;,
+  &quot;nodeId&quot; : &quot;filter premium customers&quot;,
+  &quot;message&quot; : &quot;Unknown exception&quot;,
+  &quot;exceptionInput&quot; : &quot;SpelExpressionEvaluationException:Expression [1/0 != 10] evaluation failed, message: / by zero&quot;,
+  &quot;inputEvent&quot; : &quot;{ \&quot; field1\&quot;: \&quot;vaulue1\&quot; }&quot;,
+  &quot;stackTrace&quot; : &quot;pl.touk.nussknacker.engine.api.exception.NonTransientException: mess\n\tat pl.touk.nussknacker.engine.kafka.exception.KafkaExceptionConsumerSerializationSpec.&lt;init&gt;(KafkaExceptionConsumerSerializationSpec.scala:24)\n\tat java.base/jdk.internal.reflect.NativeConstructorAccessorImpl.newInstance0(Native Method)\n\tat java.base/jdk.internal.reflect.NativeConstructorAccessorImpl.newInstance(NativeConstructorAccessorImpl.java:62)\n\tat java.base/jdk.internal.reflect.DelegatingConstructorAccessorImpl.newInstance(DelegatingConstructorAccessorImpl.java:45)\n\tat java.base/java.lang.reflect.Constructor.newInstance(Constructor.java:490)\n\tat java.base/java.lang.Class.newInstance(Class.java:584)\n\tat org.scalatest.tools.Runner$.genSuiteConfig(Runner.scala:1431)\n\tat org.scalatest.tools.Runner$.$anonfun$doRunRunRunDaDoRunRun$8(Runner.scala:1239)\n\tat scala.collection.immutable.List.map(List.scala:286)\n\tat org.scalatest.tools.Runner$.doRunRunRunDaDoRunRun(Runner.scala:1238)\n\tat org.scalatest.tools.Runner$.$anonfun$runOptionallyWithPassFailReporter$24(Runner.scala:1033)\n\tat org.scalatest.tools.Runner$.$anonfun$runOptionallyWithPassFailReporter$24$adapted(Runner.scala:1011)\n\tat org.scalatest.tools.Runner$.withClassLoaderAndDispatchReporter(Runner.scala:1509)\n\tat org.scalatest.tools.Runner$.runOptionallyWithPassFailReporter(Runner.scala:1011)\n\tat org.scalatest.tools.Runner$.run(Runner.scala:850)\n\tat org.scalatest.tools.Runner.run(Runner.scala)\n\tat org.jetbrains.plugins.scala.testingSupport.scalaTest.ScalaTestRunner.runScalaTest2or3(ScalaTestRunner.java:38)\n\tat org.jetbrains.plugins.scala.testingSupport.scalaTest.ScalaTestRunner.main(ScalaTestRunner.java:25)&quot;,
+  &quot;timestamp&quot; : 1623758738000,
+  &quot;host&quot; : &quot;teriberka.pl&quot;,
+  &quot;additionalData&quot; : {
+    &quot;scenarioCategory&quot; : &quot;Marketing&quot;
+  }
+}
+</code></pre><p>Following properties can be configured:</p>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Default value</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>topic</td>
+<td>-</td>
+<td>Topic where errors will be sent. It should be configured separately (or topic <code>auto.create</code> setting should be enabled on Kafka cluster)</td>
+</tr>
+<tr>
+<td>stackTraceLengthLimit</td>
+<td>50</td>
+<td>Limit of stacktrace length that will be sent (0 to omit stacktrace at all)</td>
+</tr>
+<tr>
+<td>includeHost</td>
+<td>true</td>
+<td>Should name of host where error occurred (e.g. TaskManager in case of <a href="GLOSSARY.html#flink" class="glossary-term" title="Apache Flink&#xAE; is an open-source stream processing framework for distributed, high-performing, always-available, and accurate data streaming applications. See https://flink.apache.org/">Flink</a>) be included. Can be misleading if there are many network interfaces or hostname is improperly configured)</td>
+</tr>
+<tr>
+<td>includeInputEvent</td>
+<td>false</td>
+<td>Should input event be serialized (can be large or contain sensitive data so use with care)</td>
+</tr>
+<tr>
+<td>useSharedProducer</td>
+<td>false</td>
+<td>For better performance shared Kafka producer can be used (by default it&apos;s created and closed for each error), shared Producer is kind of experimental feature and should be used with care</td>
+</tr>
+<tr>
+<td>additionalParams</td>
+<td>{}</td>
+<td>Map of fixed parameters that can be added to Kafka message</td>
+</tr>
+</tbody>
+</table>
+<h4 id="configuring-restart-strategies-flink-only">Configuring restart strategies (Flink only)</h4>
+<p>We rely on <a href="GLOSSARY.html#flink" class="glossary-term" title="Apache Flink&#xAE; is an open-source stream processing framework for distributed, high-performing, always-available, and accurate data streaming applications. See https://flink.apache.org/">Flink</a> restart strategies described <a href="https://ci.apache.org/projects/flink/flink-docs-stable/docs/dev/execution/task_failure_recovery/" target="_blank">in documentation</a>.
+It&apos;s also possible to configure restart strategies per scenario, using additional properties.           </p>
+<pre><code>    restartStrategy {
+      //if scenarioProperty is configured, strategy name will be used from this category: restartType = for-important, etc.
+      //probably scenarioProperty should be configured with FixedValuesEditor
+      //scenarioProperty: restartType. For simple cases one needs to configure only default strategy
+      default: {
+        strategy: fixed-delay
+        attempts: 10
+        delay: 10s
+      }
+      for-important {
+        strategy: fixed-delay
+        attempts: 30
+      }
+      for-very-important {
+        strategy: fixed-delay
+        attempts: 50
+      }
+    }
+</code></pre><h3 id="configuration-of-component-providers">Configuration of component providers</h3>
+<pre><code>  componentProviders {
+    sqlHsql {
+      providerType: sql
+      jdbcUrl: jdbc:hsql...//
+      admin/pass
+    }
+    sqlOracle {
+      providerType: sql
+      jdbcUrl: jdbc:oracle...//
+      admin/pass
+    }
+    prinzH20 {
+      providerType: prinzH20
+      h2oLocation:
+    }
+    prinzMlFlow {
+      //this is not needed, as configuration is named just as provider
+      //providerType: prinzMLFlow
+      mlFlowUrl:
+    }
+    //not needed in our domain
+    aggregation {
+      disabled: true
+    }
+  }
+</code></pre><h3 id="configuration-of-ui-attributes-of-components">Configuration of UI attributes of components</h3>
+<p>In <a href="GLOSSARY.html#model" class="glossary-term" title="Model describes your processes, includes data structures, and nodes definitions.  ">model</a> configuration you can also define some UI attributes of components. These include:</p>
+<ul>
+<li>default values of fields</li>
+<li>icons</li>
+</ul>
+<pre><code>  nodes {
+    containsDefaultValue {
+      defaultValues {
+        parameterName = &quot;parameterValue&quot;
+      }
+    },
+    serviceWithDocumentation {
+      docsUrl: &quot;https://en.wikipedia.org/wiki/Customer_service&quot;
+    }
+    hasSpecialIcon {
+      icon: &quot;icon_file.svg&quot;
+    }
+  }
+</code></pre><ul>
+<li><code>containsDefaultValue</code>, <code>hasSpecialIcon</code>, <code>serviceWithDocumentation</code> - nodes names</li>
+<li><code>parameterName</code> - node parameter name you&apos;d like to assign default value</li>
+<li><code>parameterValue</code> - value of default parameter</li>
+<li><code>docsUrl</code> - link to documentation (e.g. confluence page)</li>
+<li><code>icon</code>- path to icon file</li>
+</ul>
+
+                                
+                                </section>
+                            
+    </div>
+    <div class="search-results">
+        <div class="has-results">
+            
+            <h1 class="search-results-title"><span class='search-results-count'></span> results matching "<span class='search-query'></span>"</h1>
+            <ul class="search-results-list"></ul>
+            
+        </div>
+        <div class="no-results">
+            
+            <h1 class="search-results-title">No results matching "<span class='search-query'></span>"</h1>
+            
+        </div>
+    </div>
+</div>
+
+                        </div>
+                    </div>
+                
+            </div>
+
+            
+                
+                <a href="designingProcesses/Spel.html" class="navigation navigation-prev " aria-label="Previous page: SpEL">
+                    <i class="fa fa-angle-left"></i>
+                </a>
+                
+                
+                <a href="Security.html" class="navigation navigation-next " aria-label="Next page: Security">
+                    <i class="fa fa-angle-right"></i>
+                </a>
+                
+            
+        
+    </div>
+
+    <script>
+        var gitbook = gitbook || [];
+        gitbook.push(function() {
+            gitbook.page.hasChanged({"page":{"title":"Configuration","level":"2.4","depth":1,"next":{"title":"Security","level":"2.5","depth":1,"path":"Security.md","ref":"Security.md","articles":[]},"previous":{"title":"SpEL","level":"2.3.4","depth":2,"path":"designingProcesses/Spel.md","ref":"designingProcesses/Spel.md","articles":[]},"dir":"ltr"},"config":{"gitbook":"*","theme":"default","variables":{"nussknackerVersion":"0.0.11","flinkMajorVersion":"1.9"},"plugins":[],"pluginsConfig":{"highlight":{},"search":{},"lunr":{"maxIndexSize":1000000,"ignoreSpecialCharacters":false},"sharing":{"facebook":true,"twitter":true,"google":false,"weibo":false,"instapaper":false,"vk":false,"all":["facebook","google","twitter","weibo","instapaper"]},"fontsettings":{"theme":"white","family":"sans","size":2},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false}},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56}},"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"}},"file":{"path":"Configuration.md","mtime":"2021-09-14T15:14:41.085Z","type":"markdown"},"gitbook":{"version":"3.2.3","time":"2021-09-14T15:15:16.961Z"},"basePath":".","book":{"language":""}});
+        });
+    </script>
+</div>
+
+        
+    <script src="gitbook/gitbook.js"></script>
+    <script src="gitbook/theme.js"></script>
+    
+        
+        <script src="gitbook/gitbook-plugin-search/search-engine.js"></script>
+        
+    
+        
+        <script src="gitbook/gitbook-plugin-search/search.js"></script>
+        
+    
+        
+        <script src="gitbook/gitbook-plugin-lunr/lunr.min.js"></script>
+        
+    
+        
+        <script src="gitbook/gitbook-plugin-lunr/search-lunr.js"></script>
+        
+    
+        
+        <script src="gitbook/gitbook-plugin-sharing/buttons.js"></script>
+        
+    
+        
+        <script src="gitbook/gitbook-plugin-fontsettings/fontsettings.js"></script>
+        
+    
+
+    </body>
+</html>
+

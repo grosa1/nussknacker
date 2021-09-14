@@ -1,0 +1,591 @@
+
+<!DOCTYPE HTML>
+<html lang="" >
+    <head>
+        <meta charset="UTF-8">
+        <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+        <title>Basic nodes · GitBook</title>
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="description" content="">
+        <meta name="generator" content="GitBook 3.2.3">
+        
+        
+        
+    
+    <link rel="stylesheet" href="../gitbook/style.css">
+
+    
+            
+                
+                <link rel="stylesheet" href="../gitbook/gitbook-plugin-highlight/website.css">
+                
+            
+                
+                <link rel="stylesheet" href="../gitbook/gitbook-plugin-search/search.css">
+                
+            
+                
+                <link rel="stylesheet" href="../gitbook/gitbook-plugin-fontsettings/website.css">
+                
+            
+        
+
+    
+
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+
+        
+    
+    
+    <meta name="HandheldFriendly" content="true"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <link rel="apple-touch-icon-precomposed" sizes="152x152" href="../gitbook/images/apple-touch-icon-precomposed-152.png">
+    <link rel="shortcut icon" href="../gitbook/images/favicon.ico" type="image/x-icon">
+
+    
+    <link rel="next" href="Subprocesses.html" />
+    
+    
+    <link rel="prev" href="../DesigningProcesses.html" />
+    
+
+    </head>
+    <body>
+        
+<div class="book">
+    <div class="book-summary">
+        
+            
+<div id="book-search-input" role="search">
+    <input type="text" placeholder="Type to search" />
+</div>
+
+            
+                <nav role="navigation">
+                
+
+
+<ul class="summary">
+    
+    
+
+    
+
+    
+        
+        
+    
+        <li class="chapter " data-level="1.1" data-path="../">
+            
+                <a href="../">
+            
+                    
+                    Introduction
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.2" data-path="../Why.html">
+            
+                <a href="../Why.html">
+            
+                    
+                    Why Nussknacker
+            
+                </a>
+            
+
+            
+        </li>
+    
+
+    
+        
+        <li class="divider"></li>
+        
+        
+    
+        <li class="chapter " data-level="2.1" data-path="../Quickstart.html">
+            
+                <a href="../Quickstart.html">
+            
+                    
+                    Quickstart
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="2.2" data-path="../UI.html">
+            
+                <a href="../UI.html">
+            
+                    
+                    UI Manual
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="2.3" data-path="../DesigningProcesses.html">
+            
+                <a href="../DesigningProcesses.html">
+            
+                    
+                    Designing processes
+            
+                </a>
+            
+
+            
+            <ul class="articles">
+                
+    
+        <li class="chapter active" data-level="2.3.1" data-path="BasicNodes.html">
+            
+                <a href="BasicNodes.html">
+            
+                    
+                    Basic nodes
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="2.3.2" data-path="Subprocesses.html">
+            
+                <a href="Subprocesses.html">
+            
+                    
+                    Subprocesses
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="2.3.3" data-path="FlinkCustomTransformers.html">
+            
+                <a href="FlinkCustomTransformers.html">
+            
+                    
+                    Flink custom transformers
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="2.3.4" data-path="Spel.html">
+            
+                <a href="Spel.html">
+            
+                    
+                    SpEL
+            
+                </a>
+            
+
+            
+        </li>
+    
+
+            </ul>
+            
+        </li>
+    
+        <li class="chapter " data-level="2.4" data-path="../Configuration.html">
+            
+                <a href="../Configuration.html">
+            
+                    
+                    Configuration
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="2.5" data-path="../Security.html">
+            
+                <a href="../Security.html">
+            
+                    
+                    Security
+            
+                </a>
+            
+
+            
+        </li>
+    
+
+    
+        
+        <li class="divider"></li>
+        
+        
+    
+        <li class="chapter " data-level="3.1" data-path="../Architecture.html">
+            
+                <a href="../Architecture.html">
+            
+                    
+                    Architecture
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="3.2" data-path="../Engines.html">
+            
+                <a href="../Engines.html">
+            
+                    
+                    Engines
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="3.3" data-path="../API.html">
+            
+                <a href="../API.html">
+            
+                    
+                    API
+            
+                </a>
+            
+
+            
+        </li>
+    
+
+    
+        
+        <li class="divider"></li>
+        
+        
+    
+        <li class="chapter " data-level="4.1" data-path="../Metrics.html">
+            
+                <a href="../Metrics.html">
+            
+                    
+                    Monitoring
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="4.2" data-path="../Install.html">
+            
+                <a href="../Install.html">
+            
+                    
+                    How to install
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="4.3" data-path="../Resources.html">
+            
+                <a href="../Resources.html">
+            
+                    
+                    Resources
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="4.4" data-path="../PoweredBy.html">
+            
+                <a href="../PoweredBy.html">
+            
+                    
+                    Powered by Nussknacker
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="4.5" data-path="../Roadmap.html">
+            
+                <a href="../Roadmap.html">
+            
+                    
+                    Roadmap
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="4.6" data-path="../Changelog.html">
+            
+                <a href="../Changelog.html">
+            
+                    
+                    Changelog
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="4.7" data-path="../MigrationGuide.html">
+            
+                <a href="../MigrationGuide.html">
+            
+                    
+                    Migration guide
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="4.8" data-path="../GLOSSARY.html">
+            
+                <a href="../GLOSSARY.html">
+            
+                    
+                    Glossary
+            
+                </a>
+            
+
+            
+        </li>
+    
+
+    
+
+    <li class="divider"></li>
+
+    <li>
+        <a href="https://www.gitbook.com" target="blank" class="gitbook-link">
+            Published with GitBook
+        </a>
+    </li>
+</ul>
+
+
+                </nav>
+            
+        
+    </div>
+
+    <div class="book-body">
+        
+            <div class="body-inner">
+                
+                    
+
+<div class="book-header" role="navigation">
+    
+
+    <!-- Title -->
+    <h1>
+        <i class="fa fa-circle-o-notch fa-spin"></i>
+        <a href=".." >Basic nodes</a>
+    </h1>
+</div>
+
+
+
+
+                    <div class="page-wrapper" tabindex="-1" role="main">
+                        <div class="page-inner">
+                            
+<div id="book-search-results">
+    <div class="search-noresults">
+    
+                                <section class="normal markdown-section">
+                                
+                                <h1 id="introduction">Introduction</h1>
+<p>Node works with a data stream. It can produce, fetch, send, collect data or organize data flow. Each node has at least two parameters: <code>Name</code> and <code>Description</code>. Name has to be unique in a scenario. Description is a narrative of your choice.  </p>
+<p>Most of the nodes, with source and sink nodes being notable exceptions, have input and at least one output flow.</p>
+<p>Sinks and filters can be disabled by selecting <code>Disable</code> checkbox. </p>
+<h1 id="filter">Filter</h1>
+<p>Filter passes records which satisfies filtering condition. It can have one or two outputs. 
+<img src="../img/filter_graph.png" alt="filter graph"></p>
+<p>Records from the <code>source</code> which meet filter&apos;s condition go to the <code>true sink</code>, and others go to the <code>false sink</code>. </p>
+<p><img src="../img/filter_graph_single.png" alt="filter graph single"></p>
+<p>Records from the <code>source</code> which meets condition go to the <code>blue sink</code>, and others are filtered out. </p>
+<p><img src="../img/filter_window.png" alt="filter window">
+The Expression field should contain the SpEL expression for the filtering conditiona and should produce a boolean value</p>
+<h1 id="split">Split</h1>
+<p>Split node logically splits processing into two or more parallel branches. Each branch receives all records and processes them independently. </p>
+<p><img src="../img/split_graph.png" alt="split graph"></p>
+<p>Every record from the <code>source</code> gos to <code>sink 1</code> and <code>sink 2</code>. Split node doesn&apos;t have additional parameters.</p>
+<h1 id="switch">Switch</h1>
+<p>Switch distributes incoming records among output branches in accordance with the criteria configured in those branches</p>
+<p><img src="../img/switch_graph.png" alt="switch graph"></p>
+<p>Each record form the <code>source</code> is tested against condition defined on the edge. If <code>#color</code> is <code>blue</code> record goes to the <code>blue sink</code>.  If <code>#color</code> is <code>green</code> record goes to the <code>green sink</code>. For every other value record goes to the <code>sink for others</code>.</p>
+<p><img src="../img/switch_window.png" alt="switch window"></p>
+<p>There are two parameters <code>Expression</code> and <code>exprVal</code>. <code>Expression</code> contains expression which is evaluated for each record, and result is assigned to variable named in <code>exprVal</code> - <code>#color</code> in the example above.</p>
+<p><img src="../img/switch_edge_condition.png" alt="switch_edge_condition"></p>
+<p>Eeach edge outgoing from <code>Switch</code> node has a boolean expression attached to it; if the expression evaluates to true the record is allowed to pass through this edge.  Record go to the first output with matching condition. <em>Order of matching outgoing edges is not guaranteed.</em></p>
+<p><img src="../img/switch_edge_default.png" alt="switch_edge_default"></p>
+<p>There can be at most one edge of type <code>Default</code>, and it gets all records that don&apos;t match any <code>Condition</code> edge. </p>
+<h3 id="flow">Flow</h3>
+<p>For each incoming record <code>Expression</code> is evaluated and result is assigned to <code>exprVal</code> variable. After that, records are tested against condition <code>Expressions</code> from output edges one by one. Record goes to the first output  where the edge condition is evaluated to <code>true</code>. If record doesn&apos;t match any conditional output, and default output exists, record goes to default output. Otherwise mismatching record is filtered out.</p>
+<h2 id="union">Union</h2>
+<p><img src="../img/union_window.png" alt="union_window"></p>
+<p>Union merges multiple branches into one stream. For each incoming branch two parameters are configured:</p>
+<ul>
+<li>key - it&apos;s value should be of type <code>String</code>, definex how elements from branches will be matched together</li>
+<li>value - this is the output value which will be put the field with name the same as branch id</li>
+</ul>
+<p>Union node defines new stream which is union of all branches. In this new stream there is only one variable, it&apos;s name
+is defined by &apos;Output&apos; parameter, it&apos;s value is: </p>
+<pre><code class="lang-$json">{
+  &quot;key&quot;: `value of key expression for given event`,
+  &quot;branch1&quot;: `value expression when event comes from branch1, otherwise null`,
+  &quot;branch2&quot;: `value expression when event comes from branch2, otherwise null`,
+  ...
+}
+</code></pre>
+<p>Currently branches are identified by id of last node in this branch before union.</p>
+<h2 id="unionmemo">UnionMemo</h2>
+<p>Works exactly like Union, but also memoize values for each branches. Memoized state will be cleared when there was no
+subsequent events from any branch during <code>stateTimeout</code>. Produced object has values from all branches.</p>
+<h2 id="previousvalue">PreviousValue</h2>
+<p><img src="../img/previous_value_window.png" alt="previous_value_window"></p>
+<p>Previousvalue stores arbitrary value for the given key. This element has two parameters:</p>
+<ul>
+<li>keyBy - expression defining key for which we compute aggregate, e.g. <code>#input.userId</code></li>
+<li>value - stored value</li>
+</ul>
+<p>For example, given stream of events which contain users with their current location, when we set </p>
+<ul>
+<li>keyBy is <code>#input.userId</code></li>
+<li>value is <code>#input.location</code>
+then the value of output variable is the previous location for current user. If this is the first appearance of this user,
+<strong>current</strong> location will be returned.</li>
+</ul>
+
+                                
+                                </section>
+                            
+    </div>
+    <div class="search-results">
+        <div class="has-results">
+            
+            <h1 class="search-results-title"><span class='search-results-count'></span> results matching "<span class='search-query'></span>"</h1>
+            <ul class="search-results-list"></ul>
+            
+        </div>
+        <div class="no-results">
+            
+            <h1 class="search-results-title">No results matching "<span class='search-query'></span>"</h1>
+            
+        </div>
+    </div>
+</div>
+
+                        </div>
+                    </div>
+                
+            </div>
+
+            
+                
+                <a href="../DesigningProcesses.html" class="navigation navigation-prev " aria-label="Previous page: Designing processes">
+                    <i class="fa fa-angle-left"></i>
+                </a>
+                
+                
+                <a href="Subprocesses.html" class="navigation navigation-next " aria-label="Next page: Subprocesses">
+                    <i class="fa fa-angle-right"></i>
+                </a>
+                
+            
+        
+    </div>
+
+    <script>
+        var gitbook = gitbook || [];
+        gitbook.push(function() {
+            gitbook.page.hasChanged({"page":{"title":"Basic nodes","level":"2.3.1","depth":2,"next":{"title":"Subprocesses","level":"2.3.2","depth":2,"path":"designingProcesses/Subprocesses.md","ref":"designingProcesses/Subprocesses.md","articles":[]},"previous":{"title":"Designing processes","level":"2.3","depth":1,"path":"DesigningProcesses.md","ref":"DesigningProcesses.md","articles":[{"title":"Basic nodes","level":"2.3.1","depth":2,"path":"designingProcesses/BasicNodes.md","ref":"designingProcesses/BasicNodes.md","articles":[]},{"title":"Subprocesses","level":"2.3.2","depth":2,"path":"designingProcesses/Subprocesses.md","ref":"designingProcesses/Subprocesses.md","articles":[]},{"title":"Flink custom transformers","level":"2.3.3","depth":2,"path":"designingProcesses/FlinkCustomTransformers.md","ref":"designingProcesses/FlinkCustomTransformers.md","articles":[]},{"title":"SpEL","level":"2.3.4","depth":2,"path":"designingProcesses/Spel.md","ref":"designingProcesses/Spel.md","articles":[]}]},"dir":"ltr"},"config":{"gitbook":"*","theme":"default","variables":{"nussknackerVersion":"0.0.11","flinkMajorVersion":"1.9"},"plugins":[],"pluginsConfig":{"highlight":{},"search":{},"lunr":{"maxIndexSize":1000000,"ignoreSpecialCharacters":false},"sharing":{"facebook":true,"twitter":true,"google":false,"weibo":false,"instapaper":false,"vk":false,"all":["facebook","google","twitter","weibo","instapaper"]},"fontsettings":{"theme":"white","family":"sans","size":2},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false}},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56}},"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"}},"file":{"path":"designingProcesses/BasicNodes.md","mtime":"2021-09-14T15:14:41.085Z","type":"markdown"},"gitbook":{"version":"3.2.3","time":"2021-09-14T15:15:16.961Z"},"basePath":"..","book":{"language":""}});
+        });
+    </script>
+</div>
+
+        
+    <script src="../gitbook/gitbook.js"></script>
+    <script src="../gitbook/theme.js"></script>
+    
+        
+        <script src="../gitbook/gitbook-plugin-search/search-engine.js"></script>
+        
+    
+        
+        <script src="../gitbook/gitbook-plugin-search/search.js"></script>
+        
+    
+        
+        <script src="../gitbook/gitbook-plugin-lunr/lunr.min.js"></script>
+        
+    
+        
+        <script src="../gitbook/gitbook-plugin-lunr/search-lunr.js"></script>
+        
+    
+        
+        <script src="../gitbook/gitbook-plugin-sharing/buttons.js"></script>
+        
+    
+        
+        <script src="../gitbook/gitbook-plugin-fontsettings/fontsettings.js"></script>
+        
+    
+
+    </body>
+</html>
+

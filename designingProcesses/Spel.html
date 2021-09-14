@@ -1,0 +1,1111 @@
+
+<!DOCTYPE HTML>
+<html lang="" >
+    <head>
+        <meta charset="UTF-8">
+        <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+        <title>SpEL · GitBook</title>
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="description" content="">
+        <meta name="generator" content="GitBook 3.2.3">
+        
+        
+        
+    
+    <link rel="stylesheet" href="../gitbook/style.css">
+
+    
+            
+                
+                <link rel="stylesheet" href="../gitbook/gitbook-plugin-highlight/website.css">
+                
+            
+                
+                <link rel="stylesheet" href="../gitbook/gitbook-plugin-search/search.css">
+                
+            
+                
+                <link rel="stylesheet" href="../gitbook/gitbook-plugin-fontsettings/website.css">
+                
+            
+        
+
+    
+
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+
+        
+    
+    
+    <meta name="HandheldFriendly" content="true"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <link rel="apple-touch-icon-precomposed" sizes="152x152" href="../gitbook/images/apple-touch-icon-precomposed-152.png">
+    <link rel="shortcut icon" href="../gitbook/images/favicon.ico" type="image/x-icon">
+
+    
+    <link rel="next" href="../Configuration.html" />
+    
+    
+    <link rel="prev" href="FlinkCustomTransformers.html" />
+    
+
+    </head>
+    <body>
+        
+<div class="book">
+    <div class="book-summary">
+        
+            
+<div id="book-search-input" role="search">
+    <input type="text" placeholder="Type to search" />
+</div>
+
+            
+                <nav role="navigation">
+                
+
+
+<ul class="summary">
+    
+    
+
+    
+
+    
+        
+        
+    
+        <li class="chapter " data-level="1.1" data-path="../">
+            
+                <a href="../">
+            
+                    
+                    Introduction
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.2" data-path="../Why.html">
+            
+                <a href="../Why.html">
+            
+                    
+                    Why Nussknacker
+            
+                </a>
+            
+
+            
+        </li>
+    
+
+    
+        
+        <li class="divider"></li>
+        
+        
+    
+        <li class="chapter " data-level="2.1" data-path="../Quickstart.html">
+            
+                <a href="../Quickstart.html">
+            
+                    
+                    Quickstart
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="2.2" data-path="../UI.html">
+            
+                <a href="../UI.html">
+            
+                    
+                    UI Manual
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="2.3" data-path="../DesigningProcesses.html">
+            
+                <a href="../DesigningProcesses.html">
+            
+                    
+                    Designing processes
+            
+                </a>
+            
+
+            
+            <ul class="articles">
+                
+    
+        <li class="chapter " data-level="2.3.1" data-path="BasicNodes.html">
+            
+                <a href="BasicNodes.html">
+            
+                    
+                    Basic nodes
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="2.3.2" data-path="Subprocesses.html">
+            
+                <a href="Subprocesses.html">
+            
+                    
+                    Subprocesses
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="2.3.3" data-path="FlinkCustomTransformers.html">
+            
+                <a href="FlinkCustomTransformers.html">
+            
+                    
+                    Flink custom transformers
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter active" data-level="2.3.4" data-path="Spel.html">
+            
+                <a href="Spel.html">
+            
+                    
+                    SpEL
+            
+                </a>
+            
+
+            
+        </li>
+    
+
+            </ul>
+            
+        </li>
+    
+        <li class="chapter " data-level="2.4" data-path="../Configuration.html">
+            
+                <a href="../Configuration.html">
+            
+                    
+                    Configuration
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="2.5" data-path="../Security.html">
+            
+                <a href="../Security.html">
+            
+                    
+                    Security
+            
+                </a>
+            
+
+            
+        </li>
+    
+
+    
+        
+        <li class="divider"></li>
+        
+        
+    
+        <li class="chapter " data-level="3.1" data-path="../Architecture.html">
+            
+                <a href="../Architecture.html">
+            
+                    
+                    Architecture
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="3.2" data-path="../Engines.html">
+            
+                <a href="../Engines.html">
+            
+                    
+                    Engines
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="3.3" data-path="../API.html">
+            
+                <a href="../API.html">
+            
+                    
+                    API
+            
+                </a>
+            
+
+            
+        </li>
+    
+
+    
+        
+        <li class="divider"></li>
+        
+        
+    
+        <li class="chapter " data-level="4.1" data-path="../Metrics.html">
+            
+                <a href="../Metrics.html">
+            
+                    
+                    Monitoring
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="4.2" data-path="../Install.html">
+            
+                <a href="../Install.html">
+            
+                    
+                    How to install
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="4.3" data-path="../Resources.html">
+            
+                <a href="../Resources.html">
+            
+                    
+                    Resources
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="4.4" data-path="../PoweredBy.html">
+            
+                <a href="../PoweredBy.html">
+            
+                    
+                    Powered by Nussknacker
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="4.5" data-path="../Roadmap.html">
+            
+                <a href="../Roadmap.html">
+            
+                    
+                    Roadmap
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="4.6" data-path="../Changelog.html">
+            
+                <a href="../Changelog.html">
+            
+                    
+                    Changelog
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="4.7" data-path="../MigrationGuide.html">
+            
+                <a href="../MigrationGuide.html">
+            
+                    
+                    Migration guide
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="4.8" data-path="../GLOSSARY.html">
+            
+                <a href="../GLOSSARY.html">
+            
+                    
+                    Glossary
+            
+                </a>
+            
+
+            
+        </li>
+    
+
+    
+
+    <li class="divider"></li>
+
+    <li>
+        <a href="https://www.gitbook.com" target="blank" class="gitbook-link">
+            Published with GitBook
+        </a>
+    </li>
+</ul>
+
+
+                </nav>
+            
+        
+    </div>
+
+    <div class="book-body">
+        
+            <div class="body-inner">
+                
+                    
+
+<div class="book-header" role="navigation">
+    
+
+    <!-- Title -->
+    <h1>
+        <i class="fa fa-circle-o-notch fa-spin"></i>
+        <a href=".." >SpEL</a>
+    </h1>
+</div>
+
+
+
+
+                    <div class="page-wrapper" tabindex="-1" role="main">
+                        <div class="page-inner">
+                            
+<div id="book-search-results">
+    <div class="search-noresults">
+    
+                                <section class="normal markdown-section">
+                                
+                                <h1 id="expressions-and-types">Expressions and types</h1>
+<p>Expressions used in Nussknacker are primarily written using SpEL (Spring Expression language) - simple, yet powerful expression language. 
+SpEL is based on Java (<a href="https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#expressions" target="_blank">reference documentation</a>), but 
+no prior Java knowledge is needed to use it. </p>
+<p>The easiest way to learn SpEL is looking at examples which are further down this page. Some attention should be paid to data types, described in more detail 
+in the next section, as depending on the context in which data are processed or displayed, different data type schemes are in use.</p>
+<h2 id="data-types-and-structures">Data types and structures</h2>
+<p>The data types are used primarily for:                            </p>
+<ul>
+<li>validation - e.g. to detect attempt to use incorrect data type, for example numeric field instead of a string, or checking if field used in expression exists at all.</li>
+<li>code completion - suggestions appearing in UI when editing expressions.</li>
+</ul>
+<p>Types of events in the Kafka streams or data returned by enrichers can be often discovered from some sort of schema registry, for example Confluent Schema Registry, SQL table schema or description of REST API. Nussknacker can also infer types of variables defined by user.</p>
+<p>The data types used in the execution engine, SpEL expressions and data structures are Java based. 
+These are also the data type names that appear in code completion hints. 
+In most cases Nussknacker can automatically convert between Java data types and JSON and AVRO formats. JSON will be used for REST API enrichers, while AVRO should be first choice for format of Kafka messages.</p>
+<p>Below is the list of the most common data types, with their JSON and Avro counterparts. 
+In Java types column package names are omitted for brevity, 
+they are usually <code>java.lang</code> (primitives), <code>java.util</code> (List, Map) and <code>java.time</code></p>
+<h3 id="basic-primitive-data-types">Basic (primitive data types)</h3>
+<table>
+<thead>
+<tr>
+<th>Java type</th>
+<th>JSON</th>
+<th>Avro</th>
+<th>Comment</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>null</td>
+<td>null</td>
+<td>null</td>
+<td></td>
+</tr>
+<tr>
+<td>String</td>
+<td>string</td>
+<td>string</td>
+<td>UTF-8</td>
+</tr>
+<tr>
+<td>Boolean</td>
+<td>boolean</td>
+<td>boolean</td>
+<td></td>
+</tr>
+<tr>
+<td>Integer</td>
+<td>number</td>
+<td>int</td>
+<td>32bit</td>
+</tr>
+<tr>
+<td>Long</td>
+<td>number</td>
+<td>long</td>
+<td>64bit</td>
+</tr>
+<tr>
+<td>Float</td>
+<td>number</td>
+<td>float</td>
+<td>single precision</td>
+</tr>
+<tr>
+<td>Double</td>
+<td>number</td>
+<td>double</td>
+<td>double precision</td>
+</tr>
+<tr>
+<td>BigDecimal</td>
+<td>number</td>
+<td>bytes or fixed + decimal</td>
+<td>enable computation without rounding errors</td>
+</tr>
+<tr>
+<td>UUID</td>
+<td>string</td>
+<td>string + uuid</td>
+<td>uuid</td>
+</tr>
+</tbody>
+</table>
+<p>More information about how to declare each type in Avro you can find in <a href="http://avro.apache.org/docs/current/spec.html#schemas" target="_blank">Avro ducumentation</a>, 
+especially about <a href="http://avro.apache.org/docs/current/spec.html#Logical+Types" target="_blank">Avro logical types</a>.</p>
+<h3 id="recordsobjects">Records/objects</h3>
+<p>In Nussknacker, the following data types share common processing characteristics:</p>
+<ul>
+<li><code>object</code> in JSON</li>
+<li><code>record</code> or <code>map</code> in Avro</li>
+<li><code>Map</code> and <a href="https://en.wikipedia.org/wiki/Plain_old_Java_object" target="_blank">POJO</a> in Java</li>
+</ul>
+<p>In many cases Nussknacker can convert between them automatically.
+For the user, the most significant difference is (using Avro terminology) 
+between <code>record</code> and <code>map</code>. Both can describe following JSON structure:</p>
+<p>input = <code>{ name: &apos;John&apos;, surname: &apos;Doe&apos;}</code>                            </p>
+<p>The main difference is that in case of <code>record</code> Nussknacker &quot;knows&quot; which fields (<code>name</code> and <code>surname</code>)
+are available and suggests and validates fields and their types.
+For example, <code>#input.name</code> is valid, while <code>#input.noname</code> or <code>#input.name &gt; 0</code> as field name or type do not match.</p>
+<p>On the other hand, <code>map</code> describes &quot;generic&quot; structure - Nussknacker tacitly assumes it can contain any field of any type.</p>
+<p>Nussknacker usually infers structure of record from external source (e.g. AVRO schema), but it can also detect it from map literals.</p>
+<h3 id="arrayslists">Arrays/lists</h3>
+<p>In Nussknacker (e.g. in code completion) JSON / Avro arrays are refered to as <code>Lists</code>; 
+also in some context <code>Collection</code> can be met (it&apos;s Java API for handling lists, sets etc.).</p>
+<h3 id="handling-datetime">Handling date/time.</h3>
+<p>Formats of date/time are pretty complex - especially in Java. There are basically three ways of storing date:</p>
+<ul>
+<li>as timestamp - absolute value, number of milliseconds since 1970-01-01T00:00:00 UTC. In Nussknacker this is 
+usually seen as <code>Long</code> or <code>Instant</code>. This format is handy for storing/sending values, a bit problematic when
+it comes to computations like adding a month or extracting date. </li>
+<li>as date/time without timezone information (this is usually handy if your system is in one timezone).
+Converting to timestamp is done using Nussknacker server timezone.
+In Nussknacker they are usually represented as <code>LocalDate</code> and <code>LocalDateTime</code>. Suitable for date computations like adding a month or extracting date. </li>
+<li>as date/time with stored timezone. In Nussknacker usually seen as <code>ZonedDateTime</code>. Suitable for date computations like adding a month or extracting date. </li>
+<li>as date/time with stored time offset. In Nussknacker usually seen as <code>OffsetDateTime</code>. Contrary to <code>ZonedDateTime</code> doesn&apos;t handle daylight saving time. 
+Quite often used to hold timestamp with additional information showing what was the local date/time from &quot;user perspective&quot; </li>
+</ul>
+<p>Conversions of different types of dates are handled either by </p>
+<ul>
+<li><code>#DATE</code> helper has methods for parsing and conversion</li>
+<li>methods on some types of objects, e.g.  <ul>
+<li><code>#instantObj.toEpochMilli</code> returns timestamp for <code>#instantObj</code> of type <code>Instant</code></li>
+<li><code>#localDate.atStartOfDay()</code> - returns <code>LocalDateTime</code> at midnight for <code>#localDate</code> of type <code>LocalDate</code></li>
+<li><code>#localDateTime.toLocalDate</code> - truncates to date for <code>#localDateTime</code> of type <code>LocalDateTime</code> </li>
+</ul>
+</li>
+</ul>
+<p>The following table mapping of types, possible JSON representation (no standard here though) and 
+mapping of AVRO types (<code>int + date</code> means <code>int</code> type with <code>date</code> logical type):</p>
+<table>
+<thead>
+<tr>
+<th>Java type</th>
+<th>JSON</th>
+<th>Avro</th>
+<th>Sample</th>
+<th>Comment</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>LocalDate</td>
+<td>string</td>
+<td>int + date</td>
+<td>2021-05-17</td>
+<td>Timezone is not stored</td>
+</tr>
+<tr>
+<td>LocalTime</td>
+<td>string</td>
+<td>int + time-millis or long + time-micros</td>
+<td>07:34:00.12345</td>
+<td>Timezone is not stored</td>
+</tr>
+<tr>
+<td>LocalDateTime</td>
+<td>string</td>
+<td>not supported yet</td>
+<td>2021-05-17T07:34:00</td>
+<td>Timezone is not stored</td>
+</tr>
+<tr>
+<td>ZonedDateTime</td>
+<td>string</td>
+<td>long + timestamp-millis or timestamp-micros (not supported in sources)</td>
+<td>2021-05-17T07:34:00+02:00</td>
+<td></td>
+</tr>
+<tr>
+<td>OffsetDateTime</td>
+<td>string</td>
+<td>long + timestamp-millis or timestamp-micros (not supported in sources)</td>
+<td>2021-05-17T07:34:00+02:00</td>
+<td></td>
+</tr>
+<tr>
+<td>Instant</td>
+<td>number</td>
+<td>long + timestamp-millis or timestamp-micros</td>
+<td>2021-05-17T05:34:00Z</td>
+<td>Timestamp (millis since 1970-01-01) in human readable format</td>
+</tr>
+<tr>
+<td>Long</td>
+<td>number</td>
+<td>long, long + local-timestamp-millis or local-timestamp-micros</td>
+<td>123456789</td>
+<td>Raw timestamp (millis since 1970-01-01)</td>
+</tr>
+</tbody>
+</table>
+<h1 id="spel-syntax">SpEL syntax</h1>
+<h2 id="literals">Literals</h2>
+<p>Most of the literals are similar to JSON ones, in fact in many cases JSON structure is valid SpEL. 
+There are a few notable exceptions:</p>
+<ul>
+<li>Lists are written using curly braces: <code>{&quot;firstElement&quot;, &quot;secondElement&quot;}</code>, as <code>[]</code> is used to access elements in array </li>
+<li>Empty record is <code>{:}</code>, to distinguish it from empty list: <code>{}</code></li>
+<li>Strings can be quoted with either <code>&apos;</code> or <code>&quot;</code></li>
+<li>Field names in records do not to be quoted (e.g. <code>{name: &quot;John&quot;}</code> is valid SpEL, but not valid JSON)</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>Expression</th>
+<th>Result</th>
+<th>Type</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>&apos;Hello World&apos;</code></td>
+<td>&quot;Hello World&quot;</td>
+<td>String</td>
+</tr>
+<tr>
+<td><code>true</code></td>
+<td>true</td>
+<td>Boolean</td>
+</tr>
+<tr>
+<td><code>null</code></td>
+<td>null</td>
+<td>Null</td>
+</tr>
+<tr>
+<td><code>{1,2,3,4}</code></td>
+<td>a list of integers from 1 to 4</td>
+<td>List[Integer]</td>
+</tr>
+<tr>
+<td><code>{john:300, alex:400}</code></td>
+<td>a map (name-value collection)</td>
+<td>Map[String, Integer]</td>
+</tr>
+<tr>
+<td><code>#input</code></td>
+<td>variable</td>
+</tr>
+</tbody>
+</table>
+<h2 id="arithmetic-operators">Arithmetic Operators</h2>
+<table>
+<thead>
+<tr>
+<th>Expression</th>
+<th>Result</th>
+<th>Type</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>42 + 2</code></td>
+<td>44</td>
+<td>Integer</td>
+</tr>
+<tr>
+<td><code>&apos;AA&apos; + &apos;BB&apos;</code></td>
+<td>&quot;AABB&quot;</td>
+<td>String</td>
+</tr>
+</tbody>
+</table>
+<h2 id="conditional-operators">Conditional Operators</h2>
+<table>
+<thead>
+<tr>
+<th>Expression</th>
+<th>Result</th>
+<th>Type</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>2 == 2</code></td>
+<td>true</td>
+<td>boolean</td>
+</tr>
+<tr>
+<td><code>2 &gt; 1</code></td>
+<td>true</td>
+<td>boolean</td>
+</tr>
+<tr>
+<td><code>true AND false</code></td>
+<td>false</td>
+<td>boolean</td>
+</tr>
+<tr>
+<td><code>true &amp;&amp; false</code></td>
+<td>false</td>
+<td>boolean</td>
+</tr>
+<tr>
+<td><code>true OR false</code></td>
+<td>true</td>
+<td>boolean</td>
+</tr>
+<tr>
+<td><code>true OR false</code></td>
+<td>true</td>
+<td>boolean</td>
+</tr>
+<tr>
+<td><code>2 &gt; 1 ? &apos;a&apos; : &apos;b&apos;</code></td>
+<td>&quot;a&quot;</td>
+<td>String</td>
+</tr>
+<tr>
+<td><code>2 &lt; 1 ? &apos;a&apos; : &apos;b&apos;</code></td>
+<td>&quot;b&quot;</td>
+<td>String</td>
+</tr>
+<tr>
+<td><code>#nonNullVar == null ? &apos;Unkown&apos; : &apos;Success&apos;</code></td>
+<td>&quot;Success&quot;</td>
+<td>String</td>
+</tr>
+<tr>
+<td><code>#nullVar == null ? &apos;Unknown&apos; : &apos;Success&apos;</code></td>
+<td>&quot;Unknown&quot;</td>
+<td>String</td>
+</tr>
+<tr>
+<td><code>#nullVar?:&apos;Unknown&apos;</code></td>
+<td>&quot;Unknown&quot;</td>
+<td>String</td>
+</tr>
+<tr>
+<td><code>&apos;john&apos;?:&apos;Unknown&apos;</code></td>
+<td>&quot;john&quot;</td>
+<td>String</td>
+</tr>
+</tbody>
+</table>
+<h2 id="method-invocations">Method invocations</h2>
+<p>As Nussknacker uses Java types, some objects are more than data containers - there are additional methods 
+that can be invoked on them. Method parameters are passed in parentheses, usually parameter details 
+are shown in code completion hints.</p>
+<table>
+<thead>
+<tr>
+<th>Expression</th>
+<th>Result</th>
+<th>Type</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>&apos;someValue.substring(4)</code></td>
+<td>&quot;Value&quot;</td>
+<td>String</td>
+</tr>
+<tr>
+<td><code>&apos;someValue&apos;.length()</code></td>
+<td>9</td>
+<td>Integer</td>
+</tr>
+</tbody>
+</table>
+<h2 id="accessing-elements-of-a-list-or-a-record">Accessing elements of a list or a record</h2>
+<table>
+<thead>
+<tr>
+<th>Expression</th>
+<th>Result</th>
+<th>Type</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>{1,2,3,4}[0]</code></td>
+<td>1</td>
+<td>Integer</td>
+</tr>
+<tr>
+<td><code>{jan:300, alex:400}[alex]</code></td>
+<td>a value of field &apos;alex&apos;, which is 400</td>
+<td>Integer</td>
+</tr>
+</tbody>
+</table>
+<h2 id="filtering-lists">Filtering lists</h2>
+<p>Special variable <code>#this</code> is used to operate on single element of list.</p>
+<table>
+<thead>
+<tr>
+<th>Expression</th>
+<th>Result</th>
+<th>Type</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>{1,2,3,4}.?[#this ge 3]</code></td>
+<td>{3, 4}</td>
+<td>List[Integer]</td>
+</tr>
+<tr>
+<td><code>#usersList.?[#this.firstName == &apos;john&apos;]</code></td>
+<td>{&apos;john doe&apos;}</td>
+<td>List[String]</td>
+</tr>
+</tbody>
+</table>
+<h2 id="mapping-lists">Mapping lists</h2>
+<p>Special variable <code>#this</code> is used to operate on single element of list.</p>
+<p>Examples below assume following structure:
+<code>Person: {name: String, age: Integer }
+listOfPersons: List[Person]
+person1 = name: &quot;Alex&quot;; age: 42
+person2 = name: &quot;John&quot;; age: 24
+listOfPersons = {person1, person2}</code></p>
+<table>
+<thead>
+<tr>
+<th>Expression</th>
+<th>Result</th>
+<th>Type</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>{1,2,3,4}.![#this * 2]</code></td>
+<td>{2, 4, 6, 8}</td>
+<td>List[Integer]</td>
+</tr>
+<tr>
+<td><code>#listOfPersons.![#this.name]</code></td>
+<td>{&apos;Alex&apos;, &apos;John&apos;}</td>
+<td>List[String]</td>
+</tr>
+<tr>
+<td><code>#listOfPersons.![#this.age]</code></td>
+<td>{42, 24}</td>
+<td>List[Integer]</td>
+</tr>
+<tr>
+<td><code>#listOfPersons.![7]</code></td>
+<td>{7, 7}</td>
+<td>List[Integer]</td>
+</tr>
+</tbody>
+</table>
+<h2 id="safe-navigation">Safe navigation</h2>
+<p>When you access nested structure, you have to take care of null fields, otherwise you&apos;ll end up with 
+error. SpEL provides helpful safe navigation operator, it&apos;s basically shorthand for conditional operator:
+<code>#someVar?.b</code> means <code>#someVar != null ? #someVar.b : null</code></p>
+<table>
+<thead>
+<tr>
+<th>Expression</th>
+<th>Result</th>
+<th>Type</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>null.someField</code></td>
+<td>java.lang.NullPointerException</td>
+<td>java.lang.NullPointerException</td>
+</tr>
+<tr>
+<td><code>null?.someField</code></td>
+<td>null</td>
+<td>Null</td>
+</tr>
+</tbody>
+</table>
+<h2 id="invoking-static-methods">Invoking static methods</h2>
+<p>It is possible to invoke Java static methods directly with SpEL. Nussknacker can prevent invocations
+of some of them due to security reasons. Invoking static methods is advanced functionality, which can lead
+to incomprehensible expressions, also code completions will not work with many of them. 
+If you need to invoke the same method in many places, probably the best solution is to create additional helper.</p>
+<table>
+<thead>
+<tr>
+<th>Expression</th>
+<th>Result</th>
+<th>Type</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>T(java.lang.Math).PI</code></td>
+<td>3.14159..</td>
+<td>Double</td>
+</tr>
+</tbody>
+</table>
+<h2 id="chaining-with-dot">Chaining with dot</h2>
+<table>
+<thead>
+<tr>
+<th>Expression</th>
+<th>Result</th>
+<th>Type</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>{1, 2, 3, 4}.?[#this &gt; 1].![#this &gt; 2 ? #this * 2 : #this]</code></td>
+<td>{2, 6, 8}</td>
+<td>Double</td>
+</tr>
+</tbody>
+</table>
+<h2 id="type-conversions">Type conversions</h2>
+<table>
+<thead>
+<tr>
+<th>Expression</th>
+<th>Result</th>
+<th>Type</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>#NUMERIC.toNumber(&apos;42&apos;)</code></td>
+<td>42</td>
+<td>Number</td>
+</tr>
+<tr>
+<td><code>#NUMERIC.toNumber(&apos;42&apos;).toString()</code></td>
+<td>&apos;42&apos;</td>
+<td>String</td>
+</tr>
+<tr>
+<td><code>&apos;&apos; + 42</code></td>
+<td>&apos;42&apos;</td>
+<td>String</td>
+</tr>
+<tr>
+<td><code>#DATE.parseToTimestamp(&apos;2018-10-23T12:12:13+00:00&apos;)</code></td>
+<td>1540296720000</td>
+<td>Long</td>
+</tr>
+<tr>
+<td><code>#DATE.parseToLocalDate(&apos;2018-10-23T12:12:13+00:00&apos;)</code></td>
+<td>2018-10-23T12:12:13+00:00</td>
+<td>LocalDateTime</td>
+</tr>
+</tbody>
+</table>
+<h2 id="built-in-helpers">Built-in helpers</h2>
+<table>
+<thead>
+<tr>
+<th>Helper</th>
+<th>Functions</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>GEO</code></td>
+<td>Simple distance measurements</td>
+</tr>
+<tr>
+<td><code>NUMERIC</code></td>
+<td>Number parsing</td>
+</tr>
+<tr>
+<td><code>CONV</code></td>
+<td>General conversion functions</td>
+</tr>
+<tr>
+<td><code>DATE</code></td>
+<td>Date operations (parsing, printing)</td>
+</tr>
+<tr>
+<td><code>UTIL</code></td>
+<td>Various utilities (e.g. identifier generation)</td>
+</tr>
+<tr>
+<td><code>AGG</code></td>
+<td>Aggregator functions</td>
+</tr>
+</tbody>
+</table>
+
+                                
+                                </section>
+                            
+    </div>
+    <div class="search-results">
+        <div class="has-results">
+            
+            <h1 class="search-results-title"><span class='search-results-count'></span> results matching "<span class='search-query'></span>"</h1>
+            <ul class="search-results-list"></ul>
+            
+        </div>
+        <div class="no-results">
+            
+            <h1 class="search-results-title">No results matching "<span class='search-query'></span>"</h1>
+            
+        </div>
+    </div>
+</div>
+
+                        </div>
+                    </div>
+                
+            </div>
+
+            
+                
+                <a href="FlinkCustomTransformers.html" class="navigation navigation-prev " aria-label="Previous page: Flink custom transformers">
+                    <i class="fa fa-angle-left"></i>
+                </a>
+                
+                
+                <a href="../Configuration.html" class="navigation navigation-next " aria-label="Next page: Configuration">
+                    <i class="fa fa-angle-right"></i>
+                </a>
+                
+            
+        
+    </div>
+
+    <script>
+        var gitbook = gitbook || [];
+        gitbook.push(function() {
+            gitbook.page.hasChanged({"page":{"title":"SpEL","level":"2.3.4","depth":2,"next":{"title":"Configuration","level":"2.4","depth":1,"path":"Configuration.md","ref":"Configuration.md","articles":[]},"previous":{"title":"Flink custom transformers","level":"2.3.3","depth":2,"path":"designingProcesses/FlinkCustomTransformers.md","ref":"designingProcesses/FlinkCustomTransformers.md","articles":[]},"dir":"ltr"},"config":{"gitbook":"*","theme":"default","variables":{"nussknackerVersion":"0.0.11","flinkMajorVersion":"1.9"},"plugins":[],"pluginsConfig":{"highlight":{},"search":{},"lunr":{"maxIndexSize":1000000,"ignoreSpecialCharacters":false},"sharing":{"facebook":true,"twitter":true,"google":false,"weibo":false,"instapaper":false,"vk":false,"all":["facebook","google","twitter","weibo","instapaper"]},"fontsettings":{"theme":"white","family":"sans","size":2},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false}},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56}},"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"}},"file":{"path":"designingProcesses/Spel.md","mtime":"2021-09-14T15:14:41.085Z","type":"markdown"},"gitbook":{"version":"3.2.3","time":"2021-09-14T15:15:16.961Z"},"basePath":"..","book":{"language":""}});
+        });
+    </script>
+</div>
+
+        
+    <script src="../gitbook/gitbook.js"></script>
+    <script src="../gitbook/theme.js"></script>
+    
+        
+        <script src="../gitbook/gitbook-plugin-search/search-engine.js"></script>
+        
+    
+        
+        <script src="../gitbook/gitbook-plugin-search/search.js"></script>
+        
+    
+        
+        <script src="../gitbook/gitbook-plugin-lunr/lunr.min.js"></script>
+        
+    
+        
+        <script src="../gitbook/gitbook-plugin-lunr/search-lunr.js"></script>
+        
+    
+        
+        <script src="../gitbook/gitbook-plugin-sharing/buttons.js"></script>
+        
+    
+        
+        <script src="../gitbook/gitbook-plugin-fontsettings/fontsettings.js"></script>
+        
+    
+
+    </body>
+</html>
+
