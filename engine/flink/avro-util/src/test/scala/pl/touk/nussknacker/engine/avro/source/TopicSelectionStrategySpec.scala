@@ -1,9 +1,12 @@
 package pl.touk.nussknacker.engine.avro.source
 
+import cats.data.Validated
 import io.confluent.kafka.schemaregistry.client.{SchemaRegistryClient => CSchemaRegistryClient}
-import pl.touk.nussknacker.engine.avro.{AllTopicsSelectionStrategy, TopicPatternSelectionStrategy}
+import pl.touk.nussknacker.engine.avro.{AllTopicsSelectionStrategy, TopicPatternSelectionStrategy, TopicSelectionStrategy}
 import pl.touk.nussknacker.engine.avro.helpers.KafkaAvroSpecMixin
+import pl.touk.nussknacker.engine.avro.schemaregistry.{SchemaRegistryClient, SchemaRegistryError}
 import pl.touk.nussknacker.engine.avro.schemaregistry.confluent.client.ConfluentSchemaRegistryClientFactory
+import pl.touk.nussknacker.engine.kafka.{KafkaConfig, KafkaUtils}
 
 import java.util.regex.Pattern
 
@@ -30,6 +33,19 @@ class TopicSelectionStrategySpec extends KafkaAvroSpecMixin with KafkaAvroSource
   test("show how to override topic selection strategy") {
     new KafkaAvroSourceFactory(schemaRegistryProvider, testProcessObjectDependencies, None) {
       override def topicSelectionStrategy = new TopicPatternSelectionStrategy(Pattern.compile("test-.*"))
+    }
+  }
+
+  class OnlyExistingTopicSelectionStrategy(kafkaConfig: KafkaConfig) extends TopicSelectionStrategy {
+    override def getTopics(schemaRegistryClient: SchemaRegistryClient): Validated[SchemaRegistryError, List[String]] = {
+      val existingTopics = KafkaUtils.getTopics(kafkaConfig) // or, for consistency, use topics cached within CachedTopicsExistenceValidator (maybe cache outside the validator?)
+      schemaRegistryClient.getAllTopics.map(all => all.intersect(existingTopics))
+    }
+  }
+
+  test("show how to use only existing topics strategy") {
+    new KafkaAvroSourceFactory(schemaRegistryProvider, testProcessObjectDependencies, None) {
+      override def topicSelectionStrategy = new OnlyExistingTopicSelectionStrategy(this.kafkaConfig)
     }
   }
 

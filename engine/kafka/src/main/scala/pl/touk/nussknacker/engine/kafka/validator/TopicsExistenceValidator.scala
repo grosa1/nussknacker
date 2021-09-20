@@ -44,27 +44,22 @@ class CachedTopicsExistenceValidator(kafkaConfig: KafkaConfig) extends TopicsExi
   @transient private lazy val autoCreateSettingCache = new SingleValueCache[Boolean](expireAfterAccess = None, expireAfterWrite = Some(config.autoCreateFlagFetchCacheTtl))
   @transient private lazy val topicListCache = new SingleValueCache[List[String]](expireAfterAccess = None, expireAfterWrite = Some(config.topicsFetchCacheTtl))
 
+  def getExistingTopics: List[String] = topicListCache.get()
+    .getOrElse {
+      val existingTopics = KafkaUtils.getTopics(kafkaConfig)
+      topicListCache.put(existingTopics)
+      existingTopics
+    }
+
   def validateTopics(topics: List[String]): Validated[TopicExistenceValidationException, List[String]] = {
     if (!kafkaConfig.topicsExistenceValidationConfig.enabled || isAutoCreateEnabled()) {
       Valid(topics)
     } else {
-      topicListCache.get().flatMap(existingTopics => {
-        if(topics.diff(existingTopics).isEmpty)
-          Some(Valid(topics))
-        else
-          None
-      }).getOrElse {
-        val existingTopics = usingAdminClient {
-          _.listTopics(new ListTopicsOptions().timeoutMs(config.adminClientTimeout.toMillis.toInt))
-            .names().get().asScala.toList
-        }
-        topicListCache.put(existingTopics)
-        val notExistingTopics = topics.diff(existingTopics)
-        if (notExistingTopics.isEmpty)
-          Valid(topics)
-        else
-          Invalid(new TopicExistenceValidationException(notExistingTopics))
-      }
+      val notExistingTopics = topics.diff(getExistingTopics)
+      if (notExistingTopics.isEmpty)
+        Valid(topics)
+      else
+        Invalid(new TopicExistenceValidationException(notExistingTopics))
     }
   }
 

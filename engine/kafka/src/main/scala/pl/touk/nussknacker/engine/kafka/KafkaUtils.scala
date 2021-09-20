@@ -4,7 +4,7 @@ import java.util.concurrent.TimeUnit
 import java.util.{Collections, Properties}
 import com.typesafe.scalalogging.LazyLogging
 import org.apache.kafka.clients.KafkaClient
-import org.apache.kafka.clients.admin.{Admin, AdminClient}
+import org.apache.kafka.clients.admin.{Admin, AdminClient, ListTopicsOptions}
 import org.apache.kafka.clients.consumer.{ConsumerRecord, KafkaConsumer}
 import org.apache.kafka.clients.producer.{Callback, KafkaProducer, Producer, ProducerRecord, RecordMetadata}
 import org.apache.kafka.common.TopicPartition
@@ -44,6 +44,14 @@ object KafkaUtils extends LazyLogging {
   def validateTopicsExistence(topics: List[PreparedKafkaTopic], kafkaConfig: KafkaConfig): Unit = {
     new CachedTopicsExistenceValidator(kafkaConfig = kafkaConfig)
       .validateTopics(topics.map(_.prepared)).valueOr(err => throw err)
+  }
+
+  def getTopics(kafkaConfig: KafkaConfig): List[String] = {
+    val config = kafkaConfig.topicsExistenceValidationConfig.validatorConfig // maybe move parameter to kafkaConfig.adminClientTimeout as it is not specific to validator only?
+    usingAdminClient(kafkaConfig) {
+      _.listTopics(new ListTopicsOptions().timeoutMs(config.adminClientTimeout.toMillis.toInt))
+        .names().get().asScala.toList
+    }
   }
 
   def prepareKafkaTopic(topic :String, processObjectDependencies: ProcessObjectDependencies): PreparedKafkaTopic =
