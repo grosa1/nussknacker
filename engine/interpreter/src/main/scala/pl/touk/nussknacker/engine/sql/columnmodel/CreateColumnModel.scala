@@ -61,6 +61,7 @@ object CreateColumnModel {
     val NUMBER: TypingResult = Typed[Number]
     val DATE: TypingResult = Typed[Date]
     val LOCAL_DATE_TIME: TypingResult = Typed[LocalDateTime]
+    val TIMESTAMP: TypingResult = Typed[java.sql.Timestamp]
 
     def convert(name: String, arg: TypingResult, className: String): Option[SqlType] = {
       import SqlType._
@@ -79,7 +80,7 @@ object CreateColumnModel {
              J_BOOLEAN =>
           Some(Bool)
           //TODO: other date types?
-        case DATE | LOCAL_DATE_TIME =>
+        case DATE | LOCAL_DATE_TIME | TIMESTAMP =>
           Some(SqlType.Date)
         case a =>
           logger.warn(s"No mapping for name: $name in $className and type $a")
