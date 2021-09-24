@@ -1,8 +1,7 @@
 package pl.touk.nussknacker.engine.sql.columnmodel
 
-import java.time.LocalDateTime
+import java.time.{Instant, LocalDateTime}
 import java.util.Date
-
 import cats.data._
 import cats.implicits._
 import com.typesafe.scalalogging.LazyLogging
@@ -61,7 +60,6 @@ object CreateColumnModel {
     val NUMBER: TypingResult = Typed[Number]
     val DATE: TypingResult = Typed[Date]
     val LOCAL_DATE_TIME: TypingResult = Typed[LocalDateTime]
-    val TIMESTAMP: TypingResult = Typed[java.sql.Timestamp]
 
     def convert(name: String, arg: TypingResult, className: String): Option[SqlType] = {
       import SqlType._
@@ -80,7 +78,7 @@ object CreateColumnModel {
              J_BOOLEAN =>
           Some(Bool)
           //TODO: other date types?
-        case DATE | LOCAL_DATE_TIME | TIMESTAMP =>
+        case DATE | LOCAL_DATE_TIME =>
           Some(SqlType.Date)
         case a =>
           logger.warn(s"No mapping for name: $name in $className and type $a")
