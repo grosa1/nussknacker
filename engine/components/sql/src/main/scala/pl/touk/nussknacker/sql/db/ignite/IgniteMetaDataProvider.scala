@@ -1,6 +1,5 @@
 package pl.touk.nussknacker.sql.db.ignite
 
-import pl.touk.nussknacker.engine.sql.ColumnModel
 import pl.touk.nussknacker.sql.db.schema._
 
 import java.sql.Connection
@@ -19,7 +18,7 @@ class IgniteMetaDataProvider(getConnection: () => Connection) extends JdbcMetaDa
 
   override def getSchemaDefinition(): SchemaDefinition = SchemaDefinition(queryHelper.fetchTablesMeta.keys.toList)
 
-  private def executeInHsql(query: String, tables: Map[String, ColumnModel])(function: HsqlSqlQueryableDatabase => TableMetaData): TableMetaData =
-    Using.resource(new HsqlSqlQueryableDatabase(query, tables)) { function }
+  private def executeInHsql(query: String, tables: Map[String, IgniteColumnModel])(function: IgniteHsqlDatabase => TableMetaData): TableMetaData =
+    Using.resource(new IgniteHsqlDatabase(query, tables)) { function }
 
 }
