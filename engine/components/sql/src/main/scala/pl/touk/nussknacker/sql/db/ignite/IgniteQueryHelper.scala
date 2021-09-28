@@ -26,7 +26,8 @@ class IgniteQueryHelper(getConnection: () => Connection) extends LazyLogging {
       }.groupBy { case (tableName, _, _, _) => tableName }
         .map { case (tableName, entries) =>
           val columns = entries.map { case (_, columnName, klassName, _) =>
-            Column(columnName, ClazzToSqlType.convert(columnName, typeMapping(Class.forName(klassName)), klassName).get)
+            val sqlType = ClazzToSqlType.convert(columnName, typeMapping(Class.forName(klassName)), klassName).get
+            Column(columnName, sqlType)
           }
           tableName -> ColumnModel(columns)
         }
@@ -35,7 +36,7 @@ class IgniteQueryHelper(getConnection: () => Connection) extends LazyLogging {
 
   private def typeMapping(clazz: Class[_]): typing.TypedClass = {
     val effectiveClass = if (clazz == classOf[java.sql.Timestamp])
-      classOf[java.util.Date]
+      classOf[java.time.Instant]
     else
       clazz
     Typed.typedClass(effectiveClass)

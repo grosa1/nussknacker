@@ -95,16 +95,10 @@ class HsqlSqlQueryableDataBase(query: String, tables: Map[String, ColumnModel]) 
     data
   }
 
-  def getTypedMap: TypedObjectDefinition = {
+  override def getTypingResult: typing.TypingResult = {
     val metaData = queryStatement.getMetaData
-    toTypedMapDefinition(metaData)
+    TypedObjectTypingResult(toTypedMapDefinition(metaData))
   }
-
-  override def getTypingResult: typing.TypingResult =
-    TypedObjectTypingResult(getTypedMap)
-
-  def parameterMetaData: ParameterMetaData =
-    queryStatement.getParameterMetaData
 
   override def close(): Unit = {
     connection.close()
