@@ -20,8 +20,8 @@ function fromTimestampOrDate(tsOrDate) {
 }
 
 export function visualizationUrl(processName: string, nodeId?: NodeId): string {
-  const baseUrl = `${visualizationBasePath}/${encodeURIComponent(processName)}`
-  return BASE_PATH + baseUrl + queryString.stringify({nodeId})
+  const baseUrl = `/${visualizationBasePath}/${encodeURIComponent(processName)}`
+  return queryString.stringifyUrl({url: baseUrl, query: {nodeId}})
 }
 
 export function extractCountParams(queryParams) {
