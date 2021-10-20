@@ -1,7 +1,6 @@
 package pl.touk.nussknacker.engine.flink.util.transformer
 
 import java.time.Duration
-
 import org.apache.flink.api.common.state.ValueStateDescriptor
 import org.apache.flink.api.common.typeinfo.TypeInformation
 import org.apache.flink.streaming.api.functions.KeyedProcessFunction
@@ -18,6 +17,7 @@ import pl.touk.nussknacker.engine.flink.api.timestampwatermark.TimestampWatermar
 import pl.touk.nussknacker.engine.flink.util.keyed
 import pl.touk.nussknacker.engine.flink.util.keyed.{StringKeyedValue, StringKeyedValueMapper}
 import pl.touk.nussknacker.engine.flink.util.timestamp.TimestampAssignmentHelper
+import pl.touk.nussknacker.engine.util.KeyedValue
 
 object UnionWithMemoTransformer extends UnionWithMemoTransformer(None)
 
@@ -61,7 +61,7 @@ class UnionWithMemoTransformer(timestampAssigner: Option[TimestampWatermarkHandl
       )
 
 
-  protected def mapElement: ValueWithContext[keyed.KeyedValue[String, (String, AnyRef)]] => ValueWithContext[keyed.KeyedValue[String, (String, AnyRef)]] = identity
+  protected def mapElement: ValueWithContext[KeyedValue[String, (String, AnyRef)]] => ValueWithContext[KeyedValue[String, (String, AnyRef)]] = identity
 
 }
 
@@ -85,5 +85,5 @@ class UnionMemoFunction(stateTimeout: Duration) extends LatelyEvictableStateFunc
     updateState(mergedValue, ctx.timestamp() + stateTimeout.toMillis, ctx.timerService())
     out.collect(new ValueWithContext[AnyRef](mergedValue.asJava, valueWithCtx.context))
   }
-  
+
 }
