@@ -1,10 +1,12 @@
 //types from pl.touk.nussknacker.ui.definition
 
+import {SingleComponentConfig} from "./component";
+
 export type UIObjectDefinition = {
     parameters: Array<UIParameter>,
     returnType?: TypingResult,
     categories: Array<string>,
-    nodeConfig: SingleNodeConfig,
+    componentConfig: SingleComponentConfig,
 }
 
 interface TypingResultBase {
@@ -48,21 +50,8 @@ export type UIParameter = {
      typ: TypingResult,
      editor: $TodoType,
      validators: $TodoType,
+     defaultValue: string,
      additionalVariables: Record<string, TypingResult>,
      variablesToHide: Array<string>,
      branchParam: boolean,
-}
-
-export type SingleNodeConfig = {
-    params?: Record<string, ParameterConfig>,
-    icon?: string,
-    docsUrl?: string,
-    category?: string,
-}
-
-export type ParameterConfig = {
-    defaultValue?: string,
-    editor?: $TodoType,
-    validators?: $TodoType,
-    label?: string,
 }

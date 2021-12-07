@@ -1,20 +1,20 @@
 package pl.touk.nussknacker.engine.flink.util.transformer
 
-import java.time.Duration
-import java.{util => jul}
 import org.apache.flink.api.common.eventtime.{SerializableTimestampAssigner, WatermarkStrategy}
-
-import javax.annotation.Nullable
-import javax.validation.constraints.Min
 import org.apache.flink.api.scala._
 import org.apache.flink.streaming.api.functions.source.SourceFunction
 import org.apache.flink.streaming.api.scala.{DataStream, StreamExecutionEnvironment}
 import pl.touk.nussknacker.engine.api._
-import pl.touk.nussknacker.engine.api.process.Source
+import pl.touk.nussknacker.engine.api.process.{BasicContextInitializer, Source, SourceFactory}
+import pl.touk.nussknacker.engine.api.typed.typing.Unknown
 import pl.touk.nussknacker.engine.api.typed.{ReturningType, typing}
-import pl.touk.nussknacker.engine.flink.api.process.{BasicContextInitializingFunction, FlinkCustomNodeContext, FlinkSource, FlinkSourceFactory}
+import pl.touk.nussknacker.engine.flink.api.process.{FlinkCustomNodeContext, FlinkSource, RichLifecycleMapFunction}
 import pl.touk.nussknacker.engine.flink.api.timestampwatermark.{StandardTimestampWatermarkHandler, TimestampWatermarkHandler}
 
+import java.time.Duration
+import java.{util => jul}
+import javax.annotation.Nullable
+import javax.validation.constraints.Min
 import scala.collection.JavaConverters._
 
 // TODO: add testing capabilities
@@ -22,14 +22,14 @@ object PeriodicSourceFactory extends PeriodicSourceFactory(
   new StandardTimestampWatermarkHandler[AnyRef](WatermarkStrategy.forMonotonousTimestamps()
     .withTimestampAssigner(new MapAscendingTimestampExtractor(MapAscendingTimestampExtractor.DefaultTimestampField))))
 
-class PeriodicSourceFactory(timestampAssigner: TimestampWatermarkHandler[AnyRef]) extends FlinkSourceFactory[AnyRef]  {
+class PeriodicSourceFactory(timestampAssigner: TimestampWatermarkHandler[AnyRef]) extends SourceFactory  {
 
   @MethodToInvoke
   def create(@ParamName("period") period: Duration,
              // TODO: @DefaultValue(1) instead of nullable
              @ParamName("count") @Nullable @Min(1) nullableCount: Integer,
-             @ParamName("value") value: LazyParameter[AnyRef]): Source[_] = {
-    new FlinkSource[AnyRef] with ReturningType {
+             @ParamName("value") value: LazyParameter[AnyRef]): Source = {
+    new FlinkSource with ReturningType {
 
       override def sourceStream(env: StreamExecutionEnvironment, flinkNodeContext: FlinkCustomNodeContext): DataStream[Context] = {
 
@@ -38,7 +38,7 @@ class PeriodicSourceFactory(timestampAssigner: TimestampWatermarkHandler[AnyRef]
         val stream = env
           .addSource(new PeriodicFunction(period))
           .map(_ => Context(processId))
-          .map(flinkNodeContext.lazyParameterHelper.lazyMapFunction(value))
+          .flatMap(flinkNodeContext.lazyParameterHelper.lazyMapFunction(value))
           .flatMap { v =>
             1.to(count).map(_ => v.value)
           }
@@ -47,7 +47,9 @@ class PeriodicSourceFactory(timestampAssigner: TimestampWatermarkHandler[AnyRef]
 
         val typeInformationFromNodeContext = flinkNodeContext.typeInformationDetection.forContext(flinkNodeContext.validationContext.left.get)
         rawSourceWithTimestamp
-          .map(new BasicContextInitializingFunction[AnyRef](flinkNodeContext.metaData.id, flinkNodeContext.nodeId))(typeInformationFromNodeContext)
+          .map(new RichLifecycleMapFunction[AnyRef, Context](
+            new BasicContextInitializer[AnyRef](Unknown).initContext(flinkNodeContext.nodeId),
+            flinkNodeContext.convertToEngineRuntimeContext))(typeInformationFromNodeContext)
       }
 
       override val returnType: typing.TypingResult = value.returnType

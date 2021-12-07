@@ -1,6 +1,6 @@
 /* eslint-disable i18next/no-literal-string */
+import {css, cx} from "@emotion/css"
 import {WindowContentProps} from "@touk/window-manager"
-import {css, cx} from "emotion"
 import _ from "lodash"
 import React from "react"
 import {connect} from "react-redux"
@@ -37,9 +37,9 @@ class VersionsForm extends React.Component<Props, State> {
 
   state = this.initState
 
-  UNSAFE_componentWillReceiveProps(nextProps: Props) {
-    if (nextProps.processId && nextProps.otherEnvironment) {
-      HttpService.fetchRemoteVersions(nextProps.processId).then(response => this.setState({remoteVersions: response.data || []}))
+  componentDidMount() {
+    if (this.props.processId && this.props.otherEnvironment) {
+      HttpService.fetchRemoteVersions(this.props.processId).then(response => this.setState({remoteVersions: response.data || []}))
     }
   }
 

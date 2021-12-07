@@ -8,7 +8,7 @@ For detailed instructions how to migrate to the newest version please see [migra
 Nussknacker versions
 ====================
      
-1.1.0 (Not released yet)
+1.1.0
 ------------------------
 * [#2176](https://github.com/TouK/nussknacker/pull/2176) Allow to enrich periodic scenario config on initial schedule and each deployment.
 * [#2179](https://github.com/TouK/nussknacker/pull/2179) Permission allowing for editing scenario on FE, but not saving etc.
@@ -16,8 +16,54 @@ Nussknacker versions
 Better handling of multiple schedules in batch periodic engine - fixed running one time scenarios and improved current scenario status reporting.
 * [#2208](https://github.com/TouK/nussknacker/pull/2208) Upgrade libraries: cats 2.6.x, cats-effect 2.5.x, circe 0.14.x
 * [#1422](https://github.com/TouK/nussknacker/pull/1422) Remove `ServiceReturningType` and `WithExplicitMethod`, added helpers, small refactor
-                                
-1.0.0 (Not released yet)
+* [#2278](https://github.com/TouK/nussknacker/pull/1422) SQL Variable is removed          
+* [#2280](https://github.com/TouK/nussknacker/pull/2280) Default values for parameters can be setup programmatically now - thanks to `@DefaultValue` annotation and `Parameter.defaultValue` field.
+* [#2293](https://github.com/TouK/nussknacker/pull/2293) Enhancement: change `nodeCategoryMapping` configuration to `componentsGroupMapping` 
+* [#2169](https://github.com/TouK/nussknacker/pull/2169) Add Apache Ignite support to SQL Component by implementing
+a custom DB metadata provider that extends the standard JDBC Driver with missing features.
+* [#2301](https://github.com/TouK/nussknacker/pull/2301) [#2366](https://github.com/TouK/nussknacker/pull/2366) 
+  [#2409](https://github.com/TouK/nussknacker/pull/2409) [#2477](https://github.com/TouK/nussknacker/pull/2477) Simplification of component API:
+  * `GenericNodeTransformation.initialParameters` was removed
+  * `GenericNodeTransformation.fallbackFinalResult` introduced for not handle step, with default graceful strategy
+  * `GenericNodeTransformation.contextTransformation` now handles `ParameterValidator` properly. Invalid value is handled as `FailedToDefineParameter`
+and `GenericNodeTransformation.implementation` is not invoked in this case
+  * `FinalResults.forValidation` utility method added to easily handle situation when you need to make some validation on context of variables (e.g. add variable checking if it already exists) 
+* [#2245](https://github.com/TouK/nussknacker/pull/2245) Periodic process scheduler retries failed scenario deployments based on PeriodicBatchConfig. 
+  Breaking change in PeriodicProcessListener FailedEvent. Failed event is split into FailedOnDeployEvent and FailedOnRunEvent. 
+  Please note that this mechanism only retries when failure on deployment occurs - failure recovery of running scenario should be handled by [restart strategy](https://docs.nussknacker.io/docs/installation_configuration_guide/ModelConfiguration#configuring-restart-strategies-flink-only)
+* [#2304](https://github.com/TouK/nussknacker/pull/2304) Upgrade to Flink 1.14
+* [#2295](https://github.com/TouK/nussknacker/pull/2295) `FlinkLazyParameterFunctionHelper` has additional methods to handle exceptions during evaluation gracefully
+* [#2300](https://github.com/TouK/nussknacker/pull/2300) Enhancement: refactor and improvements at components group
+* [#2347](https://github.com/TouK/nussknacker/pull/2347) Support for implicit type conversions between `String` and various value classes (`Locale` etc.) 
+* [#2346](https://github.com/TouK/nussknacker/pull/2346) Remove `endResult` from `Sink` in graph. 
+* [#2331](https://github.com/TouK/nussknacker/pull/2331) [#2496](https://github.com/TouK/nussknacker/pull/2496) Refactor `nussknacker-avro-flink-util` module. Move non-flink specific classes to new `nussknacker-avro-util` module. 
+* [#2348](https://github.com/TouK/nussknacker/pull/2348) [#2459](https://github.com/TouK/nussknacker/pull/2459) [#2486](https://github.com/TouK/nussknacker/pull/2486) 
+  [#2490](https://github.com/TouK/nussknacker/pull/2490) [#2496](https://github.com/TouK/nussknacker/pull/2496)
+  Refactor `nussknacker-kafka-flink-util` module. Move non-flink specific classes to `nussknacker-kafka-util` module.
+* [#2344](https://github.com/TouK/nussknacker/pull/2344) Redesign of `#DATE` and `#DATE_FORMAT` utilities.
+* [#2305](https://github.com/TouK/nussknacker/pull/2305) Enhancement: change `processingTypeToDashboard` configuration to `scenarioTypeToDashboard`
+* [#2374](https://github.com/TouK/nussknacker/pull/2374) Auto-loaded `ComponentProvider`s
+* [#2337](https://github.com/TouK/nussknacker/pull/2337) Extract base engine from standalone
+  * Common functionality of base engine (i.e. microservice based, without Flink) is extracted to `base-api` and `base-runtime`
+  * It's possible to use generic effect type instead of `Future`
+  * Possibility to accumulate errors
+  * New API for custom components (transformers and sinks)
+* [#2349](https://github.com/TouK/nussknacker/pull/2349) Removed module `queryable-state`, `FlinkQueryableClient` was moved to `nussknacker-flink-manager`.
+* `PrettyValidationErrors`, `CustomActionRequest` and `CustomActionResponse` moved from `nussknacker-ui` to `nussknacker-restmodel`.
+* [#2361](https://github.com/TouK/nussknacker/pull/2361) Removed `security` dependency from `listener-api`. `LoggedUser` replaced with dedicated class in `listener-api`.
+* [#2367](https://github.com/TouK/nussknacker/pull/2367), [#2406](https://github.com/TouK/nussknacker/pull/2406) Simple kafka-based streaming scenario interpreter. 
+  Stateless, with basic kafka sinks and sources. This is MVP, not intended for direct usage, more work with sources, sinks and invoking will come in next PRs                                                                     
+* [#2377](https://github.com/TouK/nussknacker/pull/2377) Remove `clazz` from `SourceFactory`. It was used mainly for test sources. 
+* [#2534](https://github.com/TouK/nussknacker/pull/2534) Remove generic parameter from `Source` and `SourceFactory`. It was used mainly to determine `TypingResult` in `SourceFactory.noParam`
+* [#2397](https://github.com/TouK/nussknacker/pull/2397) Common `EngineRuntimeContext` lifecycle and `MetricsProvider`, cleaning unnecessary dependencies on Flink 
+* [#2486](https://github.com/TouK/nussknacker/pull/2486) Aggregates now producing context id in similar format as sources - will be visible in "Test case" during usage of tests mechanism
+* [#2465](https://github.com/TouK/nussknacker/pull/2465) aggregate-sliding emitWhenEventLeft parameter changed default value from true to false
+* [#2474](https://github.com/TouK/nussknacker/pull/2474) Interpreter return type changed from `F[Either[List[InterpretationResult], EspExceptionInfo[_ <: Throwable]]]` to `F[List[Either[InterpretationResult, EspExceptionInfo[_ <: Throwable]]]]`.
+  Hence, e.g. multiple branches in Graph can be evaluated, both positively and negatively at the same time.
+* [#2540](https://github.com/TouK/nussknacker/pull/2540) It's possible to use different Effects than `Future` in request-response (standalone) runtime. `InvocationMetrics` are no longer 
+  automatically computed, as they are `Future` dependent - see `StandaloneRequestHandler` how to enable them.
+
+1.0.0
 ------------------------
 * [#1968](https://github.com/TouK/nussknacker/pull/1968) `BestEffortJsonEncoder` uses `ServiceLoader` mechanism to
 load additional encoders.
@@ -48,9 +94,21 @@ Better handling Flink's job deploying - we report job initialization as a "DURIN
 * [#2110](https://github.com/TouK/nussknacker/pull/2110) Remove node grouping
 * [#2098](https://github.com/TouK/nussknacker/pull/2098) Correct timestamps for tests of Kafka sources
 * [#2108](https://github.com/TouK/nussknacker/pull/2108) Enhanced class extraction settings, fewer unnecessary methods        
-
 * [#2191](https://github.com/TouK/nussknacker/pull/2191) KafkaAvroSink performance fix
-
+* UI enhancements:              
+  * [#1706](https://github.com/TouK/nussknacker/pull/1706) New window manager, consistent behaviour, many improvements, 
+    e.g. modals can be expanded to full screen, fix display of fragments in FF
+  * [#2184](https://github.com/TouK/nussknacker/pull/2184), [#2101](https://github.com/TouK/nussknacker/pull/2101) Fix undo breaking UI in certain circumstances
+  * [#2181](https://github.com/TouK/nussknacker/pull/2181), [#1975](https://github.com/TouK/nussknacker/pull/1975) Remove spurious 'unsaved changes' after opening aggregation nodes
+  * [#2202](https://github.com/TouK/nussknacker/pull/2202) Correct hashes of FE assets
+  * [#2097](https://github.com/TouK/nussknacker/pull/2097), [#2178](https://github.com/TouK/nussknacker/pull/2178) Pasting nodes in correct places
+  * [#2003](https://github.com/TouK/nussknacker/pull/2003) Counts dialog fixes: timezone handling, datepicker allows editing from keyboard
+  * [#2111](https://github.com/TouK/nussknacker/pull/2111) Correct graph display after opening fragment
+  * [#2087](https://github.com/TouK/nussknacker/pull/2087) Pan and zoom animation
+  * [#2081](https://github.com/TouK/nussknacker/pull/2081) Fix switch behaviour after changing condition
+  * [#2071](https://github.com/TouK/nussknacker/pull/2071) Fix pasting cell on multiple edges
+  * [#1978](https://github.com/TouK/nussknacker/pull/1978) Removed unclear node details panel
+  
 0.4.0
 ------------------------
 * More precise TypeInformation generation

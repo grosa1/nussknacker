@@ -1,6 +1,5 @@
 package pl.touk.nussknacker.genericmodel
 
-import cats.data.NonEmptyList
 import com.typesafe.config.ConfigValueFactory.fromAnyRef
 import com.typesafe.config.{Config, ConfigFactory}
 import com.typesafe.scalalogging.LazyLogging
@@ -13,17 +12,16 @@ import org.scalatest.{EitherValues, FunSuite, Matchers}
 import pl.touk.nussknacker.engine.api.CirceUtil.decodeJsonUnsafe
 import pl.touk.nussknacker.engine.api.deployment.DeploymentData
 import pl.touk.nussknacker.engine.api.process.ProcessObjectDependencies
-import pl.touk.nussknacker.engine.api.{JobData, MetaData, ProcessVersion, StreamMetaData}
+import pl.touk.nussknacker.engine.api.{JobData, ProcessVersion}
 import pl.touk.nussknacker.engine.avro.encode.{BestEffortAvroEncoder, ValidationMode}
 import pl.touk.nussknacker.engine.avro.kryo.AvroSerializersRegistrar
 import pl.touk.nussknacker.engine.avro.schemaregistry.confluent.client.{MockConfluentSchemaRegistryClientFactory, MockSchemaRegistryClient}
 import pl.touk.nussknacker.engine.avro.schemaregistry.confluent.{ConfluentSchemaRegistryProvider, ConfluentUtils}
 import pl.touk.nussknacker.engine.avro.schemaregistry.{ExistingSchemaVersion, LatestSchemaVersion, SchemaRegistryProvider, SchemaVersionOption}
-import pl.touk.nussknacker.engine.avro.{KafkaAvroBaseTransformer, _}
-import pl.touk.nussknacker.engine.build.{EspProcessBuilder, GraphBuilder}
+import pl.touk.nussknacker.engine.avro._
+import pl.touk.nussknacker.engine.build.EspProcessBuilder
 import pl.touk.nussknacker.engine.flink.test.FlinkSpec
 import pl.touk.nussknacker.engine.graph.EspProcess
-import pl.touk.nussknacker.engine.graph.exceptionhandler.ExceptionHandlerRef
 import pl.touk.nussknacker.engine.kafka.{KafkaConfig, KafkaSpec, KafkaZookeeperUtils}
 import pl.touk.nussknacker.engine.process.ExecutionConfigPreparer
 import pl.touk.nussknacker.engine.process.ExecutionConfigPreparer.{ProcessSettingsPreparer, UnoptimizedSerializationPreparer}
@@ -48,6 +46,8 @@ class GenericItSpec extends FunSuite with FlinkSpec with Matchers with KafkaSpec
 
   override lazy val config: Config = ConfigFactory.load()
     .withValue("kafka.kafkaAddress", fromAnyRef(kafkaZookeeperServer.kafkaAddress))
+    .withValue("components.kafka.disabled", fromAnyRef(true))
+    .withValue("components.mockKafka.disabled", fromAnyRef(false))
     .withValue("kafka.kafkaProperties.\"schema.registry.url\"", fromAnyRef("not_used"))
     // we turn off auto registration to do it on our own passing mocked schema registry client
     .withValue(s"kafka.kafkaEspProperties.${AvroSerializersRegistrar.autoRegisterRecordSchemaIdSerializationProperty}", fromAnyRef(false))
@@ -122,7 +122,7 @@ class GenericItSpec extends FunSuite with FlinkSpec with Matchers with KafkaSpec
             |}""".stripMargin
       )
       .filter("name-filter", filter)
-      .sink("end", "#input", "kafka-json", "topic" -> s"'$JsonOutTopic'")
+      .emptySink("end",  "kafka-json", "topic" -> s"'$JsonOutTopic'", "value" -> "#input")
 
   private def jsonSchemedProcess(topicConfig: TopicConfig, versionOption: SchemaVersionOption, validationMode: ValidationMode = ValidationMode.strict) =
     EspProcessBuilder
@@ -132,18 +132,18 @@ class GenericItSpec extends FunSuite with FlinkSpec with Matchers with KafkaSpec
       .source(
         "start",
         "kafka-registry-typed-json",
-        KafkaAvroBaseTransformer.TopicParamName -> s"'${topicConfig.input}'",
-        KafkaAvroBaseTransformer.SchemaVersionParamName -> versionOptionParam(versionOption)
+        KafkaAvroBaseComponentTransformer.TopicParamName -> s"'${topicConfig.input}'",
+        KafkaAvroBaseComponentTransformer.SchemaVersionParamName -> versionOptionParam(versionOption)
       )
       .filter("name-filter", "#input.first == 'Jan'")
       .emptySink(
         "end",
         "kafka-registry-typed-json-raw",
-        KafkaAvroBaseTransformer.SinkKeyParamName -> "",
-        KafkaAvroBaseTransformer.SinkValueParamName -> "#input",
-        KafkaAvroBaseTransformer.TopicParamName -> s"'${topicConfig.output}'",
-        KafkaAvroBaseTransformer.SchemaVersionParamName -> s"'${SchemaVersionOption.LatestOptionName}'",
-        KafkaAvroBaseTransformer.SinkValidationModeParameterName -> s"'${validationMode.name}'"
+        KafkaAvroBaseComponentTransformer.SinkKeyParamName -> "",
+        KafkaAvroBaseComponentTransformer.SinkValueParamName -> "#input",
+        KafkaAvroBaseComponentTransformer.TopicParamName -> s"'${topicConfig.output}'",
+        KafkaAvroBaseComponentTransformer.SchemaVersionParamName -> s"'${SchemaVersionOption.LatestOptionName}'",
+        KafkaAvroBaseComponentTransformer.SinkValidationModeParameterName -> s"'${validationMode.name}'"
       )
 
   private def avroProcess(topicConfig: TopicConfig, versionOption: SchemaVersionOption, validationMode: ValidationMode = ValidationMode.strict) =
@@ -154,18 +154,18 @@ class GenericItSpec extends FunSuite with FlinkSpec with Matchers with KafkaSpec
       .source(
         "start",
         "kafka-avro",
-        KafkaAvroBaseTransformer.TopicParamName -> s"'${topicConfig.input}'",
-        KafkaAvroBaseTransformer.SchemaVersionParamName -> versionOptionParam(versionOption)
+        KafkaAvroBaseComponentTransformer.TopicParamName -> s"'${topicConfig.input}'",
+        KafkaAvroBaseComponentTransformer.SchemaVersionParamName -> versionOptionParam(versionOption)
       )
       .filter("name-filter", "#input.first == 'Jan'")
       .emptySink(
         "end",
         "kafka-avro-raw",
-        KafkaAvroBaseTransformer.SinkKeyParamName -> "",
-        KafkaAvroBaseTransformer.SinkValueParamName -> "#input",
-        KafkaAvroBaseTransformer.TopicParamName -> s"'${topicConfig.output}'",
-        KafkaAvroBaseTransformer.SchemaVersionParamName -> s"'${SchemaVersionOption.LatestOptionName}'",
-        KafkaAvroBaseTransformer.SinkValidationModeParameterName -> s"'${validationMode.name}'"
+        KafkaAvroBaseComponentTransformer.SinkKeyParamName -> "",
+        KafkaAvroBaseComponentTransformer.SinkValueParamName -> "#input",
+        KafkaAvroBaseComponentTransformer.TopicParamName -> s"'${topicConfig.output}'",
+        KafkaAvroBaseComponentTransformer.SchemaVersionParamName -> s"'${SchemaVersionOption.LatestOptionName}'",
+        KafkaAvroBaseComponentTransformer.SinkValidationModeParameterName -> s"'${validationMode.name}'"
 
       )
 
@@ -177,17 +177,17 @@ class GenericItSpec extends FunSuite with FlinkSpec with Matchers with KafkaSpec
       .source(
         "start",
         "kafka-avro",
-        KafkaAvroBaseTransformer.TopicParamName -> s"'${topicConfig.input}'",
-        KafkaAvroBaseTransformer.SchemaVersionParamName -> versionOptionParam(versionOption)
+        KafkaAvroBaseComponentTransformer.TopicParamName -> s"'${topicConfig.input}'",
+        KafkaAvroBaseComponentTransformer.SchemaVersionParamName -> versionOptionParam(versionOption)
       )
       .emptySink(
         "end",
         "kafka-avro-raw",
-        KafkaAvroBaseTransformer.SinkKeyParamName -> "",
-        KafkaAvroBaseTransformer.SinkValueParamName -> s"{first: #input.first, last: #input.last}",
-        KafkaAvroBaseTransformer.TopicParamName -> s"'${topicConfig.output}'",
-        KafkaAvroBaseTransformer.SinkValidationModeParameterName -> s"'${ValidationMode.strict.name}'",
-        KafkaAvroBaseTransformer.SchemaVersionParamName -> "'1'"
+        KafkaAvroBaseComponentTransformer.SinkKeyParamName -> "",
+        KafkaAvroBaseComponentTransformer.SinkValueParamName -> s"{first: #input.first, last: #input.last}",
+        KafkaAvroBaseComponentTransformer.TopicParamName -> s"'${topicConfig.output}'",
+        KafkaAvroBaseComponentTransformer.SinkValidationModeParameterName -> s"'${ValidationMode.strict.name}'",
+        KafkaAvroBaseComponentTransformer.SchemaVersionParamName -> "'1'"
       )
 
   private def versionOptionParam(versionOption: SchemaVersionOption) =
@@ -263,65 +263,6 @@ class GenericItSpec extends FunSuite with FlinkSpec with Matchers with KafkaSpec
     }
   }
 
-  test("should merge two streams with union and save it to kafka") {
-    val topicIn1: String = "union.json.input1"
-    val topicIn2: String = "union.json.input2"
-    val topicOut: String = "union.json.output"
-
-    val dataJson1 = """{"data1": "from source1"}"""
-    val dataJson2 = """{"data2": "from source2"}"""
-
-    sendAsJson(dataJson1, topicIn1)
-    sendAsJson(dataJson2, topicIn2)
-
-    val bizarreBranchName = "?branch .2-"
-    val sanitizedBizarreBranchName = "_branch__2_"
-
-    val process = EspProcess(MetaData("proc1", StreamMetaData()), ExceptionHandlerRef(List()), NonEmptyList.of(
-      GraphBuilder
-        .source("sourceId1", "kafka-typed-json",
-          "topic" -> s"'$topicIn1'",
-          "type" -> """{"data1": "String"}""")
-        .branchEnd("branch1", "join1"),
-      GraphBuilder
-        .source("sourceId2", "kafka-typed-json",
-          "topic" -> s"'$topicIn2'",
-          "type" -> """{"data2": "String"}""")
-        .branchEnd(bizarreBranchName, "join1"),
-      GraphBuilder
-        .branch("join1", "union", Some("outPutVar"),
-          List(
-            "branch1" -> List("key" -> "'key1'", "value" -> "#input.data1"),
-            bizarreBranchName -> List("key" -> "'key2'", "value" -> "#input.data2")
-          )
-        )
-        .filter("always-true-filter", """#outPutVar.key != "not key1 or key2"""")
-        .sink("end", "#outPutVar", "kafka-json", "topic" -> s"'$topicOut'")
-    ))
-
-    logger.info("Starting union scenario")
-    run(process) {
-      logger.info("Waiting for consumer")
-      val consumer = kafkaClient.createConsumer().consume(topicOut, secondsToWaitForAvro)
-      logger.info("Waiting for messages")
-      val processed = consumer.map(_.message()).map(new String(_, StandardCharsets.UTF_8)).take(2).toList
-      processed.map(parseJson) should contain theSameElementsAs List(
-        parseJson(
-          s"""{
-             |  "key" : "key2",
-             |  "$sanitizedBizarreBranchName" : "from source2"
-             |}""".stripMargin
-        ),
-        parseJson(
-          """{
-            |  "key" : "key1",
-            |  "branch1" : "from source1"
-            |}""".stripMargin
-        )
-      )
-    }
-  }
-
   test("should read avro object in v1 from kafka and deserialize it to v2, filter and save it to kafka in v2") {
     val topicConfig = createAndRegisterTopicConfig("v1.v2.v2", RecordSchemas)
     val result = avroEncoder.encodeRecordOrError(
@@ -373,11 +314,7 @@ class GenericItSpec extends FunSuite with FlinkSpec with Matchers with KafkaSpec
 
   private def consumeOneAvroMessage(topic: String) = valueDeserializer.deserialize(topic, consumeOneRawAvroMessage(topic).message())
 
-  private lazy val creator: GenericConfigCreator = new GenericConfigCreator {
-    override protected def createAvroSchemaRegistryProvider: SchemaRegistryProvider = ConfluentSchemaRegistryProvider.avroPayload(new MockConfluentSchemaRegistryClientFactory(schemaRegistryMockClient))
-
-    override protected def createJsonSchemaRegistryProvider: SchemaRegistryProvider = ConfluentSchemaRegistryProvider.jsonPayload(new MockConfluentSchemaRegistryClientFactory(schemaRegistryMockClient))
-  }
+  private lazy val creator: GenericConfigCreator = new GenericConfigCreator
 
   private var registrar: FlinkProcessRegistrar = _
   private lazy val valueSerializer = new KafkaAvroSerializer(schemaRegistryMockClient)

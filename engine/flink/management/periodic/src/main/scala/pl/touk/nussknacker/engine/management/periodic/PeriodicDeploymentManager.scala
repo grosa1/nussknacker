@@ -9,21 +9,20 @@ import pl.touk.nussknacker.engine.api.deployment._
 import pl.touk.nussknacker.engine.api.deployment.simple.SimpleStateStatus
 import pl.touk.nussknacker.engine.api.process.ProcessName
 import pl.touk.nussknacker.engine.management.FlinkConfig
-import pl.touk.nussknacker.engine.management.periodic.Utils._
+import pl.touk.nussknacker.engine.management.periodic.Utils.runSafely
 import pl.touk.nussknacker.engine.management.periodic.db.{DbInitializer, SlickPeriodicProcessesRepository}
 import pl.touk.nussknacker.engine.management.periodic.flink.FlinkJarManager
 import pl.touk.nussknacker.engine.management.periodic.model.{PeriodicProcessDeployment, PeriodicProcessDeploymentStatus}
-import pl.touk.nussknacker.engine.management.periodic.service.{AdditionalDeploymentDataProvider, ProcessConfigEnricherFactory, PeriodicProcessListenerFactory}
+import pl.touk.nussknacker.engine.management.periodic.service.{AdditionalDeploymentDataProvider, PeriodicProcessListenerFactory, ProcessConfigEnricherFactory}
 import slick.jdbc
 import slick.jdbc.JdbcProfile
-import sttp.client.asynchttpclient.future.AsyncHttpClientFutureBackend
 import sttp.client.{NothingT, SttpBackend}
 
 import java.time.{Clock, LocalDateTime, ZoneOffset}
-import scala.concurrent.duration._
-import scala.concurrent.{Await, ExecutionContext, Future}
+import scala.concurrent.{ExecutionContext, Future}
 
 object PeriodicDeploymentManager {
+
   def apply(delegate: DeploymentManager,
             schedulePropertyExtractorFactory: SchedulePropertyExtractorFactory,
             processConfigEnricherFactory: ProcessConfigEnricherFactory,
@@ -32,12 +31,9 @@ object PeriodicDeploymentManager {
             originalConfig: Config,
             modelData: ModelData,
             listenerFactory: PeriodicProcessListenerFactory,
-            additionalDeploymentDataProvider: AdditionalDeploymentDataProvider): PeriodicDeploymentManager = {
-    implicit val system: ActorSystem = ActorSystem("periodic-process-manager-provider")
-    implicit val ec: ExecutionContext = ExecutionContext.global
-    implicit val backend: SttpBackend[Future, Nothing, NothingT] = AsyncHttpClientFutureBackend.usingConfigBuilder { builder =>
-      builder.setThreadPoolName("AsyncBatchPeriodicClient")
-    }
+            additionalDeploymentDataProvider: AdditionalDeploymentDataProvider,
+            customActionsProviderFactory: PeriodicCustomActionsProviderFactory)
+           (implicit ec: ExecutionContext, system: ActorSystem, sttpBackend: SttpBackend[Future, Nothing, NothingT]): PeriodicDeploymentManager = {
 
     val clock = Clock.systemDefaultZone()
 
@@ -46,26 +42,34 @@ object PeriodicDeploymentManager {
     val jarManager = FlinkJarManager(flinkConfig, periodicBatchConfig, modelData)
     val listener = listenerFactory.create(originalConfig)
     val processConfigEnricher = processConfigEnricherFactory(originalConfig)
-    val service = new PeriodicProcessService(delegate, jarManager, scheduledProcessesRepository, listener, additionalDeploymentDataProvider, processConfigEnricher, clock)
+    val service = new PeriodicProcessService(
+      delegate,
+      jarManager,
+      scheduledProcessesRepository,
+      listener,
+      additionalDeploymentDataProvider,
+      periodicBatchConfig.deploymentRetry,
+      processConfigEnricher,
+      clock)
     system.actorOf(DeploymentActor.props(service, periodicBatchConfig.deployInterval))
     system.actorOf(RescheduleFinishedActor.props(service, periodicBatchConfig.rescheduleCheckInterval))
 
+    val customActionsProvider = customActionsProviderFactory.create(scheduledProcessesRepository, service)
+
     val toClose = () => {
       runSafely(listener.close())
-      Await.ready(system.terminate(), 10 seconds)
       db.close()
-      Await.ready(backend.close(), 10 seconds)
-      ()
     }
-    new PeriodicDeploymentManager(delegate, service, schedulePropertyExtractorFactory(originalConfig), toClose)
+    new PeriodicDeploymentManager(delegate, service, schedulePropertyExtractorFactory(originalConfig), customActionsProvider, toClose)
   }
 }
 
-class PeriodicDeploymentManager(val delegate: DeploymentManager,
-                             service: PeriodicProcessService,
-                             schedulePropertyExtractor: SchedulePropertyExtractor,
-                             toClose: () => Unit)
-                            (implicit val ec: ExecutionContext) extends DeploymentManager with LazyLogging {
+class PeriodicDeploymentManager private[periodic](val delegate: DeploymentManager,
+                                                  service: PeriodicProcessService,
+                                                  schedulePropertyExtractor: SchedulePropertyExtractor,
+                                                  customActionsProvider: PeriodicCustomActionsProvider,
+                                                  toClose: () => Unit)
+                                                 (implicit val ec: ExecutionContext) extends DeploymentManager with LazyLogging {
 
   override def deploy(processVersion: ProcessVersion,
                       deploymentData: DeploymentData,
@@ -74,14 +78,10 @@ class PeriodicDeploymentManager(val delegate: DeploymentManager,
     (processDeploymentData, schedulePropertyExtractor(processDeploymentData)) match {
       case (GraphProcess(processJson), Right(scheduleProperty)) =>
         logger.info(s"About to (re)schedule ${processVersion.processName} in version ${processVersion.versionId}")
-
         // PeriodicProcessStateDefinitionManager do not allow to redeploy (so doesn't GUI),
         // but NK API does, so we need to handle this situation.
-        cancelIfJobPresent(processVersion, deploymentData.user)
-          .flatMap(_ => {
-            logger.info(s"Scheduling ${processVersion.processName}, versionId: ${processVersion.versionId}")
-            service.schedule(scheduleProperty, processVersion, processJson)
-          }.map(_ => None))
+        service.schedule(scheduleProperty, processVersion, processJson, cancelIfJobPresent(processVersion, deploymentData.user))
+          .map(_ => None)
       case (_: GraphProcess, Left(error)) =>
         Future.failed(new PeriodicProcessException(error))
       case _ =>
@@ -204,11 +204,10 @@ class PeriodicDeploymentManager(val delegate: DeploymentManager,
     delegate.close()
   }
 
-  override def customActions: List[CustomAction] = List.empty
+  override def customActions: List[CustomAction] = customActionsProvider.customActions
 
   override def invokeCustomAction(actionRequest: CustomActionRequest,
-                                  processDeploymentData: ProcessDeploymentData): Future[Either[CustomActionError, CustomActionResult]] =
-    Future.successful(Left(CustomActionNotImplemented(actionRequest)))
+                                  processDeploymentData: ProcessDeploymentData): Future[Either[CustomActionError, CustomActionResult]] = customActionsProvider.invokeCustomAction(actionRequest, processDeploymentData)
 }
 
 case class ScheduledStatus(nextRunAt: LocalDateTime) extends CustomStateStatus("SCHEDULED") {

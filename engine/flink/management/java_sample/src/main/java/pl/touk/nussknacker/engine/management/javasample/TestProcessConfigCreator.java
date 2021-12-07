@@ -27,7 +27,7 @@ public class TestProcessConfigCreator implements ProcessConfigCreator {
     }
 
     @Override
-    public Map<String, WithCategories<SourceFactory<?>>> sourceFactories(ProcessObjectDependencies processObjectDependencies) {
+    public Map<String, WithCategories<SourceFactory>> sourceFactories(ProcessObjectDependencies processObjectDependencies) {
         return Collections.singletonMap("source", objects.source());
     }
 
@@ -58,7 +58,7 @@ public class TestProcessConfigCreator implements ProcessConfigCreator {
 
     @Override
     public ExpressionConfig expressionConfig(ProcessObjectDependencies processObjectDependencies) {
-        return new ExpressionConfig(Collections.emptyMap(), Collections.emptyList(), Collections.emptyList());
+        return new ExpressionConfig(Collections.emptyMap(), Collections.emptyList());
     }
 
     @Override

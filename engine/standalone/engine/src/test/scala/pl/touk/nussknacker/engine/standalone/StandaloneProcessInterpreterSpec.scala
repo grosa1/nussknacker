@@ -1,30 +1,33 @@
 package pl.touk.nussknacker.engine.standalone
 
-import cats.data.NonEmptyList
+import cats.data.Validated.{Invalid, Valid}
+import cats.data.{NonEmptyList, ValidatedNel}
 import com.typesafe.config.ConfigFactory
 import io.dropwizard.metrics5.MetricRegistry
 import org.scalatest.{FunSuite, Matchers}
+import pl.touk.nussknacker.engine.api.context.ProcessCompilationError.NodeId
 import pl.touk.nussknacker.engine.api.deployment.DeploymentData
 import pl.touk.nussknacker.engine.api.exception.EspExceptionInfo
+import pl.touk.nussknacker.engine.api.process.RunMode
 import pl.touk.nussknacker.engine.api.typed.typing.{Typed, TypedObjectTypingResult}
-import pl.touk.nussknacker.engine.api.{Context, JobData, MetaData, ProcessVersion, StreamMetaData}
+import pl.touk.nussknacker.engine.api.{Context, MetaData, ProcessVersion, StreamMetaData}
+import pl.touk.nussknacker.engine.baseengine.api.commonTypes.ErrorType
+import pl.touk.nussknacker.engine.baseengine.api.runtimecontext.EngineRuntimeContextPreparer
+import pl.touk.nussknacker.engine.baseengine.metrics.dropwizard.DropwizardMetricsProviderFactory
 import pl.touk.nussknacker.engine.build.{EspProcessBuilder, GraphBuilder}
 import pl.touk.nussknacker.engine.graph.EspProcess
 import pl.touk.nussknacker.engine.graph.exceptionhandler.ExceptionHandlerRef
 import pl.touk.nussknacker.engine.resultcollector.ProductionServiceInvocationCollector
 import pl.touk.nussknacker.engine.spel
-import pl.touk.nussknacker.engine.standalone.api.StandaloneContextPreparer
-import pl.touk.nussknacker.engine.standalone.api.metrics.MetricsProvider
-import pl.touk.nussknacker.engine.standalone.api.types.GenericListResultType
-import pl.touk.nussknacker.engine.standalone.metrics.NoOpMetricsProvider
-import pl.touk.nussknacker.engine.standalone.metrics.dropwizard.DropwizardMetricsProvider
+import pl.touk.nussknacker.engine.standalone.FutureBaseStandaloneScenarioEngine.InterpreterType
+import pl.touk.nussknacker.engine.standalone.metrics.InvocationMetrics
+import pl.touk.nussknacker.engine.standalone.openapi.StandaloneOpenApiGenerator.OutputSchemaProperty
 import pl.touk.nussknacker.engine.testing.LocalModelData
-import pl.touk.nussknacker.test.{PatientScalaFutures, VeryPatientScalaFutures}
+import pl.touk.nussknacker.test.PatientScalaFutures
 
 import java.util
-import pl.touk.nussknacker.engine.api.process.RunMode
-
 import scala.collection.immutable.ListMap
+import scala.concurrent.Future
 import scala.util.Using
 
 class StandaloneProcessInterpreterSpec extends FunSuite with Matchers with PatientScalaFutures {
@@ -43,13 +46,13 @@ class StandaloneProcessInterpreterSpec extends FunSuite with Matchers with Patie
       .filter("filter1", "#input.field1 == 'a'")
       .enricher("enricher", "var1", "enricherService")
       .processor("processor", "processorService")
-      .sink("endNodeIID", "#var1", "response-sink")
+      .emptySink("endNodeIID", "response-sink", "value" -> "#var1")
 
     val creator = new StandaloneProcessConfigCreator
     val contextId = "context-id"
     val result = runProcess(process, Request1("a", "b"), creator, contextId = Some(contextId))
 
-    result shouldBe Right(List(Response(s"alamakota-$contextId")))
+    result shouldBe Valid(List(Response(s"alamakota-$contextId")))
     creator.processorService.invocationsCount.get() shouldBe 1
   }
 
@@ -59,13 +62,13 @@ class StandaloneProcessInterpreterSpec extends FunSuite with Matchers with Patie
       .exceptionHandler()
       .source("start", "request1-post-source")
       .split("split",
-        GraphBuilder.sink("sink1", "#input.field1", "response-sink"),
-        GraphBuilder.sink("sink2", "#input.field2", "response-sink")
+        GraphBuilder.emptySink("sink1", "response-sink", "value" -> "#input.field1"),
+        GraphBuilder.emptySink("sink2", "response-sink", "value" -> "#input.field2")
       )
 
     val result = runProcess(process, Request1("a", "b"))
 
-    result shouldBe Right(List("a", "b"))
+    result shouldBe Valid(List("a", "b"))
   }
 
   test("collect metrics") {
@@ -77,17 +80,17 @@ class StandaloneProcessInterpreterSpec extends FunSuite with Matchers with Patie
       .filter("filter1", "#input.field1 == 'a'")
       .enricher("enricher", "var1", "enricherService")
       .processor("processor", "processorService")
-      .sink("endNodeIID", "#var1", "response-sink")
+      .emptySink("endNodeIID", "response-sink", "value" -> "#var1")
 
     val creator = new StandaloneProcessConfigCreator
     val metricRegistry = new MetricRegistry
 
     Using.resource(prepareInterpreter(process, creator, metricRegistry)) { interpreter =>
-      interpreter.open(JobData(process.metaData, ProcessVersion.empty, DeploymentData.empty))
+      interpreter.open()
       val contextId = "context-id"
-      val result = interpreter.invoke(Request1("a", "b"), Some(contextId)).futureValue
+      val result = invokeInterpreter(interpreter, Request1("a", "b"), Some(contextId))
 
-      result shouldBe Right(List(Response(s"alamakota-$contextId")))
+      result shouldBe Valid(List(Response(s"alamakota-$contextId")))
       creator.processorService.invocationsCount.get() shouldBe 1
 
       eventually {
@@ -104,13 +107,13 @@ class StandaloneProcessInterpreterSpec extends FunSuite with Matchers with Patie
       .id("proc1")
       .exceptionHandler()
       .source("start", "request1-post-source")
-      .customNode("split", "outPart", "splitter", "parts" -> "#input.toList()")
+      .customNode("split", "outPart", "split", "parts" -> "#input.toList()")
       .buildSimpleVariable("var1", "var1", "#outPart")
-      .sink("sink1", "#outPart", "response-sink")
+      .emptySink("sink1", "response-sink", "value" -> "#outPart")
 
     val result = runProcess(process, Request1("a", "b"))
 
-    result shouldBe Right(List("a", "b"))
+    result shouldBe Valid(List("a", "b"))
   }
 
   test("init call open method for service") {
@@ -119,11 +122,11 @@ class StandaloneProcessInterpreterSpec extends FunSuite with Matchers with Patie
       .exceptionHandler()
       .source("start", "request1-post-source")
       .enricher("enricherWithOpenService", "response", "enricherWithOpenService")
-      .sink("sink1", "#response.field1", "response-sink")
+      .emptySink("sink1", "response-sink", "value" -> "#response.field1")
 
     val result = runProcess(process, Request1("a", "b"))
 
-    result shouldBe Right(List("true"))
+    result shouldBe Valid(List("true"))
   }
 
   test("init call open method for eager service") {
@@ -134,12 +137,12 @@ class StandaloneProcessInterpreterSpec extends FunSuite with Matchers with Patie
       .enricher("enricher1", "response1", "eagerEnricherWithOpen", "name" -> "'1'")
       .customNode("custom", "output", "extractor", "expression" -> "''")
       .enricher("enricher2", "response2", "eagerEnricherWithOpen", "name" -> "'2'")
-      .sink("sink1", "#response1.field1 + #response2.field1", "response-sink")
+      .emptySink("sink1", "response-sink", "value" -> "#response1.field1 + #response2.field1")
 
     val creator = new StandaloneProcessConfigCreator
     val result = runProcess(process, Request1("a", "b"), creator)
 
-    result shouldBe Right(List("truetrue"))
+    result shouldBe Valid(List("truetrue"))
     creator.eagerEnricher.opened shouldBe true
     creator.eagerEnricher.closed shouldBe true
     val openedInvokers = creator.eagerEnricher.list.filter(_._2.opened == true)
@@ -156,23 +159,25 @@ class StandaloneProcessInterpreterSpec extends FunSuite with Matchers with Patie
       .exceptionHandler()
       .source("start", "request1-post-source")
       .enricher("enricherWithOpenService", "response", "enricherWithOpenService")
-      .sink("sink1", "#response.field1", "response-sink")
+      .emptySink("sink1", "response-sink", "value" -> "#response.field1")
 
     val metricRegistry = new MetricRegistry
 
     Using.resource(
       prepareInterpreter(process, new StandaloneProcessConfigCreator, metricRegistry = metricRegistry)
     ) { interpreter =>
-      interpreter.open(JobData(process.metaData, ProcessVersion.empty, DeploymentData.empty))
-      val result = interpreter.invoke(Request1("a", "b")).futureValue
+      interpreter.open()
+      val result = invokeInterpreter(interpreter, Request1("a", "b"), None)
 
-      result shouldBe Right(List("true"))
+      result shouldBe Valid(List("true"))
 
       eventually {
+
         metricRegistry.getGauges().get(MetricRegistry.name("invocation", "success", "instantRate")
           .tagged("processId", "proc1")).getValue.asInstanceOf[Double] should not be 0
         metricRegistry.getHistograms().get(MetricRegistry.name("invocation", "success", "histogram")
           .tagged("processId", "proc1")).getCount shouldBe 1
+
         metricRegistry.getGauges().get(MetricRegistry.name("service", "OK", "instantRate")
           .tagged("processId", "proc1", "serviceName", "enricherWithOpenService")).getValue.asInstanceOf[Double] should not be 0
         metricRegistry.getHistograms().get(MetricRegistry.name("service", "OK", "histogram")
@@ -187,11 +192,11 @@ class StandaloneProcessInterpreterSpec extends FunSuite with Matchers with Patie
       .exceptionHandler()
       .source("start", "request1-post-source")
       .customNode("extract", "extracted", "extractor", "expression" -> "#input.field2")
-      .sink("sink1", "#extracted", "response-sink")
+      .emptySink("sink1", "response-sink", "value" -> "#extracted")
 
     val result = runProcess(process, Request1("a", "b"))
 
-    result shouldBe Right(List("b"))
+    result shouldBe Valid(List("b"))
   }
 
   test("collects answers from parameters") {
@@ -203,7 +208,7 @@ class StandaloneProcessInterpreterSpec extends FunSuite with Matchers with Patie
 
     val result = runProcess(process, Request1("abc", "b"))
 
-    result shouldBe Right(List("abcd withRandomString"))
+    result shouldBe Valid(List("abcd withRandomString"))
   }
 
   test("recognizes output types") {
@@ -216,17 +221,17 @@ class StandaloneProcessInterpreterSpec extends FunSuite with Matchers with Patie
 
 
     val interpreter = prepareInterpreter(process = process)
-    interpreter.sinkTypes shouldBe Map("endNodeIID" -> Typed[String])
+    interpreter.sinkTypes shouldBe Map(NodeId("endNodeIID") -> Typed[String])
 
     val process2 = EspProcessBuilder
       .id("proc1")
       .exceptionHandler()
       .source("start", "request1-post-source")
-      .sink("endNodeIID", "{'str': #input.toString(), 'int': 15}", "response-sink")
+      .emptySink("endNodeIID", "response-sink", "value" -> "{'str': #input.toString(), 'int': 15}")
 
 
     val interpreter2 = prepareInterpreter(process = process2)
-    interpreter2.sinkTypes shouldBe Map("endNodeIID" -> TypedObjectTypingResult(ListMap("str" -> Typed[String], "int" -> Typed[java.lang.Integer])))
+    interpreter2.sinkTypes shouldBe Map(NodeId("endNodeIID") -> TypedObjectTypingResult(ListMap("str" -> Typed[String], "int" -> Typed[java.lang.Integer])))
 
   }
 
@@ -235,13 +240,13 @@ class StandaloneProcessInterpreterSpec extends FunSuite with Matchers with Patie
       .id("exception-in-sink")
       .exceptionHandler()
       .source("start", "request1-post-source")
-      .sink("sink", "#input.field1", "failing-sink", "fail" -> "true")
+      .emptySink("sink", "failing-sink", "fail" -> "true")
 
     val creator = new StandaloneProcessConfigCreator
     val contextId = "context-id"
     val result = runProcess(process, Request1("a", "b"), creator, contextId = Some(contextId))
 
-    result shouldBe Left(NonEmptyList.of(
+    result shouldBe Invalid(NonEmptyList.of(
       EspExceptionInfo(Some("sink"),
         SinkException("FailingSink failed"),
         Context("context-id", Map("input" -> Request1("a", "b")), None))
@@ -253,24 +258,12 @@ class StandaloneProcessInterpreterSpec extends FunSuite with Matchers with Patie
       .id("proc1")
       .exceptionHandler()
       .source("start", "request1-post-source")
-      .customNodeNoOutput("filter", "filterWithLog", "filterExpression" -> "true")
+      .customNodeNoOutput("filter", "customFilter", "filterExpression" -> "true")
       .emptySink("endNodeIID", "parameterResponse-sink", "computed" -> "#input.field1 + 'd'")
 
     val result = runProcess(process, Request1("abc", "b"))
 
-    result shouldBe Right(List("abcd withRandomString"))
-  }
-
-  test("stop process on filter and return StandaloneLogInformation") {
-    val process = EspProcessBuilder
-      .id("proc1")
-      .exceptionHandler()
-      .source("start", "request1-post-source")
-      .customNodeNoOutput("filter", "filterWithLog", "filterExpression" -> "false")
-      .emptySink("endNodeIID", "parameterResponse-sink", "computed" -> "#input.field1 + 'd'")
-
-    val result = runProcess(process, Request1("abc", "b"))
-    result shouldBe Right(List(StandaloneLogInformation(false)))
+    result shouldBe Valid(List("abcd withRandomString"))
   }
 
   test("should perform union") {
@@ -286,7 +279,7 @@ class StandaloneProcessInterpreterSpec extends FunSuite with Matchers with Patie
     ))
 
     val result = runProcess(process, Request1("abc", "b"))
-    result shouldBe Right(List("abc aa withRandomString", "abc bb withRandomString"))
+    result shouldBe Valid(List("abc aa withRandomString", "abc bb withRandomString"))
   }
 
   test("should sort split results") {
@@ -301,28 +294,29 @@ class StandaloneProcessInterpreterSpec extends FunSuite with Matchers with Patie
         .branch("joinWithSort", "union", None, Nil)
         .customNode("sorter", "sorted", "sorter",
           "maxCount" -> "2", "rank" -> "#v1.rank", "output" -> "#v1.value")
-        .sink("endNodeIID", "#sorted", "response-sink")
+        .emptySink("endNodeIID", "response-sink", "value" -> "#sorted")
     ))
 
     val result = runProcess(process, Request1("abc", "b"))
-    result shouldBe Right(List(util.Arrays.asList("v5", "v4")))
+    result shouldBe Valid(List(util.Arrays.asList("v5", "v4")))
   }
 
   test("render schema for process") {
-    val schema = "'{\"properties\": {\"city\": {\"type\": \"string\", \"default\": \"Warsaw\"}}}'"
+    val inputSchema = "'{\"properties\": {\"city\": {\"type\": \"string\", \"default\": \"Warsaw\"}}}'"
+    val outputSchema = "{\"properties\": {\"place\": {\"type\": \"string\"}}}"
     val process = EspProcessBuilder
       .id("proc1")
-      .additionalFields(properties = Map("paramName" -> "paramValue"))
+      .additionalFields(properties = Map("paramName" -> "paramValue", OutputSchemaProperty -> outputSchema))
       .exceptionHandler()
-      .source("start", "jsonSchemaSource", "schema" -> schema)
-      .sink("endNodeIID", "#input", "response-sink")
+      .source("start", "jsonSchemaSource", "schema" -> inputSchema)
+      .emptySink("endNodeIID", "response-sink", "value" -> "#input")
 
     val interpreter = prepareInterpreter(process = process)
     val openApiOpt = interpreter.generateOpenApiDefinition()
     val expectedOpenApi =
       """{
         |  "post" : {
-        |    "description" : "**paramName**: paramValue",
+        |    "description" : "**scenario name**: proc1",
         |    "tags" : [
         |      "Nussknacker"
         |    ],
@@ -353,8 +347,11 @@ class StandaloneProcessInterpreterSpec extends FunSuite with Matchers with Patie
         |        "content" : {
         |          "application/json" : {
         |            "schema" : {
-        |              "type" : "object",
-        |              "properties" : null
+        |              "properties" : {
+        |                "place" : {
+        |                  "type" : "string"
+        |                }
+        |              }
         |            }
         |          }
         |        }
@@ -371,33 +368,41 @@ class StandaloneProcessInterpreterSpec extends FunSuite with Matchers with Patie
                  input: Any,
                  creator: StandaloneProcessConfigCreator = new StandaloneProcessConfigCreator,
                  metricRegistry: MetricRegistry = new MetricRegistry,
-                 contextId: Option[String] = None): GenericListResultType[Any] =
+                 contextId: Option[String] = None): ValidatedNel[ErrorType, Any] =
     Using.resource(prepareInterpreter(
       process = process,
       creator = creator,
       metricRegistry = metricRegistry
     )) { interpreter =>
-      interpreter.open(JobData(process.metaData, ProcessVersion.empty, DeploymentData.empty))
-      interpreter.invoke(input, contextId).futureValue
+      interpreter.open()
+      invokeInterpreter(interpreter, input, contextId)
     }
 
   def prepareInterpreter(process: EspProcess,
                          creator: StandaloneProcessConfigCreator,
-                         metricRegistry: MetricRegistry): StandaloneProcessInterpreter = {
-    prepareInterpreter(process, creator, new DropwizardMetricsProvider(metricRegistry))
+                         metricRegistry: MetricRegistry): InterpreterType = {
+    prepareInterpreter(process, creator, new EngineRuntimeContextPreparer(new DropwizardMetricsProviderFactory(metricRegistry)))
   }
 
   def prepareInterpreter(process: EspProcess,
                          creator: StandaloneProcessConfigCreator = new StandaloneProcessConfigCreator,
-                         metricsProvider: MetricsProvider = NoOpMetricsProvider): StandaloneProcessInterpreter = {
+                         engineRuntimeContextPreparer: EngineRuntimeContextPreparer = EngineRuntimeContextPreparer.noOp): InterpreterType = {
     val simpleModelData = LocalModelData(ConfigFactory.load(), creator)
-    val ctx = new StandaloneContextPreparer(metricsProvider)
 
-    val maybeinterpreter = StandaloneProcessInterpreter(process, ctx, simpleModelData, Nil, ProductionServiceInvocationCollector, RunMode.Normal)
+    import FutureBaseStandaloneScenarioEngine._
+    val maybeinterpreter = StandaloneScenarioEngine[Future](process, ProcessVersion.empty, DeploymentData.empty,
+      engineRuntimeContextPreparer, simpleModelData, Nil, ProductionServiceInvocationCollector, RunMode.Normal)
 
     maybeinterpreter shouldBe 'valid
     val interpreter = maybeinterpreter.toOption.get
     interpreter
+  }
+
+  private def invokeInterpreter(interpreter: InterpreterType, input: Any, contextId: Option[String]) = {
+    val metrics = new InvocationMetrics(interpreter.context)
+    metrics.measureTime {
+      interpreter.invokeToOutput(input, contextId)
+    }.futureValue
   }
 
 }

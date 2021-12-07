@@ -41,6 +41,7 @@ class PeriodicDeploymentManagerTest extends FunSuite
       scheduledProcessesRepository = repository,
       EmptyListener,
       DefaultAdditionalDeploymentDataProvider,
+      DeploymentRetryConfig(),
       ProcessConfigEnricher.identity,
       Clock.systemDefaultZone()
     )
@@ -48,6 +49,7 @@ class PeriodicDeploymentManagerTest extends FunSuite
       delegate = delegateDeploymentManagerStub,
       service = periodicProcessService,
       schedulePropertyExtractor = CronSchedulePropertyExtractor(),
+      EmptyPeriodicCustomActionsProvider,
       toClose = () => ()
     )
 
@@ -141,6 +143,17 @@ class PeriodicDeploymentManagerTest extends FunSuite
     val f = new Fixture
 
     f.periodicDeploymentManager.deploy(processVersion, DeploymentData.empty, PeriodicProcessGen(), None).futureValue
+
+    f.repository.processEntities.loneElement.active shouldBe true
+    f.repository.deploymentEntities.loneElement.status shouldBe PeriodicProcessDeploymentStatus.Scheduled
+  }
+
+  test("deploy - should not cancel current schedule after trying to deploy with past date") {
+    val f = new Fixture
+    f.repository.addActiveProcess(processName, PeriodicProcessDeploymentStatus.Scheduled)
+
+    f.periodicDeploymentManager.deploy(processVersion, DeploymentData.empty, PeriodicProcessGen("0 0 0 ? * * 2000"), None)
+      .failed.futureValue
 
     f.repository.processEntities.loneElement.active shouldBe true
     f.repository.deploymentEntities.loneElement.status shouldBe PeriodicProcessDeploymentStatus.Scheduled

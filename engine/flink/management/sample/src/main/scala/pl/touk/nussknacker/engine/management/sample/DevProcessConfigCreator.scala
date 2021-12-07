@@ -3,15 +3,15 @@ package pl.touk.nussknacker.engine.management.sample
 import com.cronutils.model.CronType
 import com.cronutils.model.definition.CronDefinitionBuilder
 import com.cronutils.parser.CronParser
-
-import java.time.LocalDateTime
 import com.typesafe.config.Config
-import io.circe.{Decoder, Encoder}
 import io.circe.parser.decode
+import io.circe.{Decoder, Encoder}
 import net.ceedubs.ficus.Ficus._
 import org.apache.flink.api.common.serialization.{DeserializationSchema, SimpleStringSchema}
+import org.apache.flink.streaming.api.functions.sink.DiscardingSink
 import org.apache.flink.streaming.api.scala._
 import pl.touk.nussknacker.engine.api._
+import pl.touk.nussknacker.engine.api.component.{ComponentGroupName, ParameterConfig, SingleComponentConfig}
 import pl.touk.nussknacker.engine.api.definition.{FixedExpressionValue, FixedValuesParameterEditor, MandatoryParameterValidator, StringParameterEditor}
 import pl.touk.nussknacker.engine.api.exception.ExceptionHandlerFactory
 import pl.touk.nussknacker.engine.api.process._
@@ -19,22 +19,24 @@ import pl.touk.nussknacker.engine.avro.schemaregistry.SchemaRegistryProvider
 import pl.touk.nussknacker.engine.avro.schemaregistry.confluent.ConfluentSchemaRegistryProvider
 import pl.touk.nussknacker.engine.avro.schemaregistry.confluent.client.{CachedConfluentSchemaRegistryClientFactory, ConfluentSchemaRegistryClientFactory, MockConfluentSchemaRegistryClientFactory, MockSchemaRegistryClient}
 import pl.touk.nussknacker.engine.avro.sink.KafkaAvroSinkFactoryWithEditor
+import pl.touk.nussknacker.engine.avro.sink.flink.FlinkKafkaAvroSinkImplFactory
 import pl.touk.nussknacker.engine.avro.source.KafkaAvroSourceFactory
-import pl.touk.nussknacker.engine.flink.api.process._
 import pl.touk.nussknacker.engine.flink.util.exception.ConfigurableExceptionHandlerFactory
-import pl.touk.nussknacker.engine.flink.util.sink.EmptySink
+import pl.touk.nussknacker.engine.flink.util.sink.{EmptySink, SingleValueSinkFactory}
 import pl.touk.nussknacker.engine.flink.util.source.{EspDeserializationSchema, ReturningClassInstanceSource, ReturningTestCaseClass}
+import pl.touk.nussknacker.engine.flink.util.transformer.TransformStateTransformer
 import pl.touk.nussknacker.engine.flink.util.transformer.aggregate.AggregateHelper
 import pl.touk.nussknacker.engine.flink.util.transformer.aggregate.sampleTransformers.SlidingAggregateTransformerV2
 import pl.touk.nussknacker.engine.flink.util.transformer.join.SingleSideJoinTransformer
-import pl.touk.nussknacker.engine.flink.util.transformer.{TransformStateTransformer, UnionTransformer, UnionWithMemoTransformer}
 import pl.touk.nussknacker.engine.kafka.KafkaConfig
 import pl.touk.nussknacker.engine.kafka.consumerrecord.{ConsumerRecordToJsonFormatterFactory, FixedValueDeserializationSchemaFactory}
+import pl.touk.nussknacker.engine.kafka.generic.sinks.FlinkKafkaSinkImplFactory
 import pl.touk.nussknacker.engine.kafka.serialization.schemas.SimpleSerializationSchema
 import pl.touk.nussknacker.engine.kafka.sink.KafkaSinkFactory
 import pl.touk.nussknacker.engine.kafka.source.KafkaSourceFactory
+import pl.touk.nussknacker.engine.kafka.source.flink.FlinkKafkaSourceImplFactory
 import pl.touk.nussknacker.engine.management.sample.dict.{BusinessConfigDictionary, RGBDictionary, TestDictionary}
-import pl.touk.nussknacker.engine.management.sample.dto.{ConstantState, SampleProduct}
+import pl.touk.nussknacker.engine.management.sample.dto.{ConstantState, CsvRecord, SampleProduct}
 import pl.touk.nussknacker.engine.management.sample.global.ConfigTypedGlobalVariable
 import pl.touk.nussknacker.engine.management.sample.helper.DateProcessHelper
 import pl.touk.nussknacker.engine.management.sample.service._
@@ -44,6 +46,7 @@ import pl.touk.nussknacker.engine.management.sample.transformer._
 import pl.touk.nussknacker.engine.util.LoggingListener
 
 import java.nio.charset.StandardCharsets
+import java.time.LocalDateTime
 import scala.reflect.ClassTag
 
 object DevProcessConfigCreator {
@@ -71,19 +74,19 @@ class DevProcessConfigCreator extends ProcessConfigCreator {
   override def sinkFactories(processObjectDependencies: ProcessObjectDependencies): Map[String, WithCategories[SinkFactory]] = {
     val schemaRegistryProvider = createSchemaRegistryProvider(processObjectDependencies)
     Map(
-      "sendSms" -> all(SinkFactory.noParam(EmptySink)),
+      "sendSms" -> all(new SingleValueSinkFactory(new DiscardingSink)),
       "monitor" -> categories(SinkFactory.noParam(EmptySink)),
       "communicationSink" -> categories(DynamicParametersSink),
-      "kafka-string" -> all(new KafkaSinkFactory(new SimpleSerializationSchema[Any](_, String.valueOf), processObjectDependencies)),
-      "kafka-avro" -> all(new KafkaAvroSinkFactoryWithEditor(schemaRegistryProvider, processObjectDependencies))
+      "kafka-string" -> all(new KafkaSinkFactory(new SimpleSerializationSchema[AnyRef](_, String.valueOf), processObjectDependencies, FlinkKafkaSinkImplFactory)),
+      "kafka-avro" -> all(new KafkaAvroSinkFactoryWithEditor(schemaRegistryProvider, processObjectDependencies, FlinkKafkaAvroSinkImplFactory))
     )
   }
 
   override def listeners(processObjectDependencies: ProcessObjectDependencies) = List(LoggingListener)
 
-  override def sourceFactories(processObjectDependencies: ProcessObjectDependencies): Map[String, WithCategories[SourceFactory[_]]] = {
+  override def sourceFactories(processObjectDependencies: ProcessObjectDependencies): Map[String, WithCategories[SourceFactory]] = {
     val schemaRegistryProvider = createSchemaRegistryProvider(processObjectDependencies)
-    val avroSourceFactory = new KafkaAvroSourceFactory[Any, Any](schemaRegistryProvider, processObjectDependencies, None)
+    val avroSourceFactory = new KafkaAvroSourceFactory[Any, Any](schemaRegistryProvider, processObjectDependencies, new FlinkKafkaSourceImplFactory(None))
     Map(
       "real-kafka" -> all(fixedValueKafkaSource[String](
         processObjectDependencies,
@@ -94,11 +97,11 @@ class DevProcessConfigCreator extends ProcessConfigCreator {
         new EspDeserializationSchema(bytes => decode[SampleProduct](new String(bytes, StandardCharsets.UTF_8)).right.get)
       )),
       "real-kafka-avro" -> all(avroSourceFactory),
-      "kafka-transaction" -> all(FlinkSourceFactory.noParam(new NoEndingSource)),
+      "kafka-transaction" -> all(SourceFactory.noParam[String](new NoEndingSource)),
       "boundedSource" -> categories(BoundedSource),
-      "oneSource" -> categories(FlinkSourceFactory.noParam(new OneSource)),
+      "oneSource" -> categories(SourceFactory.noParam[String](new OneSource)),
       "communicationSource" -> categories(DynamicParametersSource),
-      "csv-source" -> categories(FlinkSourceFactory.noParam(new CsvSource)),
+      "csv-source" -> categories(SourceFactory.noParam[CsvRecord](new CsvSource)),
       "genericSourceWithCustomVariables" -> categories(GenericSourceWithCustomVariablesSample),
       "sql-source" -> categories(SqlSource),
       "classInstanceSource" -> all(new ReturningClassInstanceSource)
@@ -118,14 +121,14 @@ class DevProcessConfigCreator extends ProcessConfigCreator {
   }
 
   override def services(processObjectDependencies: ProcessObjectDependencies): Map[String, WithCategories[Service]] = Map(
-    "accountService" -> categories(EmptyService).withNodeConfig(SingleNodeConfig.zero.copy(docsUrl = Some("accountServiceDocs"))),
+    "accountService" -> categories(EmptyService).withComponentConfig(SingleComponentConfig.zero.copy(docsUrl = Some("accountServiceDocs"))),
     "componentService" -> categories(EmptyService),
     "transactionService" -> categories(EmptyService),
     "serviceModelService" -> categories(EmptyService),
     "paramService" -> categories(OneParamService),
     "enricher" -> categories(Enricher),
     "multipleParamsService" -> categories(MultipleParamsService)
-      .withNodeConfig(SingleNodeConfig.zero.copy(
+      .withComponentConfig(SingleComponentConfig.zero.copy(
         params = Some(Map(
           "foo" -> ParameterConfig(None, Some(FixedValuesParameterEditor(List(FixedExpressionValue("'test'", "test")))), None, None),
           "bar" -> ParameterConfig(None, Some(StringParameterEditor), None, None),
@@ -138,18 +141,18 @@ class DevProcessConfigCreator extends ProcessConfigCreator {
     "clientHttpService" -> categories(new ClientFakeHttpService()),
     "echoEnumService" -> categories(EchoEnumService),
     // types
-    "simpleTypesService" -> categories(new SimpleTypesService).withNodeConfig(SingleNodeConfig.zero.copy(category = Some("types"))),
+    "simpleTypesService" -> categories(new SimpleTypesService).withComponentConfig(SingleComponentConfig.zero.copy(componentGroup = Some(ComponentGroupName("types")))),
     "optionalTypesService" -> categories(new OptionalTypesService)
-      .withNodeConfig(SingleNodeConfig.zero.copy(
-        category = Some("types"),
+      .withComponentConfig(SingleComponentConfig.zero.copy(
+        componentGroup = Some(ComponentGroupName("types")),
         params = Some(Map(
           "overriddenByDevConfigParam" -> ParameterConfig(None, None, Some(List(MandatoryParameterValidator)), None),
           "overriddenByFileConfigParam" -> ParameterConfig(None, None, Some(List(MandatoryParameterValidator)), None)
         ))
       )),
-    "collectionTypesService" -> categories(new CollectionTypesService).withNodeConfig(SingleNodeConfig.zero.copy(
-      category = Some("types"))),
-    "datesTypesService" -> categories(new DatesTypesService).withNodeConfig(SingleNodeConfig.zero.copy(category = Some("types"))),
+    "collectionTypesService" -> categories(new CollectionTypesService).withComponentConfig(SingleComponentConfig.zero.copy(
+      componentGroup = Some(ComponentGroupName("types")))),
+    "datesTypesService" -> categories(new DatesTypesService).withComponentConfig(SingleComponentConfig.zero.copy(componentGroup = Some(ComponentGroupName("types")))),
     "campaignService" -> features(CampaignService),
     "configuratorService" -> features(ConfiguratorService),
     "meetingService" -> features(MeetingService),
@@ -167,13 +170,11 @@ class DevProcessConfigCreator extends ProcessConfigCreator {
     "additionalVariable" -> categories(AdditionalVariableTransformer),
     "lockStreamTransformer" -> categories(new SampleSignalHandlingTransformer.LockStreamTransformer()),
     "aggregate" -> categories(SlidingAggregateTransformerV2),
-    "union" -> categories(UnionTransformer),
-    "union-memo" -> categories(UnionWithMemoTransformer),
     "single-side-join" -> categories(SingleSideJoinTransformer),
     "state" -> all(TransformStateTransformer),
     "unionWithEditors" -> all(JoinTransformerWithEditors),
     // types
-    "simpleTypesCustomNode" -> categories(new SimpleTypesCustomStreamTransformer).withNodeConfig(SingleNodeConfig.zero.copy(category = Some("types"))),
+    "simpleTypesCustomNode" -> categories(new SimpleTypesCustomStreamTransformer).withComponentConfig(SingleComponentConfig.zero.copy(componentGroup = Some(ComponentGroupName("types")))),
     "lastVariableWithFilter" -> all(LastVariableFilterTransformer),
     "enrichWithAdditionalData" -> all(EnrichWithAdditionalDataTransformer),
     "sendCommunication" -> all(DynamicParametersTransformer),
@@ -198,7 +199,7 @@ class DevProcessConfigCreator extends ProcessConfigCreator {
       "TypedConfig" -> all(ConfigTypedGlobalVariable)
     )
 
-    val additionalClasses = List(
+    val additionalClasses = ExpressionConfig.defaultAdditionalClasses ++ List(
       classOf[ReturningTestCaseClass],
       classOf[CronDefinitionBuilder],
       classOf[CronType],
@@ -230,6 +231,6 @@ class DevProcessConfigCreator extends ProcessConfigCreator {
   private def fixedValueKafkaSource[T: ClassTag:Encoder:Decoder](processObjectDependencies: ProcessObjectDependencies, schema: DeserializationSchema[T]): KafkaSourceFactory[String, T] = {
     val schemaFactory = new FixedValueDeserializationSchemaFactory(schema)
     val formatterFactory = new ConsumerRecordToJsonFormatterFactory[String, T]
-    new KafkaSourceFactory[String, T](schemaFactory, None, formatterFactory, processObjectDependencies)
+    new KafkaSourceFactory[String, T](schemaFactory, formatterFactory, processObjectDependencies, new FlinkKafkaSourceImplFactory(None))
   }
 }

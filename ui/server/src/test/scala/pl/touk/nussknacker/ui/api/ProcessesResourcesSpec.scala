@@ -30,17 +30,18 @@ import pl.touk.nussknacker.ui.api.helpers._
 import pl.touk.nussknacker.ui.config.processtoolbar.ProcessToolbarsConfigProvider
 import pl.touk.nussknacker.ui.config.processtoolbar.ToolbarButtonConfigType.{CustomLink, ProcessDeploy, ProcessSave}
 import pl.touk.nussknacker.ui.config.processtoolbar.ToolbarPanelTypeConfig.{CreatorPanel, ProcessInfoPanel, TipsPanel}
+import pl.touk.nussknacker.ui.process.{ProcessToolbarSettings, ToolbarButton, ToolbarPanel}
 import pl.touk.nussknacker.ui.process.marshall.ProcessConverter
 import pl.touk.nussknacker.ui.process.repository.ProcessActivityRepository.ProcessActivity
 import pl.touk.nussknacker.ui.security.api.LoggedUser
-import pl.touk.nussknacker.ui.service.{ProcessToolbarSettings, ToolbarButton, ToolbarPanel}
+import pl.touk.nussknacker.ui.process.ToolbarButton
 
 import java.util.UUID
 import scala.concurrent.Future
 import scala.language.higherKinds
 
 /**
-  * TODO: On resource tests we should verify permissions and encoded response data. All business logic should be tested at ProcessServiceDb. 
+  * TODO: On resource tests we should verify permissions and encoded response data. All business logic should be tested at ProcessServiceDb.
   */
 class ProcessesResourcesSpec extends FunSuite with ScalatestRouteTest with Matchers with Inside with FailFastCirceSupport
   with PatientScalaFutures with OptionValues with BeforeAndAfterEach with BeforeAndAfterAll with EspItTest {
@@ -551,7 +552,7 @@ class ProcessesResourcesSpec extends FunSuite with ScalatestRouteTest with Match
 
     val modifiedParallelism = 123
     val props = ProcessProperties(StreamMetaData(Some(modifiedParallelism)),
-      ExceptionHandlerRef(List()), false, None, subprocessVersions = Map.empty)
+      ExceptionHandlerRef(List()), None, subprocessVersions = Map.empty)
     Put(s"/processes/$testCategoryName/${processName.value}", posting.toEntity(props)) ~> routeWithRead ~> check {
       rejection shouldBe server.AuthorizationFailedRejection
     }

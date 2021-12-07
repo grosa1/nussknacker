@@ -43,11 +43,7 @@ const fileLoader = {
     name: "assets/images/[name][hash].[ext]",
   },
 }
-
-//by default we use default webpack value, but we want to be able to override it for building frontend via sbt
-const outputPath = process.env.OUTPUT_PATH ?
-  path.join(process.env.OUTPUT_PATH, "classes", "web", "static") :
-  path.join(process.cwd(), "dist")
+const outputPath = path.join(process.cwd(), "dist")
 
 module.exports = {
   mode: NODE_ENV,
@@ -84,16 +80,15 @@ module.exports = {
   },
   devtool: isProd ? "hidden-source-map" : "eval-source-map",
   devServer: {
-    contentBase: [
-      path.join(__dirname, "dist"),
-    ],
+    client: {
+      overlay: false,
+    },
     historyApiFallback: {
       index: "/main.html",
     },
-    overlay: false,
     hot: true,
     host: "0.0.0.0",
-    disableHostCheck: true,
+    allowedHosts: "all",
     headers: {
       "Access-Control-Allow-Credentials": "true",
       "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, PATCH, OPTIONS",
@@ -117,23 +112,49 @@ module.exports = {
           "^/be-static": "/static",
         },
       },
+      "/submodules/components": {
+        target: "http://localhost:5001",
+        changeOrigin: true,
+        pathRewrite: {
+          "^/submodules/components": "/",
+        },
+      },
+      "/submodules": {
+        target: process.env.BACKEND_DOMAIN,
+        changeOrigin: true,
+      },
+      "/static": {
+        target: "http://localhost:3000",
+        changeOrigin: true,
+        pathRewrite: {
+          "^/static": "/",
+        },
+      },
     },
-    watchOptions: {
-      ignored: [
-        "webpack.config.js",
-        "**/dist",
-        "**/target",
-        // ignore vim swap files
-        "**/*.sw[pon]",
-        // TODO: separate src/main, src/test and so on
-        "**/cypress*",
-        "**/.nyc_output",
-        "**/.federated-types/**/*",
-        "**/dist/*-dts.tgz",
-        "**/jest*",
-        "**/test*",
-        "**/*.md",
-      ],
+    static: {
+      staticOptions: {
+        contentBase: [
+          path.join(__dirname, "dist"),
+        ],
+      },
+      directory: outputPath,
+      watch: {
+        ignored: [
+          "webpack.config.js",
+          "**/dist",
+          "**/target",
+          // ignore vim swap files
+          "**/*.sw[pon]",
+          // TODO: separate src/main, src/test and so on
+          "**/cypress*",
+          "**/.nyc_output",
+          "**/.federated-types/**/*",
+          "**/dist/*-dts.tgz",
+          "**/jest*",
+          "**/test*",
+          "**/*.md",
+        ],
+      },
     },
   },
   plugins: [
@@ -147,6 +168,9 @@ module.exports = {
       ...federationConfig,
       shared: {
         ...require("./package.json").dependencies,
+        "@emotion/react": {singleton: true},
+        "@mui/private-theming/ThemeProvider": {singleton: true},
+        "@mui/private-theming/useTheme": {singleton: true},
         react: {
           eager: true,
           singleton: true,
@@ -169,14 +193,13 @@ module.exports = {
     new WebpackShellPluginNext({
       onAfterDone: {
         scripts: [
-          `npx make-federated-types --outputDir .federated-types`,
+          `rm -rf .federated-types/*`,
+          `npx make-federated-types --outputDir .federated-types/${federationConfig.name}`,
           // this .tgz with types for exposed modules lands in public root
           // and could be downloaded by remote side (e.g. `webpack-remote-types-plugin`).
           `mkdir -p "${outputPath}"`,
-          `tar -C .federated-types -czf "${path.join(outputPath, `${federationConfig.name}-dts.tgz`)}" .`,
-          `rm -rf .federated-types`,
+          `tar -C .federated-types/${federationConfig.name} -czf "${path.join(outputPath, `${federationConfig.name}-dts.tgz`)}" .`,
         ],
-        swallowError: true,
       },
     }),
     new CopyPlugin({
@@ -208,7 +231,10 @@ module.exports = {
       },
       __BUILD_VERSION__: JSON.stringify(require("./version")),
     }),
-    new ForkTsCheckerWebpackPlugin(),
+    new ForkTsCheckerWebpackPlugin({
+      typescript: {
+        memoryLimit: 5000,
+      }}),
     isProd ? null : new ReactRefreshWebpackPlugin(),
     new webpack.ProgressPlugin(progressBar),
   ].filter(Boolean),

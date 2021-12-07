@@ -1,7 +1,5 @@
 package pl.touk.nussknacker.engine.management.sample
 
-import java.nio.charset.StandardCharsets
-import java.time.{Duration, LocalDateTime, ZoneOffset}
 import io.circe.Json
 import io.circe.generic.JsonCodec
 import org.apache.flink.api.common.typeinfo.TypeInformation
@@ -9,20 +7,20 @@ import org.apache.flink.streaming.api.functions.source.SourceFunction
 import org.apache.flink.streaming.api.functions.source.SourceFunction.SourceContext
 import org.apache.flink.streaming.api.scala._
 import pl.touk.nussknacker.engine.api._
-import pl.touk.nussknacker.engine.api.exception.ExceptionHandlerFactory
 import pl.touk.nussknacker.engine.api.process._
 import pl.touk.nussknacker.engine.api.test.{NewLineSplittedTestDataParser, TestDataParser}
-import pl.touk.nussknacker.engine.flink.api.process.{BasicFlinkSource, FlinkSourceFactory, FlinkSourceTestSupport}
+import pl.touk.nussknacker.engine.flink.api.process.{BasicFlinkSource, FlinkSourceTestSupport}
 import pl.touk.nussknacker.engine.flink.api.timestampwatermark.StandardTimestampWatermarkHandler.SimpleSerializableTimestampAssigner
 import pl.touk.nussknacker.engine.flink.api.timestampwatermark.{StandardTimestampWatermarkHandler, TimestampWatermarkHandler}
-import pl.touk.nussknacker.engine.flink.util.exception.{BrieflyLoggingExceptionHandler, ConfigurableExceptionHandlerFactory}
-import pl.touk.nussknacker.engine.flink.util.service.TimeMeasuringService
+import pl.touk.nussknacker.engine.flink.util.exception.ConfigurableExceptionHandlerFactory
 import pl.touk.nussknacker.engine.flink.util.sink.EmptySink
 import pl.touk.nussknacker.engine.management.sample.UnitTestsProcessConfigCreator._
 import pl.touk.nussknacker.engine.management.sample.helper.DateProcessHelper
+import pl.touk.nussknacker.engine.util.service.TimeMeasuringService
 
+import java.nio.charset.StandardCharsets
+import java.time.{Duration, LocalDateTime, ZoneOffset}
 import scala.concurrent.{ExecutionContext, Future}
-import scala.reflect.ClassTag
 import scala.util.Random
 
 /**
@@ -129,7 +127,7 @@ class UnitTestsProcessConfigCreator extends ProcessConfigCreator {
     "engine-version" -> "0.1"
   )
 
-  class RunningSourceFactory[T <: WithFields :TypeInformation](generate: Int => T, timestamp: SimpleSerializableTimestampAssigner[T], parser: List[String] => T) extends FlinkSourceFactory[T]()(ClassTag[T](implicitly[TypeInformation[T]].getTypeClass)) {
+  class RunningSourceFactory[T <: WithFields :TypeInformation](generate: Int => T, timestamp: SimpleSerializableTimestampAssigner[T], parser: List[String] => T) extends SourceFactory {
 
     @MethodToInvoke
     def create(@ParamName("ratePerMinute") rate: Int) = {

@@ -1,8 +1,9 @@
+import {EditorProps} from "../components/graph/node-modal/editors/expression/Editor"
+import {TypingResult} from "./definition"
 import {Edge} from "./edge"
 import {NodeType} from "./node"
 import {ValidationResult} from "./validation"
-import {EditorProps} from "../components/graph/node-modal/editors/expression/Editor"
-import {TypingResult} from "./definition";
+import {ComponentGroup, SingleComponentConfig} from "./component";
 
 export type Process = {
   id: string,
@@ -14,19 +15,7 @@ export type Process = {
 
 export type ProcessId = string
 
-export type NodeCategory = string
-
-export type PossibleNode = {
-  categories: NodeCategory[],
-  node: NodeType,
-  label: string,
-  type: string,
-}
-
-export type NodesGroup = {
-  possibleNodes: PossibleNode[],
-  name: string,
-}
+export type Category = string
 
 export type CustomAction = {
   name: string,
@@ -41,18 +30,18 @@ export type CustomActionParameter = {
 }
 
 export type ProcessDefinitionData = {
-  nodesConfig?: $TodoType,
-  nodesToAdd?: NodesGroup[],
+  componentsConfig?: Record<string, SingleComponentConfig>,
+  componentGroups?: ComponentGroup[],
   processDefinition?: $TodoType,
   customActions?: Array<CustomAction>,
   defaultAsyncInterpretation?: boolean,
 }
 
 export type ProcessDefinition = {
-  typesInformation: ClassDefinition[]
+  typesInformation: ClassDefinition[],
 }
 
 export type ClassDefinition = {
   clazzName: TypingResult,
-  methods: Record<string, $TodoType>
+  methods: Record<string, $TodoType>,
 }

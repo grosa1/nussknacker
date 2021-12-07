@@ -1,7 +1,7 @@
 ---
 sidebar_position: 3
 ---
-# Deployment manager configuration
+# Deployment Manager configuration
 
 Configuration of Deployment Manager, which is responsible for communication with scenario Executor (e.g. FLink). 
 Type of Deployment Manager is defined with `type` parameter, e.g. for running scenarios with Flink streaming job we would configure: 
@@ -12,6 +12,9 @@ deploymentConfig {
 }
 ```
 
+Look at [configuration areas](./Configuration#configuration-areas) to understand where Deployment Manager configuration should be placed in Nussknacker configuration.
+
+
 `flinkStreaming` Deployment Manager has following configuration options:
 
 | Parameter | Type | Default value | Description  |
@@ -19,6 +22,7 @@ deploymentConfig {
 | restUrl   | string |             | The only required parameter, REST API endpoint of the Flink cluster |       
 | jobManagerTimeout | duration | 1 minute | Timeout for communication with FLink cluster. Consider extending if e.g. you have long savepoint times etc. |
 | shouldVerifyBeforeDeploy | boolean | true | By default, before redeployment of scenario with state from savepoint, verification of savepoint compatibility is performed. There are some cases when it can be too time consuming or not possible. Use this flag to disable it. | 
-| queryableStateProxyUrl | string | | Some Nussknacker extensions require access to Flink queryable state. This should be comma separated list of `host:port` addresses of [queryable state proxies](https://ci.apache.org/projects/flink/flink-docs-stable/docs/dev/datastream/fault-tolerance/queryable_state/#proxy) of all taskmanagers in the cluster |                                                                                           
+| queryableStateProxyUrl | string | | Some Nussknacker extensions require access to Flink queryable state. This should be comma separated list of `host:port` addresses of [queryable state proxies](https://ci.apache.org/projects/flink/flink-docs-stable/docs/dev/datastream/fault-tolerance/queryable_state/#proxy) of all taskmanagers in the cluster |
+| shouldCheckAvailableSlots | boolean | true | When set to true, Nussknacker checks if there are free slots to run new job. This check should be disabled on Flink Kubernetes Native deployments, where Taskmanager is started on demand. |
 
 

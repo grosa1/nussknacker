@@ -1,11 +1,11 @@
 package pl.touk.nussknacker.ui.validation
 
-import org.scalatest.{FunSuite, Ignore, Matchers}
+import org.scalatest.{FunSuite, Matchers}
 import pl.touk.nussknacker.engine.api.definition._
-import pl.touk.nussknacker.engine.api.process.AdditionalPropertyConfig
+import pl.touk.nussknacker.engine.api.component.AdditionalPropertyConfig
 import pl.touk.nussknacker.engine.api.typed.typing
 import pl.touk.nussknacker.engine.api.typed.typing.{Typed, TypedObjectTypingResult}
-import pl.touk.nussknacker.engine.api.{MetaData, ProcessAdditionalFields, StreamMetaData}
+import pl.touk.nussknacker.engine.api.{FragmentSpecificData, MetaData, ProcessAdditionalFields, StreamMetaData}
 import pl.touk.nussknacker.engine.canonicalgraph.CanonicalProcess
 import pl.touk.nussknacker.engine.canonicalgraph.canonicalnode.{FlatNode, SplitNode}
 import pl.touk.nussknacker.engine.compile.ProcessValidator
@@ -25,9 +25,10 @@ import pl.touk.nussknacker.engine.{ProcessingTypeData, spel}
 import pl.touk.nussknacker.restmodel.displayedgraph.displayablenode.EdgeType.{NextSwitch, SwitchDefault}
 import pl.touk.nussknacker.restmodel.displayedgraph.displayablenode.{Edge, EdgeType}
 import pl.touk.nussknacker.restmodel.displayedgraph.{DisplayableProcess, ProcessProperties}
-import pl.touk.nussknacker.restmodel.validation.ValidationResults
+import pl.touk.nussknacker.restmodel.process.ProcessingType
+import pl.touk.nussknacker.restmodel.validation.{PrettyValidationErrors, ValidationResults}
 import pl.touk.nussknacker.restmodel.validation.ValidationResults.{NodeValidationError, NodeValidationErrorType, ValidationErrors, ValidationResult, ValidationWarnings}
-import pl.touk.nussknacker.ui.api.helpers.TestFactory.{SampleSubprocessRepository, emptyProcessingTypeDataProvider, mapProcessingTypeDataProvider, possibleValues, sampleResolver}
+import pl.touk.nussknacker.ui.api.helpers.TestFactory.{StubSubprocessRepository, emptyProcessingTypeDataProvider, mapProcessingTypeDataProvider, possibleValues, sampleResolver}
 import pl.touk.nussknacker.ui.api.helpers.{ProcessTestData, TestProcessingTypes}
 import pl.touk.nussknacker.ui.process.subprocess.SubprocessResolver
 
@@ -180,7 +181,7 @@ class ProcessValidationSpec extends FunSuite with Matchers {
       )), sampleResolver, emptyProcessingTypeDataProvider)
 
     val process = validProcessWithFields(Map())
-    val subprocess = process.copy(properties = process.properties.copy(isSubprocess = true))
+    val subprocess = process.copy(properties = process.properties.copy(typeSpecificProperties = FragmentSpecificData()))
 
     processValidation.validate(subprocess) shouldBe 'ok
 
@@ -243,7 +244,7 @@ class ProcessValidationSpec extends FunSuite with Matchers {
     )
 
     val invalidSubprocess = CanonicalProcess(
-      MetaData("sub1", StreamMetaData(), isSubprocess = true),
+      MetaData("sub1", FragmentSpecificData()),
       ExceptionHandlerRef(List.empty),
       nodes = List(
         FlatNode(
@@ -276,7 +277,7 @@ class ProcessValidationSpec extends FunSuite with Matchers {
     )
 
     val invalidSubprocess = CanonicalProcess(
-      MetaData("sub1", StreamMetaData(), isSubprocess = true),
+      MetaData("sub1", FragmentSpecificData()),
       ExceptionHandlerRef(List.empty),
       nodes = List(
         FlatNode(
@@ -317,7 +318,7 @@ class ProcessValidationSpec extends FunSuite with Matchers {
       )
     )
     val subprocess = CanonicalProcess(
-      MetaData("sub1", StreamMetaData(), isSubprocess = true),
+      MetaData("sub1", FragmentSpecificData()),
       ExceptionHandlerRef(Nil),
       nodes = List(
         FlatNode(SubprocessInputDefinition(
@@ -423,7 +424,7 @@ private object ProcessValidationSpec {
 
   def createProcess(nodes: List[NodeData],
                     edges: List[Edge],
-                    `type`: ProcessingTypeData.ProcessingType = TestProcessingTypes.Streaming,
+                    `type`: ProcessingType = TestProcessingTypes.Streaming,
                     additionalFields: Map[String, String] = Map()) = {
     DisplayableProcess("test", ProcessProperties(StreamMetaData(),
       ExceptionHandlerRef(List()), subprocessVersions = Map.empty, additionalFields = Some(ProcessAdditionalFields(None, additionalFields))), nodes, edges, `type`)
@@ -437,7 +438,7 @@ private object ProcessValidationSpec {
     val processValidation: ProcessValidation = new ProcessValidation(
       validators = mapProcessingTypeDataProvider(TestProcessingTypes.Streaming -> validator),
       mapProcessingTypeDataProvider(TestProcessingTypes.Streaming -> Map()),
-      subprocessResolver = new SubprocessResolver(new SampleSubprocessRepository(Set(subprocess))),
+      subprocessResolver = new SubprocessResolver(StubSubprocessRepository(Set(subprocess))),
       emptyProcessingTypeDataProvider)
 
     (processValidation, process)

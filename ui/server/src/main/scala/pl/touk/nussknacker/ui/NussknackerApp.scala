@@ -9,7 +9,7 @@ import akka.stream.{ActorMaterializer, Materializer}
 import com.typesafe.config.Config
 import com.typesafe.scalalogging.LazyLogging
 import pl.touk.nussknacker.engine.ProcessingTypeData
-import pl.touk.nussknacker.engine.api.process.AdditionalPropertyConfig
+import pl.touk.nussknacker.engine.api.component.AdditionalPropertyConfig
 import pl.touk.nussknacker.engine.dict.ProcessDictSubstitutor
 import pl.touk.nussknacker.engine.util.loader.ScalaServiceLoader
 import pl.touk.nussknacker.engine.util.multiplicity.{Empty, Many, Multiplicity, One}
@@ -17,12 +17,13 @@ import pl.touk.nussknacker.processCounts.influxdb.InfluxCountsReporterCreator
 import pl.touk.nussknacker.processCounts.{CountsReporter, CountsReporterCreator}
 import pl.touk.nussknacker.restmodel.validation.CustomProcessValidator
 import pl.touk.nussknacker.ui.api._
-import pl.touk.nussknacker.ui.config.{AnalyticsConfig, UiConfigLoader, FeatureTogglesConfig}
+import pl.touk.nussknacker.ui.component.{DefaultComponentService}
+import pl.touk.nussknacker.ui.config.{AnalyticsConfig, FeatureTogglesConfig, UiConfigLoader}
 import pl.touk.nussknacker.ui.db.{DatabaseInitializer, DbConfig}
 import pl.touk.nussknacker.ui.initialization.Initialization
 import pl.touk.nussknacker.ui.listener.ProcessChangeListenerFactory
 import pl.touk.nussknacker.ui.listener.services.NussknackerServices
-import pl.touk.nussknacker.ui.process._
+import pl.touk.nussknacker.ui.process.{ConfigProcessToolbarService, _}
 import pl.touk.nussknacker.ui.process.deployment.ManagementActor
 import pl.touk.nussknacker.ui.process.migrate.{HttpRemoteEnvironment, TestModelMigrations}
 import pl.touk.nussknacker.ui.process.processingtypedata.{BasicProcessingTypeDataReload, ProcessingTypeDataProvider, ProcessingTypeDataReader, ProcessingTypeDataReload}
@@ -31,7 +32,6 @@ import pl.touk.nussknacker.ui.process.subprocess.{DbSubprocessRepository, Subpro
 import pl.touk.nussknacker.ui.processreport.ProcessCounter
 import pl.touk.nussknacker.ui.security.api._
 import pl.touk.nussknacker.ui.security.ssl._
-import pl.touk.nussknacker.ui.service.ConfigProcessToolbarService
 import pl.touk.nussknacker.ui.uiresolving.UIProcessResolving
 import pl.touk.nussknacker.ui.validation.ProcessValidation
 import slick.jdbc.{HsqldbProfile, JdbcBackend, JdbcProfile, PostgresProfile}
@@ -39,7 +39,7 @@ import sttp.client.{NothingT, SttpBackend}
 import sttp.client.akkahttp.AkkaHttpBackend
 
 import scala.collection.JavaConverters.{getClass, _}
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 trait NusskanckerAppRouter extends Directives with LazyLogging {
 
@@ -55,7 +55,8 @@ trait NusskanckerDefaultAppRouter extends NusskanckerAppRouter {
   import pl.touk.nussknacker.engine.util.config.FicusReaders._
 
   //override this method to e.g. run UI with local model
-  protected def prepareProcessingTypeData(config: Config): (ProcessingTypeDataProvider[ProcessingTypeData], ProcessingTypeDataReload) = {
+  protected def prepareProcessingTypeData(config: Config)
+                                         (implicit ec: ExecutionContext, actorSystem: ActorSystem, sttpBackend: SttpBackend[Future, Nothing, NothingT]): (ProcessingTypeDataProvider[ProcessingTypeData], ProcessingTypeDataReload) = {
     BasicProcessingTypeDataReload.wrapWithReloader(
       () => ProcessingTypeDataReader.loadProcessingTypeData(config)
     )
@@ -122,6 +123,8 @@ trait NusskanckerDefaultAppRouter extends NusskanckerAppRouter {
 
     val countsReporter = featureTogglesConfig.counts.map(prepareCountsReporter(environment, _))
 
+    val componentService = DefaultComponentService(config, typeToConfig, processRepository, subprocessRepository, processCategoryService)
+
     val apiResourcesWithAuthentication: List[RouteWithUser] = {
       val routes = List(
         new ProcessesResources(
@@ -144,7 +147,8 @@ trait NusskanckerDefaultAppRouter extends NusskanckerAppRouter {
         new NotificationResources(managementActor),
         appResources,
         TestInfoResources(modelData, processAuthorizer, processRepository, featureTogglesConfig),
-        new ServiceRoutes(modelData)
+        new ServiceRoutes(modelData),
+        new ComponentResource(componentService)
       )
 
       val optionalRoutes = List(
@@ -190,11 +194,13 @@ trait NusskanckerDefaultAppRouter extends NusskanckerAppRouter {
       }
     }
 
-    (route, typeToConfig.all.values ++ countsReporter.toList)
+    val sttpClosable: AutoCloseable = () => sttpBackend.close()
+    (route, typeToConfig.all.values.toList ++ countsReporter.toList :+ sttpClosable)
   }
 
   //by default, we use InfluxCountsReporterCreator
-  private def prepareCountsReporter(env: String, config: Config): CountsReporter = {
+  private def prepareCountsReporter(env: String, config: Config)
+                                   (implicit backend: SttpBackend[Future, Nothing, NothingT]): CountsReporter = {
     val configAtKey = config.atKey(CountsReporterCreator.reporterCreatorConfigPath)
     val creator = Multiplicity(ScalaServiceLoader.load[CountsReporterCreator](getClass.getClassLoader)) match {
       case One(cr) =>
@@ -242,7 +248,7 @@ class NussknackerAppInitializer(baseUnresolvedConfig: Config) extends LazyLoggin
 
     (route, objectsToClose)
   }
-  
+
   def bindHttp(interface: String, port: Int, route: Route)(implicit system: ActorSystem, materializer: Materializer): Future[Http.ServerBinding] = {
     Http().bindAndHandle(
       handler = route,

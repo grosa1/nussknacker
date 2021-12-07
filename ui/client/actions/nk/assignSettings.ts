@@ -5,7 +5,7 @@ import {UnknownRecord} from "../../types/common"
 export type MetricsType = {
   url: string,
   defaultDashboard: string,
-  processingTypeToDashboard: UnknownRecord,
+  scenarioTypeToDashboard: UnknownRecord,
 }
 
 export type FeaturesSettings = {
@@ -17,7 +17,7 @@ export type FeaturesSettings = {
   environmentAlert: { content: string, cssClass: string },
   commentSettings: { matchExpression: string, link: string },
   intervalTimeSettings: { processes: number, healthCheck: number },
-  deploySettings: $TodoType,
+  deploySettings: { requireComment: boolean },
   tabs: DynamicTabData[],
   testDataSettings?: TestDataSettings
 }

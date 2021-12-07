@@ -3,7 +3,6 @@ package pl.touk.nussknacker.ui.process.deployment
 import java.time.LocalDateTime
 import akka.actor.{ActorRefFactory, Props, Status}
 import com.typesafe.scalalogging.LazyLogging
-import pl.touk.nussknacker.engine.ProcessingTypeData.ProcessingType
 import pl.touk.nussknacker.engine.api.deployment.ProcessActionType.ProcessActionType
 import pl.touk.nussknacker.engine.api.deployment.TestProcess.TestData
 import pl.touk.nussknacker.engine.api.deployment._
@@ -13,11 +12,13 @@ import pl.touk.nussknacker.engine.api.process.{ProcessId, ProcessName, VersionId
 import pl.touk.nussknacker.engine.marshall.ProcessMarshaller
 import pl.touk.nussknacker.ui.listener.ProcessChangeEvent.{OnDeployActionFailed, OnDeployActionSuccess, OnFinished}
 import pl.touk.nussknacker.restmodel.displayedgraph.{DisplayableProcess, ProcessStatus}
-import pl.touk.nussknacker.restmodel.process.ProcessIdWithName
+import pl.touk.nussknacker.restmodel.process.{ProcessIdWithName, ProcessingType}
 import pl.touk.nussknacker.restmodel.processdetails.ProcessAction
 import pl.touk.nussknacker.ui.EspError
+import pl.touk.nussknacker.ui.api.ListenerApiUser
 import pl.touk.nussknacker.ui.db.entity.{ProcessActionEntityData, ProcessVersionEntityData}
 import pl.touk.nussknacker.ui.listener.ProcessChangeListener
+import pl.touk.nussknacker.ui.listener.User
 import pl.touk.nussknacker.ui.process.processingtypedata.ProcessingTypeDataProvider
 import pl.touk.nussknacker.ui.process.repository.ProcessDBQueryRepository.ProcessNotFoundError
 import pl.touk.nussknacker.ui.process.repository.{DbProcessActionRepository, FetchingProcessRepository}
@@ -80,7 +81,7 @@ class ManagementActor(managers: ProcessingTypeDataProvider[DeploymentManager],
       reply(getProcessStatus(id)(user))
 
     case DeploymentActionFinished(process, user, result) =>
-      implicit val loggedUser: LoggedUser = user
+      implicit val listenerUser: User = ListenerApiUser(user)
       result match {
         case Left(failure) =>
           logger.error(s"Action: ${beingDeployed.get(process.name)} of $process finished with failure", failure)
@@ -203,7 +204,7 @@ class ManagementActor(managers: ProcessingTypeDataProvider[DeploymentManager],
     processState match {
       case Some(state) =>
         state.version match {
-          case Some(_) if !state.isDeployed =>
+          case _ if !state.isDeployed =>
             ProcessStatus.simpleErrorShouldBeRunning(action.processVersionId, action.user, processState)
           case Some(ver) if ver.versionId != action.processVersionId =>
             ProcessStatus.simpleErrorMismatchDeployedVersion(ver.versionId, action.processVersionId, action.user, processState)
@@ -212,8 +213,7 @@ class ManagementActor(managers: ProcessingTypeDataProvider[DeploymentManager],
           case None => //TODO: we should remove Option from ProcessVersion?
             ProcessStatus.simpleWarningMissingDeployedVersion(action.processVersionId, action.user, processState)
           case _ =>
-            ProcessStatus.simple(SimpleStateStatus.Error) //Generic
-          // c error in other cases
+            ProcessStatus.simple(SimpleStateStatus.Error) //Generic error in other cases
         }
       case None =>
         ProcessStatus.simpleErrorShouldBeRunning(action.processVersionId, action.user, Option.empty)
@@ -223,6 +223,7 @@ class ManagementActor(managers: ProcessingTypeDataProvider[DeploymentManager],
   //- then it's gone, not finished.
   private def handleFinishedProcess(idWithName: ProcessIdWithName, processState: Option[ProcessState]): Future[Unit] = {
     implicit val user: NussknackerInternalUser.type = NussknackerInternalUser
+    implicit val listenerUser: User = ListenerApiUser(user)
     processState match {
       case Some(state) if state.status.isFinished =>
         findDeployedVersion(idWithName).flatMap {

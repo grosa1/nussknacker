@@ -2,15 +2,14 @@
 import {attributes, dia, shapes} from "jointjs"
 import {cloneDeepWith, get, isEmpty, toString} from "lodash"
 import customAttrs from "../../../assets/json/nodeAttributes.json"
-import ProcessUtils from "../../../common/ProcessUtils"
 import {ProcessCounts} from "../../../reducers/graph"
 import {NodeType, ProcessDefinitionData} from "../../../types"
+import {getComponentIconSrc} from "../../toolbars/creator/ComponentIcon"
 import {setLinksHovered} from "../dragHelpers"
 import {isConnected, isModelElement} from "../GraphPartialsInTS"
 import {Events} from "../joint-events"
 import NodeUtils from "../NodeUtils"
 import {EspNodeShape} from "./esp"
-import {getIconHref} from "./getIconHref"
 
 const maxLineLength = 24
 const maxLineCount = 2
@@ -91,13 +90,11 @@ export const updateNodeCounts = (processCounts :ProcessCounts) => (node: shapes.
 }
 
 export function makeElement(processDefinitionData: ProcessDefinitionData): (node: NodeType) => shapes.devs.Model {
-  const nodesSettings = processDefinitionData.nodesConfig || {}
   return (node: NodeType) => {
     const description = get(node.additionalFields, "description", null)
     const {text: bodyContent} = getBodyContent(node.id)
 
-    const nodeSettings = nodesSettings?.[ProcessUtils.findNodeConfigName(node)]
-    const iconHref = getIconHref(node, nodeSettings)
+    const iconHref = getComponentIconSrc(node, processDefinitionData)
 
     const attributes: shapes.devs.ModelAttributes = {
       id: node.id,

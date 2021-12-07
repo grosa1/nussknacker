@@ -17,7 +17,6 @@ import pl.touk.nussknacker.engine.api.exception.ExceptionHandlerFactory
 import pl.touk.nussknacker.engine.api.process.{ExpressionConfig, ProcessObjectDependencies, SinkFactory, SourceFactory, WithCategories}
 import pl.touk.nussknacker.engine.api.typed.typing.TypingResult
 import pl.touk.nussknacker.engine.build.GraphBuilder
-import pl.touk.nussknacker.engine.flink.api.process.FlinkSourceFactory.NoParamSourceFactory
 import pl.touk.nussknacker.engine.flink.test.FlinkSpec
 import pl.touk.nussknacker.engine.flink.util.exception.{BrieflyLoggingExceptionHandler, ConfigurableExceptionHandlerFactory}
 import pl.touk.nussknacker.engine.flink.util.function.CoProcessFunctionInterceptor
@@ -81,7 +80,7 @@ class SingleSideJoinTransformerSpec extends FunSuite with FlinkSpec with Matcher
           "windowLength" -> s"T(${classOf[Duration].getName}).parse('PT2H')",
           "aggregateBy" -> "{last: #input.value, list: #input.value, approxCardinality: #input.value, sum: #input.value } "
         )
-        .sink(EndNodeId, s"#$OutVariableName", "end")
+        .emptySink(EndNodeId, "end")
     ))
 
     val key = "fooKey"
@@ -117,7 +116,7 @@ class SingleSideJoinTransformerSpec extends FunSuite with FlinkSpec with Matcher
     val model = modelData(input1, input2, collectingListener)
     val stoppableEnv = flinkMiniCluster.createExecutionEnvironment()
     val registrar = FlinkProcessRegistrar(new FlinkProcessCompiler(model), ExecutionConfigPreparer.unOptimizedChain(model))
-    registrar.register(new StreamExecutionEnvironment(stoppableEnv), testProcess, ProcessVersion.empty, DeploymentData.empty, Some(collectingListener.runId))
+    registrar.register(new StreamExecutionEnvironment(stoppableEnv), testProcess, ProcessVersion.empty, DeploymentData.empty)
     val id = stoppableEnv.executeAndWaitForStart(testProcess.id)
     (id, stoppableEnv)
   }
@@ -150,10 +149,10 @@ object SingleSideJoinTransformerSpec {
     override def listeners(processObjectDependencies: ProcessObjectDependencies): Seq[ProcessListener] =
       Seq(collectingListener)
 
-    override def sourceFactories(processObjectDependencies: ProcessObjectDependencies): Map[String, WithCategories[SourceFactory[_]]] =
+    override def sourceFactories(processObjectDependencies: ProcessObjectDependencies): Map[String, WithCategories[SourceFactory]] =
       Map(
-        "start-main" -> WithCategories(NoParamSourceFactory(mainRecordsSource)),
-        "start-joined" -> WithCategories(NoParamSourceFactory(
+        "start-main" -> WithCategories(SourceFactory.noParam[OneRecord](mainRecordsSource)),
+        "start-joined" -> WithCategories(SourceFactory.noParam[OneRecord](
           EmitWatermarkAfterEachElementCollectionSource.create[OneRecord](joinedRecords, _.timestamp, Duration.ofHours(1)))))
 
     override def sinkFactories(processObjectDependencies: ProcessObjectDependencies): Map[String, WithCategories[SinkFactory]] =

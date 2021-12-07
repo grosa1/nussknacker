@@ -5,10 +5,8 @@ import akka.http.scaladsl.testkit.ScalatestRouteTest
 import akka.http.scaladsl.unmarshalling.{FromEntityUnmarshaller, Unmarshaller}
 import de.heikoseeberger.akkahttpcirce.FailFastCirceSupport
 import io.circe.Json
-import io.circe.syntax._
 import org.scalatest._
 import pl.touk.nussknacker.engine.api.CirceUtil.RichACursor
-import pl.touk.nussknacker.engine.api.definition.FixedValuesValidator
 import pl.touk.nussknacker.engine.api.process.ProcessName
 import pl.touk.nussknacker.test.PatientScalaFutures
 import pl.touk.nussknacker.ui.api.helpers.{EspItTest, ProcessTestData, SampleProcess, TestProcessingTypes}
@@ -26,7 +24,7 @@ class DefinitionResourcesSpec extends FunSpec with ScalatestRouteTest with FailF
   }
 
   it("should return definition data for existing scenario type") {
-    getProcessDefinitionData(existingProcessingType) ~> check {
+    getProcessDefinitionData(TestProcessingTypes.Streaming) ~> check {
       status shouldBe StatusCodes.OK
 
       val noneReturnType = responseAs[Json].hcursor
@@ -39,7 +37,7 @@ class DefinitionResourcesSpec extends FunSpec with ScalatestRouteTest with FailF
   }
 
   it("should return definition data for allowed classes") {
-    getProcessDefinitionData(existingProcessingType) ~> check {
+    getProcessDefinitionData(TestProcessingTypes.Streaming) ~> check {
       status shouldBe StatusCodes.OK
 
       val typesInformation = responseAs[Json].hcursor
@@ -112,7 +110,7 @@ class DefinitionResourcesSpec extends FunSpec with ScalatestRouteTest with FailF
     saveSubProcess(displayableSubProcess)(succeed)
     saveProcess(processName, processWithSubProcess.process)(succeed)
 
-    getProcessDefinitionData(existingProcessingType) ~> check {
+    getProcessDefinitionData(TestProcessingTypes.Streaming) ~> check {
       status shouldBe StatusCodes.OK
 
       val response = responseAs[Json].hcursor
@@ -328,7 +326,7 @@ class DefinitionResourcesSpec extends FunSpec with ScalatestRouteTest with FailF
   }
 
   it("return info about validator based on param fixed value editor for additional properties") {
-    getProcessDefinitionData(existingProcessingType) ~> check {
+    getProcessDefinitionData(TestProcessingTypes.Streaming) ~> check {
       status shouldBe StatusCodes.OK
 
       val validators: Json = responseAs[Json].hcursor
@@ -357,13 +355,13 @@ class DefinitionResourcesSpec extends FunSpec with ScalatestRouteTest with FailF
   }
 
   it("return default value based on editor possible values") {
-    getProcessDefinitionData(existingProcessingType) ~> check {
+    getProcessDefinitionData(TestProcessingTypes.Streaming) ~> check {
       status shouldBe StatusCodes.OK
 
       val defaultExpression: Json = responseAs[Json].hcursor
-        .downField("nodesToAdd")
+        .downField("componentGroups")
         .downAt(_.hcursor.get[String]("name").right.value == "enrichers")
-        .downField("possibleNodes")
+        .downField("components")
         .downAt(_.hcursor.get[String]("label").right.value == "echoEnumService")
         .downField("node")
         .downField("service")
@@ -374,6 +372,27 @@ class DefinitionResourcesSpec extends FunSpec with ScalatestRouteTest with FailF
         .focus.get
 
       defaultExpression shouldBe Json.fromString("T(pl.touk.sample.JavaSampleEnum).FIRST_VALUE")
+    }
+  }
+
+  // TODO: currently branch parameters must be determined on node template level - aren't enriched dynamically during node validation
+  it("return branch parameters definition with standard parameters enrichments") {
+    getProcessDefinitionData(TestProcessingTypes.Streaming) ~> check {
+      status shouldBe StatusCodes.OK
+
+      val responseJson = responseAs[Json]
+      val defaultExpression: Json = responseJson.hcursor
+        .downField("componentGroups")
+        .downAt(_.hcursor.get[String]("name").right.value == "base")
+        .downField("components")
+        .downAt(_.hcursor.get[String]("label").right.value == "enrichWithAdditionalData")
+        .downField("branchParametersTemplate")
+        .downAt(_.hcursor.get[String]("name").right.value == "role")
+        .downField("expression")
+        .downField("expression")
+        .focus.get
+
+      defaultExpression shouldBe Json.fromString("'Events'")
     }
   }
 

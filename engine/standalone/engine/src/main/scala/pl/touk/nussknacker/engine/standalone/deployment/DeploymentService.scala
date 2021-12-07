@@ -5,38 +5,40 @@ import cats.data.{NonEmptyList, Validated, ValidatedNel}
 import com.typesafe.config.Config
 import com.typesafe.scalalogging.LazyLogging
 import pl.touk.nussknacker.engine.ModelData
+import pl.touk.nussknacker.engine.api.StandaloneMetaData
 import pl.touk.nussknacker.engine.api.context.ProcessCompilationError
 import pl.touk.nussknacker.engine.api.deployment.simple.{SimpleProcessState, SimpleStateStatus}
 import pl.touk.nussknacker.engine.api.deployment.{ExternalDeploymentId, ProcessState}
 import pl.touk.nussknacker.engine.api.process.{ProcessName, RunMode}
-import pl.touk.nussknacker.engine.api.{JobData, StandaloneMetaData}
+import pl.touk.nussknacker.engine.baseengine.api.runtimecontext.EngineRuntimeContextPreparer
 import pl.touk.nussknacker.engine.canonicalgraph.CanonicalProcess
 import pl.touk.nussknacker.engine.canonize.ProcessCanonizer
 import pl.touk.nussknacker.engine.marshall.{ProcessMarshaller, ProcessUnmarshallError}
 import pl.touk.nussknacker.engine.resultcollector.ProductionServiceInvocationCollector
-import pl.touk.nussknacker.engine.standalone.StandaloneProcessInterpreter
-import pl.touk.nussknacker.engine.standalone.api.{StandaloneContextPreparer, StandaloneDeploymentData}
+import pl.touk.nussknacker.engine.standalone.FutureBaseStandaloneScenarioEngine.InterpreterType
+import pl.touk.nussknacker.engine.standalone.StandaloneScenarioEngine
+import pl.touk.nussknacker.engine.standalone.api.StandaloneDeploymentData
 import pl.touk.nussknacker.engine.standalone.management.StandaloneDeploymentManagerProvider
 
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
 
 object DeploymentService {
 
   //TODO this is temporary solution, we should keep these processes e.g. in ZK
   //also: how to pass model data around?
-  def apply(context: StandaloneContextPreparer, config: Config): DeploymentService = {
+  def apply(context: EngineRuntimeContextPreparer, config: Config): DeploymentService = {
     val modelData = StandaloneDeploymentManagerProvider.defaultTypeConfig(config).toModelData
     new DeploymentService(context, modelData, FileProcessRepository(config.getString("standaloneEngineProcessLocation")))
   }
 
 }
 
-class DeploymentService(context: StandaloneContextPreparer, modelData: ModelData,
+class DeploymentService(context: EngineRuntimeContextPreparer, modelData: ModelData,
                         processRepository: ProcessRepository) extends LazyLogging with ProcessInterpreters {
 
-  private val processInterpreters: collection.concurrent.TrieMap[ProcessName, (StandaloneProcessInterpreter, StandaloneDeploymentData)] = collection.concurrent.TrieMap()
+  private val processInterpreters: collection.concurrent.TrieMap[ProcessName, (InterpreterType, StandaloneDeploymentData)] = collection.concurrent.TrieMap()
 
-  private val pathToInterpreterMap: collection.concurrent.TrieMap[String, StandaloneProcessInterpreter] = collection.concurrent.TrieMap()
+  private val pathToInterpreterMap: collection.concurrent.TrieMap[String, InterpreterType] = collection.concurrent.TrieMap()
 
   initProcesses()
 
@@ -61,13 +63,13 @@ class DeploymentService(context: StandaloneContextPreparer, modelData: ModelData
             case Some(oldId) if oldId != processName.value =>
               Invalid(NonEmptyList.of(DeploymentError(Set(), s"Scenario $oldId is already deployed at path $pathToDeploy")))
             case _ =>
-              val interpreter = newInterpreter(process)
+              val interpreter = newInterpreter(process, deploymentData)
               interpreter.foreach { processInterpreter =>
                 cancel(processName)
                 processRepository.add(processName, deploymentData)
                 processInterpreters.put(processName, (processInterpreter, deploymentData))
                 pathToInterpreterMap.put(pathToDeploy, processInterpreter)
-                processInterpreter.open(JobData(process.metaData, deploymentData.processVersion, deploymentData.deploymentData))
+                processInterpreter.open()
                 logger.info(s"Successfully deployed scenario ${processName.value}")
               }
               interpreter.map(_ => ())
@@ -98,13 +100,17 @@ class DeploymentService(context: StandaloneContextPreparer, modelData: ModelData
     removed.map(_ => ())
   }
 
-  def getInterpreterByPath(path: String): Option[StandaloneProcessInterpreter] = {
+  def getInterpreterByPath(path: String): Option[InterpreterType] = {
     pathToInterpreterMap.get(path)
   }
 
-  private def newInterpreter(canonicalProcess: CanonicalProcess): Validated[NonEmptyList[DeploymentError], StandaloneProcessInterpreter] = {
+  private def newInterpreter(canonicalProcess: CanonicalProcess, deploymentData: StandaloneDeploymentData): Validated[NonEmptyList[DeploymentError], InterpreterType] = {
+    import pl.touk.nussknacker.engine.standalone.FutureBaseStandaloneScenarioEngine._
+
+    import ExecutionContext.Implicits._
     ProcessCanonizer.uncanonize(canonicalProcess)
-      .andThen(StandaloneProcessInterpreter(_, context, modelData, Nil, ProductionServiceInvocationCollector, RunMode.Normal)).leftMap(_.map(DeploymentError(_)))
+      .andThen(StandaloneScenarioEngine[Future](_, deploymentData.processVersion, deploymentData.deploymentData,
+        context, modelData, Nil, ProductionServiceInvocationCollector, RunMode.Normal)).leftMap(_.map(DeploymentError(_)))
   }
 
   private def toEspProcess(processJson: String): ValidatedNel[DeploymentError, CanonicalProcess] =

@@ -1,7 +1,6 @@
 package pl.touk.nussknacker.ui.process.repository
 
 import cats.Monad
-import pl.touk.nussknacker.engine.ProcessingTypeData.ProcessingType
 import pl.touk.nussknacker.engine.api.process.ProcessName
 import pl.touk.nussknacker.engine.api.process.ProcessId
 import pl.touk.nussknacker.restmodel.processdetails.{BaseProcessDetails, ProcessAction, ProcessShapeFetchStrategy}
@@ -13,6 +12,7 @@ import pl.touk.nussknacker.ui.security.api.LoggedUser
 import scala.concurrent.ExecutionContext
 import scala.language.higherKinds
 import cats.syntax.functor._
+import pl.touk.nussknacker.restmodel.process.ProcessingType
 
 abstract class FetchingProcessRepository[F[_]: Monad] extends ProcessDBQueryRepository[F] {
 
@@ -61,6 +61,7 @@ abstract class FetchingProcessRepository[F[_]: Monad] extends ProcessDBQueryRepo
 
   def fetchProcessActions(processId: ProcessId)(implicit ec: ExecutionContext): F[List[ProcessAction]]
 
+  //TODO: It should return F[Option[ProcessingType]]
   def fetchProcessingType(processId: ProcessId)(implicit loggedUser: LoggedUser, ec: ExecutionContext): F[ProcessingType]
 
   def fetchProcessDetails(processName: ProcessName)(implicit ec: ExecutionContext): F[Option[ProcessEntityData]]

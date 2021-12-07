@@ -37,7 +37,7 @@ class ManagementActorSpec extends FunSuite with Matchers with PatientScalaFuture
 
   val newProcessPreparer = new NewProcessPreparer(
     mapProcessingTypeDataProvider("streaming" ->  ProcessTestData.processDefinition),
-    mapProcessingTypeDataProvider("streaming" -> (_ => StreamMetaData(None))),
+    mapProcessingTypeDataProvider("streaming" -> ProcessTestData.streamingTypeSpecificInitialData),
     mapProcessingTypeDataProvider("streaming" -> Map.empty)
   )
 
@@ -261,6 +261,19 @@ class ManagementActorSpec extends FunSuite with Matchers with PatientScalaFuture
       state.icon shouldBe Some(SimpleProcessStateDefinitionManager.deployWarningIcon)
       state.allowedActions shouldBe List(ProcessActionType.Deploy, ProcessActionType.Cancel)
       state.description shouldBe Some(SimpleProcessStateDefinitionManager.missingDeployedVersionDescription)
+    }
+  }
+
+  test("Should return error state when failed to get state") {
+    val id =  prepareDeployedProcess(processName).futureValue
+
+    deploymentManager.withProcessStateVersion(SimpleStateStatus.FailedToGet, Option.empty) {
+      val state = processService.getProcessState(ProcessIdWithName(id, processName)).futureValue
+
+      state.status shouldBe SimpleStateStatus.Error
+      state.icon shouldBe Some(SimpleProcessStateDefinitionManager.deployFailedIcon)
+      state.allowedActions shouldBe List(ProcessActionType.Deploy, ProcessActionType.Cancel)
+      state.description shouldBe Some(SimpleProcessStateDefinitionManager.shouldBeRunningDescription)
     }
   }
 

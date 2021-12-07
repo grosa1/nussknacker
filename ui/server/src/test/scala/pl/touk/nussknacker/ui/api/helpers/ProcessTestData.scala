@@ -6,7 +6,7 @@ import pl.touk.nussknacker.engine.api.definition.{FixedExpressionValue, FixedVal
 import pl.touk.nussknacker.engine.api.definition.{NotBlankParameter, Parameter}
 import pl.touk.nussknacker.engine.api.process.{ProcessId, ProcessName}
 import pl.touk.nussknacker.engine.api.typed.typing.Typed
-import pl.touk.nussknacker.engine.api.{MetaData, ProcessAdditionalFields, StreamMetaData}
+import pl.touk.nussknacker.engine.api.{FragmentSpecificData, MetaData, ProcessAdditionalFields, ScenarioSpecificData, StreamMetaData}
 import pl.touk.nussknacker.engine.build.{EspProcessBuilder, GraphBuilder}
 import pl.touk.nussknacker.engine.canonicalgraph.canonicalnode.{FlatNode, SplitNode}
 import pl.touk.nussknacker.engine.canonicalgraph.{CanonicalProcess, canonicalnode}
@@ -21,7 +21,7 @@ import pl.touk.nussknacker.engine.graph.node.{Case, Split, SubprocessInputDefini
 import pl.touk.nussknacker.engine.graph.sink.SinkRef
 import pl.touk.nussknacker.engine.graph.source.SourceRef
 import pl.touk.nussknacker.engine.graph.{EspProcess, node}
-import pl.touk.nussknacker.engine.spel
+import pl.touk.nussknacker.engine.{TypeSpecificInitialData, spel}
 import pl.touk.nussknacker.engine.testing.ProcessDefinitionBuilder
 import pl.touk.nussknacker.engine.testing.ProcessDefinitionBuilder._
 import pl.touk.nussknacker.restmodel.ProcessType
@@ -46,6 +46,7 @@ object ProcessTestData {
   val existingSourceFactory = "barSource"
   val otherExistingSourceFactory = "fooSource"
   val existingSinkFactory = "barSink"
+  val existingSinkFactory2 = "barSink2"
   val otherExistingSinkFactory = "barSink"
   val existingServiceId = "barService"
   val otherExistingServiceId = "fooService"
@@ -77,14 +78,14 @@ object ProcessTestData {
       validators = List(FixedValuesValidator(List(FixedExpressionValue("a", "a")))))
     )
     .withCustomStreamTransformer(existingStreamTransformer, classOf[String], CustomTransformerAdditionalData(Set("query1", "query2"),
-      clearsContext = false, manyInputs = false, canBeEnding = false))
+      manyInputs = false, canBeEnding = false))
     .withCustomStreamTransformer(otherExistingStreamTransformer, classOf[String], CustomTransformerAdditionalData(Set("query3"),
-      clearsContext = false, manyInputs = false, canBeEnding = false))
+      manyInputs = false, canBeEnding = false))
     .withCustomStreamTransformer(otherExistingStreamTransformer2, classOf[String], CustomTransformerAdditionalData(Set("query4"),
-      clearsContext = false, manyInputs = false, canBeEnding = false))
+      manyInputs = false, canBeEnding = false))
     .withCustomStreamTransformer(optionalEndingStreamTransformer, classOf[String], CustomTransformerAdditionalData(Set("query5"),
-      clearsContext = false, manyInputs = false, canBeEnding = true))
-  
+      manyInputs = false, canBeEnding = true))
+
   val validator = ProcessValidator.default(ProcessDefinitionBuilder.withEmptyObjects(processDefinition), new SimpleDictRegistry(Map.empty))
 
   val validation = new ProcessValidation(
@@ -123,7 +124,7 @@ object ProcessTestData {
     new ValidatedDisplayableProcess(displayable, validation.validate(displayable))
   }
 
-  def toDetails(displayable: DisplayableProcess) : ProcessDetails =
+  def toDetails(displayable: DisplayableProcess, isArchived: Boolean = false, category: String = "Category") : ProcessDetails =
     BaseProcessDetails[DisplayableProcess](
       id = displayable.id,
       name = displayable.id,
@@ -131,11 +132,11 @@ object ProcessTestData {
       processVersionId = 1,
       isLatestVersion = true,
       description = None,
-      isArchived = false,
+      isArchived = isArchived,
       isSubprocess = false,
       processType = ProcessType.Graph,
       processingType = TestProcessingTypes.Streaming,
-      processCategory = "Category",
+      processCategory = category,
       modificationDate = LocalDateTime.now(),
       createdAt = LocalDateTime.now(),
       createdBy = "user1",
@@ -248,7 +249,7 @@ object ProcessTestData {
   val sampleDisplayableProcess = {
     DisplayableProcess(
       id = "fooProcess",
-      properties = ProcessProperties(StreamMetaData(Some(2)), ExceptionHandlerRef(List.empty), false, Some(ProcessAdditionalFields(Some("process description"), Map.empty)), subprocessVersions = Map.empty),
+      properties = ProcessProperties(StreamMetaData(Some(2)), ExceptionHandlerRef(List.empty), Some(ProcessAdditionalFields(Some("process description"), Map.empty)), subprocessVersions = Map.empty),
       nodes = List(
         node.Source(
           id = "sourceId",
@@ -258,7 +259,6 @@ object ProcessTestData {
         node.Sink(
           id = "sinkId",
           ref = SinkRef(existingSinkFactory, List.empty),
-          endResult = None,
           additionalFields = None
         )
       ),
@@ -268,18 +268,18 @@ object ProcessTestData {
   }
 
   val emptySubprocess = {
-    CanonicalProcess(MetaData("sub1", StreamMetaData(), isSubprocess = true, None, Map()), ExceptionHandlerRef(List()), List(), List.empty)
+    CanonicalProcess(MetaData("sub1", FragmentSpecificData(), None, Map()), ExceptionHandlerRef(List()), List(), List.empty)
   }
 
   val sampleSubprocessOneOut = {
-    CanonicalProcess(MetaData("sub1", StreamMetaData(), isSubprocess = true), ExceptionHandlerRef(List()), List(
+    CanonicalProcess(MetaData("sub1", FragmentSpecificData()), ExceptionHandlerRef(List()), List(
       FlatNode(SubprocessInputDefinition("in", List(SubprocessParameter("param1", SubprocessClazzRef[String])))),
       canonicalnode.FlatNode(SubprocessOutputDefinition("out1", "output", List.empty))
     ), List.empty)
   }
 
   val sampleSubprocess = {
-    CanonicalProcess(MetaData("sub1", StreamMetaData(), isSubprocess = true), ExceptionHandlerRef(List()), List(
+    CanonicalProcess(MetaData("sub1", FragmentSpecificData()), ExceptionHandlerRef(List()), List(
       FlatNode(SubprocessInputDefinition("in", List(SubprocessParameter("param1", SubprocessClazzRef[String])))),
       SplitNode(Split("split"), List(
         List(FlatNode(SubprocessOutputDefinition("out", "out1", List.empty))),
@@ -289,7 +289,7 @@ object ProcessTestData {
   }
 
   val sampleSubprocess2 = {
-    CanonicalProcess(MetaData("sub1", StreamMetaData(), isSubprocess = true), ExceptionHandlerRef(List()), List(
+    CanonicalProcess(MetaData("sub1", FragmentSpecificData()), ExceptionHandlerRef(List()), List(
       FlatNode(SubprocessInputDefinition("in", List(SubprocessParameter("param2", SubprocessClazzRef[String])))),
       SplitNode(Split("split"), List(
         List(FlatNode(SubprocessOutputDefinition("out", "out1", List.empty))),
@@ -305,7 +305,6 @@ object ProcessTestData {
       properties = ProcessProperties(
         StreamMetaData(),
         ExceptionHandlerRef(List.empty),
-        isSubprocess = false,
         None,
         subprocessVersions = Map.empty
       ),
@@ -325,7 +324,7 @@ object ProcessTestData {
         .exceptionHandler()
         .source("source", existingSourceFactory)
         .subprocess(subprocess.metaData.id, subprocess.metaData.id,Nil,Map(
-          "output1" -> GraphBuilder.sink("sink", "'result1'", existingSinkFactory)
+          "output1" -> GraphBuilder.emptySink("sink", existingSinkFactory)
         )),
       subprocess = subprocess
     )
@@ -343,4 +342,7 @@ object ProcessTestData {
   }
 
   case class ProcessUsingSubprocess(process: EspProcess, subprocess: CanonicalProcess)
+
+  val streamingTypeSpecificInitialData: TypeSpecificInitialData = TypeSpecificInitialData(StreamMetaData(None))
+
 }

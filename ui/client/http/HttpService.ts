@@ -1,5 +1,5 @@
 /* eslint-disable i18next/no-literal-string */
-import {AxiosError} from "axios"
+import {AxiosError, AxiosRequestConfig, AxiosResponse} from "axios"
 import FileSaver from "file-saver"
 import i18next from "i18next"
 import {Moment} from "moment"
@@ -10,6 +10,7 @@ import {ProcessStateType, ProcessType} from "../components/Process/types"
 import {ToolbarsConfig} from "../components/toolbarSettings/types"
 import {API_URL} from "../config"
 import {AuthenticationSettings} from "../reducers/settings"
+import {ProcessDefinitionData} from "../types"
 import {WithId} from "../types/common"
 
 type HealthCheckProcessDeploymentType = {
@@ -45,6 +46,31 @@ export interface AppBuildInfo {
   buildTime: string,
   version: string,
   processingType: any,
+}
+
+type Services = Record<string, Record<string, {
+  "parameters": unknown[],
+  "returnType": unknown,
+  "categories": string[],
+  "nodeConfig": unknown,
+}>>
+
+export type ComponentActionType = {
+  id: string,
+  title: string,
+  icon: string,
+  url?: string,
+}
+
+export type ComponentType = {
+  id: string,
+  name: string,
+  icon: string,
+  componentType: string,
+  componentGroupName: string,
+  categories: string[],
+  actions: ComponentActionType[],
+  usageCount: number,
 }
 
 //TODO: Move show information about error to another place. HttpService should avoid only action (get / post / etc..) - handling errors should be in another place.
@@ -109,7 +135,7 @@ class HttpService {
     return api.get<SettingsData>("/settings")
   }
 
-  fetchSettingsWithAuth(): Promise<SettingsData & {authentication: AuthenticationSettings}> {
+  fetchSettingsWithAuth(): Promise<SettingsData & { authentication: AuthenticationSettings }> {
     return this.fetchSettings()
       .then(({data}) => {
         const {provider} = data.authentication
@@ -135,14 +161,14 @@ class HttpService {
     return api.get<AppBuildInfo>("/app/buildInfo")
   }
 
-  fetchProcessDefinitionData(processingType, isSubprocess) {
-    const promise = api.get(`/processDefinitionData/${processingType}?isSubprocess=${isSubprocess}`)
+  fetchProcessDefinitionData(processingType: string, isSubprocess: boolean) {
+    const promise = api.get<ProcessDefinitionData>(`/processDefinitionData/${processingType}?isSubprocess=${isSubprocess}`)
       .then(response => {
         // This is a walk-around for having part of node template (branch parameters) outside of itself.
         // See note in DefinitionPreparer on backend side. // TODO remove it after API refactor
-        response.data.nodesToAdd.forEach(nodeAggregates => {
-          nodeAggregates.possibleNodes.forEach(nodeToAdd => {
-            nodeToAdd.node.branchParametersTemplate = nodeToAdd.branchParametersTemplate
+        response.data.componentGroups.forEach(group => {
+          group.components.forEach(component => {
+            component.node.branchParametersTemplate = component.branchParametersTemplate
           })
         })
 
@@ -152,20 +178,34 @@ class HttpService {
     return promise
   }
 
+  /**
+   * @deprecated
+   */
   fetchComponentIds() {
-    return api.get("/processDefinitionData/componentIds")
+    // `id` is not the same as in //api/component response
+    return api.get<string[]>("/processDefinitionData/componentIds")
   }
 
   fetchServices() {
-    return api.get("/processDefinitionData/services")
+    return api.get<Services>("/processDefinitionData/services")
   }
 
   fetchDictLabelSuggestions(processingType, dictId, labelPattern) {
     return api.get(`/processDefinitionData/${processingType}/dict/${dictId}/entry?label=${labelPattern}`)
   }
 
-  fetchUnusedComponents() {
-    return api.get("/app/unusedComponents")
+  fetchComponents(): Promise<AxiosResponse<ComponentType[]>> {
+    return api.get<ComponentType[]>("/components")
+  }
+
+  /**
+   * @deprecated
+   */
+  fetchUnusedComponents(): Promise<AxiosResponse<string[]>> {
+    return this.fetchComponents().then(({data, ...response}) => ({
+      ...response,
+      data: data.filter(c => c.usageCount).map(c => c.id),
+    }))
   }
 
   fetchProcessesComponents(componentId) {
@@ -192,7 +232,10 @@ class HttpService {
 
   fetchProcessToolbarsConfiguration(processId) {
     const promise = api.get<WithId<ToolbarsConfig>>(`/processes/${processId}/toolbars`)
-    promise.catch(error => this.addError(i18next.t("notification.error.cannotFetchToolbarConfiguration", "Cannot fetch toolbars configuration"), error))
+    promise.catch(error => this.addError(i18next.t(
+      "notification.error.cannotFetchToolbarConfiguration",
+      "Cannot fetch toolbars configuration"
+    ), error))
     return promise
   }
 
@@ -202,7 +245,7 @@ class HttpService {
   }
 
   fetchProcessesDeployments(processId: string) {
-    return api.get<{performedAt: string, action: "UNARCHIVE" | "ARCHIVE" | "CANCEL" | "DEPLOY"}[]>(`/processes/${processId}/deployments`)
+    return api.get<{ performedAt: string, action: "UNARCHIVE" | "ARCHIVE" | "CANCEL" | "DEPLOY" }[]>(`/processes/${processId}/deployments`)
       .then(res => res.data
         .filter(({action}) => action === "DEPLOY")
         .map(({performedAt}) => performedAt))
@@ -213,9 +256,10 @@ class HttpService {
       this.addInfo(i18next.t("notification.info.scenarioDeployed", "Scenario {{processId}} was deployed", processId))
       return {isSuccess: true}
     }).catch(error => {
-      return this.addError(i18next.t("notification.error.failedToDeploy", "Failed to deploy {{processId}}", processId), error, true).then(() => {
-        return {isSuccess: false}
-      })
+      return this.addError(i18next.t("notification.error.failedToDeploy", "Failed to deploy {{processId}}", processId), error, true)
+        .then(() => {
+          return {isSuccess: false}
+        })
     })
   }
 
@@ -238,8 +282,12 @@ class HttpService {
 
   cancel(processId, comment?) {
     return api.post(`/processManagement/cancel/${processId}`, comment)
-      .then(() => this.addInfo(i18next.t("notification.info.scenarioCancelled", "Process {{processId}} was canceled", processId)))
-      .catch(error => this.addError(i18next.t("notification.error.failedToCancel", "Failed to cancel {{processId}}", processId), error, true))
+      .then(() => this.addInfo(i18next.t("notification.info.scenarioCancelled", "Scenario {{processId}} was canceled", processId)))
+      .catch(error => this.addError(
+        i18next.t("notification.error.failedToCancel", "Failed to cancel {{processId}}", processId),
+        error,
+        true
+      ))
   }
 
   fetchProcessActivity(processId) {
@@ -280,7 +328,7 @@ class HttpService {
 
     return api.put(`/processes/${processName}/rename/${newProcessName}`)
       .then(() => {
-        this.addInfo(i18next.t("notification.error.nameChanged", "Process name changed"))
+        this.addInfo(i18next.t("notification.error.nameChanged", "Scenario name changed"))
         return true
       })
       .catch((error) => {
@@ -312,13 +360,21 @@ class HttpService {
 
   validateNode(processId, node) {
     const promise = api.post(`/nodes/${processId}/validation`, node)
-    promise.catch(error => this.addError(i18next.t("notification.error.failedToValidateNode", "Failed to get node validation"), error, true))
+    promise.catch(error => this.addError(
+      i18next.t("notification.error.failedToValidateNode", "Failed to get node validation"),
+      error,
+      true
+    ))
     return promise
   }
 
   getNodeAdditionalData(processId, node) {
     const promise = api.post(`/nodes/${processId}/additionalData`, node)
-    promise.catch(error => this.addError(i18next.t("notification.error.failedToFetchState", "Failed to get node additional data"), error, true))
+    promise.catch(error => this.addError(
+      i18next.t("notification.error.failedToFetchState", "Failed to get node additional data"),
+      error,
+      true
+    ))
     return promise
   }
 
@@ -398,7 +454,10 @@ class HttpService {
 
   fetchRemoteVersions(processId) {
     const promise = api.get(`/remoteEnvironment/${processId}/versions`)
-    promise.catch(error => this.addError(i18next.t("notification.error.failedToGetVersions", "Failed to get versions from second environment"), error))
+    promise.catch(error => this.addError(i18next.t(
+      "notification.error.failedToGetVersions",
+      "Failed to get versions from second environment"
+    ), error))
     return promise
   }
 

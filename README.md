@@ -1,4 +1,4 @@
-[![Maven Central](https://maven-badges.herokuapp.com/maven-central/pl.touk.nussknacker/nussknacker-ui_2.11/badge.svg)](https://maven-badges.herokuapp.com/maven-central/pl.touk.nussknacker/nussknacker-ui_2.11)
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/pl.touk.nussknacker/nussknacker-ui_2.12/badge.svg)](https://maven-badges.herokuapp.com/maven-central/pl.touk.nussknacker/nussknacker-ui_2.12)
 [![Build status](https://github.com/touk/nussknacker/workflows/CI/badge.svg)](https://github.com/touk/nussknacker/actions?query=workflow%3A%22CI%22)
 [![Coverage Status](https://coveralls.io/repos/github/TouK/nussknacker/badge.svg?branch=staging)](https://coveralls.io/github/TouK/nussknacker?branch=staging)
 [![Artifact HUB](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/touk)](https://artifacthub.io/packages/search?repo=touk)
@@ -9,9 +9,13 @@
 Nussknacker lets you design, deploy and monitor streaming processes using easy to use GUI.
 We leverage power, performance and reliability of [Apache Flink](https://flink.apache.org/) to make your processes fast and accurate.
 
-Visit our [pages](https://docs.nussknacker.io) to see documentation.
-Visit our [quickstart](https://docs.nussknacker.io/quickstart/docker/) to have a look around.
+Visit our [pages](https://nussknacker.io/documentation) to see documentation.
+Visit our [quickstart](https://nussknacker.io/documentation/quickstart/docker/) to have a look around.
 Talk to us on our [mailing list](https://groups.google.com/forum/#!forum/nussknacker)
+
+## Demo
+
+Available at [demo.nussknacker.io](https://demo.nussknacker.io)
 
 ## Scala compatibility
 
@@ -31,6 +35,7 @@ with detailed instructions how to run Nussknacker with some of the older version
 - [nussknacker-quickstart](https://github.com/TouK/nussknacker-quickstart) - Repository with docker-compose presenting typical usage of Nussknacker    
 - [nussknacker-flink-compatibility](https://github.com/TouK/nussknacker-flink-compatibility) - Toolbox providing backward compatibility for older Flink's versions    
 - [prinz-nussknacker](https://github.com/prinz-nussknacker/prinz) - Nussknacker integration with ML models and model registries - currently supports [mlflow](https://mlflow.org/) 
+- [nussknacker-benchmarks](https://github.com/TouK/nussknacker-benchmarks) - micro and e2e benchmarks visualization
 
 ## License
 

@@ -8,7 +8,6 @@ import com.typesafe.scalalogging.LazyLogging
 import pl.touk.nussknacker.engine.ModelData
 import pl.touk.nussknacker.engine.graph.evaluatedparam.Parameter
 import pl.touk.nussknacker.engine.util.service.query.ServiceQuery
-import pl.touk.nussknacker.engine.ProcessingTypeData.ProcessingType
 import pl.touk.nussknacker.ui.security.api.{LoggedUser, Permission}
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -74,9 +73,9 @@ class ServiceRoutes(modelDataMap: ProcessingTypeDataProvider[ModelData])
 
   private[api] def canUserInvokeService(user: LoggedUser, serviceName: String, modelData: ModelData): Boolean = {
 
-    def hasUserDeployPermissionForCategories(categories: List[String]) = {
+    def hasUserDeployPermissionForCategories(categories: Option[List[String]]) = {
       def isAllowed(categoryName: String): Boolean = user.can(categoryName, Permission.Deploy)
-      categories.exists(isAllowed)
+      categories.forall(_.exists(isAllowed))
     }
 
     val servicesToCategories = modelData.processDefinition.services.mapValues(_.categories)

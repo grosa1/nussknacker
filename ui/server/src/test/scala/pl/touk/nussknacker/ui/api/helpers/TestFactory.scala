@@ -2,9 +2,9 @@ package pl.touk.nussknacker.ui.api.helpers
 
 import akka.http.scaladsl.server.Route
 import cats.instances.future._
+import com.typesafe.config.{Config, ConfigFactory}
 import db.util.DBIOActionInstances.DB
 import pl.touk.nussknacker.engine.ProcessingTypeConfig
-import pl.touk.nussknacker.engine.ProcessingTypeData.ProcessingType
 import pl.touk.nussknacker.engine.api.definition.FixedExpressionValue
 import pl.touk.nussknacker.engine.api.deployment.simple.{SimpleProcessState, SimpleStateStatus}
 import pl.touk.nussknacker.engine.api.deployment._
@@ -14,9 +14,11 @@ import pl.touk.nussknacker.engine.canonicalgraph.CanonicalProcess
 import pl.touk.nussknacker.engine.graph.exceptionhandler.ExceptionHandlerRef
 import pl.touk.nussknacker.engine.management.FlinkDeploymentManager
 import pl.touk.nussknacker.restmodel.displayedgraph.{DisplayableProcess, ProcessProperties}
+import pl.touk.nussknacker.restmodel.process.ProcessingType
 import pl.touk.nussknacker.ui.api.helpers.TestPermissions.CategorizedPermission
 import pl.touk.nussknacker.ui.api.{RouteWithUser, RouteWithoutUser}
 import pl.touk.nussknacker.ui.db.DbConfig
+import pl.touk.nussknacker.ui.process.NewProcessPreparer
 import pl.touk.nussknacker.ui.process.processingtypedata.MapBasedProcessingTypeDataProvider
 import pl.touk.nussknacker.ui.process.repository._
 import pl.touk.nussknacker.ui.process.subprocess.{DbSubprocessRepository, SubprocessDetails, SubprocessRepository, SubprocessResolver}
@@ -25,6 +27,7 @@ import pl.touk.nussknacker.ui.uiresolving.UIProcessResolving
 import pl.touk.nussknacker.ui.util.ConfigWithScalaVersion
 import pl.touk.nussknacker.ui.validation.ProcessValidation
 
+import java.util.concurrent.ConcurrentLinkedQueue
 import java.util.concurrent.atomic.AtomicReference
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.{ExecutionContext, Future, Promise}
@@ -42,8 +45,10 @@ object TestFactory extends TestPermissions{
     secondTestCategoryName -> Permission.ALL_PERMISSIONS
   )
 
-  val sampleSubprocessRepository = new SampleSubprocessRepository(Set(ProcessTestData.sampleSubprocess))
-  val sampleResolver = new SubprocessResolver(sampleSubprocessRepository)
+  // It should be defined as method, because when it's defined as val then there is bug in IDEA at DefinitionPreparerSpec - it returns null
+  def prepareSampleSubprocessRepository: StubSubprocessRepository = StubSubprocessRepository(Set(ProcessTestData.sampleSubprocess))
+
+  val sampleResolver = new SubprocessResolver(prepareSampleSubprocessRepository)
 
   val possibleValues = List(FixedExpressionValue("a", "a"))
   val processValidation = new ProcessValidation(
@@ -61,7 +66,6 @@ object TestFactory extends TestPermissions{
     properties = ProcessProperties(StreamMetaData(
       Some(2)),
       ExceptionHandlerRef(List.empty),
-      isSubprocess = false,
       Some(ProcessAdditionalFields(Some("scenario description"), Map(
         "maxEvents" -> "text",
         "unknown" -> "x",
@@ -95,6 +99,12 @@ object TestFactory extends TestPermissions{
     route.securedRoute(adminUser())
   }
 
+  def createNewProcessPreparer(): NewProcessPreparer = new NewProcessPreparer(
+    mapProcessingTypeDataProvider("streaming" ->  ProcessTestData.processDefinition),
+    mapProcessingTypeDataProvider("streaming" -> ProcessTestData.streamingTypeSpecificInitialData),
+    mapProcessingTypeDataProvider("streaming" -> Map.empty)
+  )
+
   def withPermissions(route: RouteWithUser, permissions: TestPermissions.CategorizedPermission): Route =
     route.securedRoute(user(permissions = permissions))
 
@@ -105,10 +115,12 @@ object TestFactory extends TestPermissions{
 
   def withoutPermissions(route: RouteWithoutUser): Route = route.publicRoute()
 
+  def userWithCategoriesReadPermission(id: String = "1", username: String = "user", categories: List[String]): LoggedUser =
+    user(id, username, categories.map(c => c -> Set(Permission.Read)).toMap)
 
   //FIXME: update
-  def user(id: String = "1", username: String = "user", permissions: CategorizedPermission = testPermissionEmpty): LoggedUser
-    = LoggedUser(id, username, permissions, globalPermissions = List("CustomFixedPermission"))
+  def user(id: String = "1", username: String = "user", permissions: CategorizedPermission = testPermissionEmpty): LoggedUser =
+    LoggedUser(id, username, permissions, globalPermissions = List("CustomFixedPermission"))
 
   def adminUser(id: String = "1", username: String = "admin"): LoggedUser = LoggedUser(id, username, Map.empty, Nil, isAdmin = true)
 
@@ -138,13 +150,18 @@ object TestFactory extends TestPermissions{
     override def findJobStatus(name: ProcessName): Future[Option[ProcessState]] =
       Future.successful(managerProcessState.get())
 
-    override def deploy(processId: ProcessVersion, deploymentData: DeploymentData,
-                        processDeploymentData: ProcessDeploymentData, savepoint: Option[String]): Future[Option[ExternalDeploymentId]] =
+    override def deploy(processVersion: ProcessVersion, deploymentData: DeploymentData,
+                        processDeploymentData: ProcessDeploymentData, savepoint: Option[String]): Future[Option[ExternalDeploymentId]] = {
+      deploys.add(processVersion)
       deployResult
+    }
 
     private var deployResult: Future[Option[ExternalDeploymentId]] = Future.successful(None)
 
     private val managerProcessState = new AtomicReference[Option[ProcessState]](prepareProcessState(defaultProcessStateStatus))
+
+    //queue of invocations to e.g. check that deploy was already invoked in "ProcessManager"
+    val deploys = new ConcurrentLinkedQueue[ProcessVersion]()
 
     def withWaitForDeployFinish[T](action: => T): T = {
       val promise = Promise[Option[ExternalDeploymentId]]
@@ -225,8 +242,13 @@ object TestFactory extends TestPermissions{
 
   }
 
-  class SampleSubprocessRepository(subprocesses: Set[CanonicalProcess]) extends SubprocessRepository {
-    override def loadSubprocesses(versions: Map[String, Long]): Set[SubprocessDetails] =
-      subprocesses.map(c => SubprocessDetails(c, testCategoryName))
+  object StubSubprocessRepository {
+    def apply(subprocesses: Set[CanonicalProcess]): StubSubprocessRepository =
+      new StubSubprocessRepository(subprocesses.map(c => SubprocessDetails(c, testCategoryName)))
   }
+
+  class StubSubprocessRepository(subprocesses: Set[SubprocessDetails]) extends SubprocessRepository {
+    override def loadSubprocesses(versions: Map[String, Long]): Set[SubprocessDetails] = subprocesses
+  }
+
 }

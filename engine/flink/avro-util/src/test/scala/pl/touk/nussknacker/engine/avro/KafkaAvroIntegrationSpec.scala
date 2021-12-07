@@ -11,7 +11,7 @@ import org.scalatest.{Assertion, BeforeAndAfter}
 import pl.touk.nussknacker.engine.api.ProcessVersion
 import pl.touk.nussknacker.engine.api.deployment.DeploymentData
 import pl.touk.nussknacker.engine.api.exception.NonTransientException
-import pl.touk.nussknacker.engine.avro.KafkaAvroBaseTransformer._
+import pl.touk.nussknacker.engine.avro.KafkaAvroBaseComponentTransformer._
 import pl.touk.nussknacker.engine.avro.KafkaAvroTestProcessConfigCreator.recordingExceptionHandler
 import pl.touk.nussknacker.engine.avro.encode.ValidationMode
 import pl.touk.nussknacker.engine.avro.helpers.KafkaAvroSpecMixin
@@ -88,7 +88,7 @@ class KafkaAvroIntegrationSpec extends KafkaAvroSpecMixin with BeforeAndAfter {
 
     intercept[Exception] {
       runAndVerifyResult(process, topicConfig, "fooBar", "fooBar")
-    }.getMessage should include ("Bad expression type, expected: String, found: Long")
+    }.getMessage should include ("Compilation errors: InvalidPropertyFixedValue(Topic,None,123L,")
   }
 
   test("should handle null value for mandatory parameter") {

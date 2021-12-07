@@ -8,7 +8,6 @@
       "checkpointIntervalInSeconds" : null,
       "type" : "StreamMetaData"
     },
-    "isSubprocess" : false,
     "additionalFields" : {
       "description" : null,
       "groups" : [
@@ -58,12 +57,15 @@
               "language" : "spel",
               "expression" : "'out'"
             }
+          },
+          {
+            "name" : "value",
+            "expression" : {
+              "language" : "spel",
+              "expression" : "''"
+            }
           }
         ]
-      },
-      "endResult" : {
-        "language" : "spel",
-        "expression" : "#input"
       },
       "isDisabled" : null,
       "additionalFields" : {

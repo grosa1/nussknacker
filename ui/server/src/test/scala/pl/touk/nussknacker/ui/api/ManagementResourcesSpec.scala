@@ -17,10 +17,10 @@ import pl.touk.nussknacker.engine.api.deployment.ProcessActionType
 import pl.touk.nussknacker.engine.api.process.{ProcessName, VersionId}
 import pl.touk.nussknacker.engine.build.EspProcessBuilder
 import pl.touk.nussknacker.engine.canonize.ProcessCanonizer
+import pl.touk.nussknacker.restmodel.{CustomActionRequest, CustomActionResponse}
 import pl.touk.nussknacker.restmodel.process.ProcessIdWithName
 import pl.touk.nussknacker.restmodel.processdetails._
 import pl.touk.nussknacker.test.PatientScalaFutures
-import pl.touk.nussknacker.ui.api.deployment.{CustomActionRequest, CustomActionResponse}
 import pl.touk.nussknacker.ui.api.helpers.TestFactory._
 import pl.touk.nussknacker.ui.api.helpers.{EspItTest, SampleProcess, TestFactory, TestProcessingTypes}
 import pl.touk.nussknacker.ui.process.exception.ProcessIllegalAction
@@ -231,6 +231,7 @@ class ManagementResourcesSpec extends FunSuite with ScalatestRouteTest with Fail
       , TestProcessingTypes.Streaming)
     val multiPart = MultipartUtils.prepareMultiParts("testData" -> "ala\nbela", "processJson" -> displayableProcess.asJson.noSpaces)()
     Post(s"/processManagement/test/${SampleProcess.process.id}", multiPart) ~> withPermissions(deployRoute(), testPermissionDeploy |+| testPermissionRead) ~> check {
+
       status shouldEqual StatusCodes.OK
 
       val ctx = responseAs[Json] .hcursor
@@ -266,7 +267,7 @@ class ManagementResourcesSpec extends FunSuite with ScalatestRouteTest with Fail
           .exceptionHandler()
           .source("startProcess", "csv-source")
           .filter("input", "new java.math.BigDecimal(null) == 0")
-          .emptySink("end", "kafka-string", "topic" -> "'end.topic'")
+          .emptySink("end", "kafka-string", "topic" -> "'end.topic'", "value" -> "''")
     }
 
     saveProcessAndAssertSuccess(process.id, process)

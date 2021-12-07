@@ -8,7 +8,6 @@
       "checkpointIntervalInSeconds" : null,
       "type" : "StreamMetaData"
     },
-    "isSubprocess" : false,
     "additionalFields" : {
       "description" : null,
       "properties" : {
@@ -101,11 +100,14 @@
       "ref" : {
         "typ" : "sendSms",
         "parameters" : [
+          {
+            "name" : "value",
+            "expression" : {
+              "language" : "spel",
+              "expression" : "''"
+            }
+          }
         ]
-      },
-      "endResult" : {
-        "language" : "spel",
-        "expression" : "#input"
       },
       "isDisabled" : null,
       "additionalFields" : {

@@ -1,19 +1,19 @@
 package pl.touk.nussknacker.engine.management.sample
 
-import java.util.concurrent.atomic.{AtomicBoolean, AtomicInteger}
-
 import com.typesafe.scalalogging.LazyLogging
 import io.circe.generic.JsonCodec
+import pl.touk.nussknacker.engine.api._
 import pl.touk.nussknacker.engine.api.exception.{EspExceptionHandler, EspExceptionInfo, ExceptionHandlerFactory}
 import pl.touk.nussknacker.engine.api.process._
+import pl.touk.nussknacker.engine.api.runtimecontext.EngineRuntimeContext
 import pl.touk.nussknacker.engine.api.signal.ProcessSignalSender
 import pl.touk.nussknacker.engine.api.test.InvocationCollectors.ServiceInvocationCollector
 import pl.touk.nussknacker.engine.api.test.{NewLineSplittedTestDataParser, TestDataParser}
-import pl.touk.nussknacker.engine.api._
-import pl.touk.nussknacker.engine.standalone.api.{StandaloneGetSource, StandalonePostSource, StandaloneSourceFactory}
-import pl.touk.nussknacker.engine.standalone.utils.service.TimeMeasuringService
+import pl.touk.nussknacker.engine.standalone.api.{StandaloneGetSource, StandalonePostSource, StandaloneSinkFactory, StandaloneSourceFactory}
+import pl.touk.nussknacker.engine.util.service.TimeMeasuringService
 import pl.touk.nussknacker.engine.util.LoggingListener
 
+import java.util.concurrent.atomic.{AtomicBoolean, AtomicInteger}
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Random
 
@@ -30,12 +30,12 @@ class StandaloneProcessConfigCreator extends ProcessConfigCreator with LazyLoggi
     "processorService" -> WithCategories(new ProcessorService, standaloneCategory)
   )
 
-  override def sourceFactories(processObjectDependencies: ProcessObjectDependencies): Map[String, WithCategories[SourceFactory[_]]] = Map(
+  override def sourceFactories(processObjectDependencies: ProcessObjectDependencies): Map[String, WithCategories[SourceFactory]] = Map(
     "request1-source" -> WithCategories(new Request1SourceFactory, standaloneCategory)
   )
 
   override def sinkFactories(processObjectDependencies: ProcessObjectDependencies): Map[String, WithCategories[SinkFactory]] = Map(
-    "response-sink" -> WithCategories(new ResponseSink, standaloneCategory)
+    "response-sink" -> WithCategories(new StandaloneSinkFactory, standaloneCategory)
   )
 
   override def listeners(processObjectDependencies: ProcessObjectDependencies): Seq[ProcessListener] = List(LoggingListener)
@@ -89,6 +89,7 @@ class SlowEnricherService extends Service with TimeMeasuringService {
       }
     }
   }
+
 }
 
 object ProcessorService {
@@ -101,7 +102,7 @@ class ProcessorService extends Service with Lifecycle {
 
   private val initialized = new AtomicBoolean(false)
 
-  override def open(jobData: JobData): Unit = {
+  override def open(engineRuntimeContext: EngineRuntimeContext): Unit = {
     initialized.set(true)
   }
 
@@ -119,10 +120,10 @@ class ProcessorService extends Service with Lifecycle {
 
 }
 
-class Request1SourceFactory extends StandaloneSourceFactory[Request1] {
+class Request1SourceFactory extends StandaloneSourceFactory {
 
   @MethodToInvoke
-  def create(): Source[Request1] = {
+  def create(): Source = {
     new StandalonePostSource[Request1] with StandaloneGetSource[Request1] with SourceTestSupport[Request1] {
 
       override def parse(data: Array[Byte]): Request1 = CirceUtil.decodeJsonUnsafe[Request1](data)
@@ -142,15 +143,4 @@ class Request1SourceFactory extends StandaloneSourceFactory[Request1] {
     }
   }
 
-
-
-  override def clazz: Class[_] = classOf[Request1]
-
-}
-
-class ResponseSink extends SinkFactory {
-  @MethodToInvoke
-  def invoke(): Sink = new Sink {
-    override def testDataOutput: Option[(Any) => String] = Some(_.toString)
-  }
 }

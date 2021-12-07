@@ -4,7 +4,7 @@ import org.apache.kafka.common.serialization.{Deserializer, Serializer}
 import org.scalatest.{BeforeAndAfter, FunSuite}
 import pl.touk.nussknacker.engine.avro.KafkaAvroTestProcessConfigCreator.recordingExceptionHandler
 import pl.touk.nussknacker.engine.avro.helpers.{KafkaAvroSpecMixin, SimpleKafkaJsonDeserializer, SimpleKafkaJsonSerializer}
-import pl.touk.nussknacker.engine.avro.schema.{GeneratedAvroClassSampleSchema, GeneratedAvroClassWithLogicalTypes, PaymentV1}
+import pl.touk.nussknacker.engine.avro.schema.{GeneratedAvroClassSampleSchema, PaymentV1}
 import pl.touk.nussknacker.engine.avro.schemaregistry.confluent.ConfluentSchemaRegistryProvider
 import pl.touk.nussknacker.engine.avro.schemaregistry.confluent.client.{ConfluentSchemaRegistryClientFactory, MockConfluentSchemaRegistryClientFactory, MockSchemaRegistryClient}
 import pl.touk.nussknacker.engine.avro.schemaregistry.{ExistingSchemaVersion, SchemaRegistryProvider}
@@ -21,7 +21,7 @@ class KafkaJsonPayloadIntegrationSpec extends FunSuite with KafkaAvroSpecMixin w
     override protected def createSchemaRegistryProvider: SchemaRegistryProvider =
       ConfluentSchemaRegistryProvider.jsonPayload(new MockConfluentSchemaRegistryClientFactory(schemaRegistryMockClient))
   }
-  
+
   override protected def schemaRegistryClient: MockSchemaRegistryClient = schemaRegistryMockClient
 
   override protected def confluentClientFactory: ConfluentSchemaRegistryClientFactory = new MockConfluentSchemaRegistryClientFactory(schemaRegistryMockClient)

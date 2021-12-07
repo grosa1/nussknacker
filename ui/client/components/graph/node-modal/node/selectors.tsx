@@ -15,12 +15,6 @@ export const getErrors = createSelector(
   },
 )
 
-export const getNodeSettings = createSelector(
-  getProcessDefinitionData,
-  getNodeToDisplay,
-  (process, node) => get(process.nodesConfig, ProcessUtils.findNodeConfigName(node)) || {},
-)
-
 export const getReadOnly = createSelector(
   (state, fromProps?: boolean) => fromProps,
   // _ needed for wierd reselect typings ;)

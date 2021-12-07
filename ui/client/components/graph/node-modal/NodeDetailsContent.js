@@ -36,7 +36,7 @@ export class NodeDetailsContent extends React.Component {
 
     this.initalizeWithProps(props)
     const nodeToAdjust = props.node
-    const {node, unusedParameters} = adjustParameters(nodeToAdjust, this.parameterDefinitions, this.nodeDefinitionByName(nodeToAdjust))
+    const {node, unusedParameters} = adjustParameters(nodeToAdjust, this.parameterDefinitions)
 
     this.state = {
       ...TestResultUtils.stateForSelectTestResults(null, this.props.testResults),
@@ -51,12 +51,6 @@ export class NodeDetailsContent extends React.Component {
       this.updateNodeDataIfNeeded(node)
     }
     this.generateUUID("fields", "parameters")
-  }
-
-  nodeDefinitionByName(node) {
-    return this.props.processDefinitionData.nodesToAdd
-      .flatMap(c => c.possibleNodes)
-      .find(n => n.node.type === node.type && n.label === ProcessUtils.findNodeDefinitionId(node))?.node
   }
 
   initalizeWithProps(props) {
@@ -92,7 +86,7 @@ export class NodeDetailsContent extends React.Component {
   }
 
   adjustStateWithParameters(nodeToAdjust) {
-    const {node, unusedParameters} = adjustParameters(nodeToAdjust, this.parameterDefinitions, this.nodeDefinitionByName(nodeToAdjust))
+    const {node, unusedParameters} = adjustParameters(nodeToAdjust, this.parameterDefinitions)
     this.updateNodeState(node, unusedParameters)
   }
 
@@ -151,17 +145,6 @@ export class NodeDetailsContent extends React.Component {
       case "Sink":
         const toAppend = (
           <div>
-            {
-              //TODO: this is a bit clumsy. we should use some metadata, instead of relying on what comes in diagram
-              this.props.node.endResult ?
-                this.createStaticExpressionField(
-                  "expression",
-                  "Expression",
-                  "endResult",
-                  fieldErrors
-                ) :
-                null
-            }
             {this.createField("checkbox", "Disabled", "isDisabled")}
           </div>
         )
@@ -378,7 +361,21 @@ export class NodeDetailsContent extends React.Component {
       case "Properties":
         const type = this.props.node.typeSpecificProperties.type
         //fixme move this configuration to some better place?
-        const fields = type === "StreamMetaData" ?
+        const fields =
+            this.props.node.isSubprocess ? [
+                  this.createField(
+                      "input",
+                      "Documentation url",
+                      "typeSpecificProperties.docsUrl",
+                      true,
+                      [errorValidator(fieldErrors, "docsUrl")],
+                      "docsUrl",
+                      null,
+                      null,
+                      "docsUrl",
+                  )
+                ] :
+            type === "StreamMetaData" ?
           [
             this.createField(
               "input",
@@ -705,7 +702,7 @@ export class NodeDetailsContent extends React.Component {
       case "Split":
         return ["id"]
       case "Properties": {
-        const fields = this.props.node.typeSpecificProperties.type === "StreamMetaData" ?
+        const fields = this.props.node.isSubprocess ? ["docsUrl"] : this.props.node.typeSpecificProperties.type === "StreamMetaData" ?
           ["parallelism", "checkpointIntervalInSeconds", "spillStateToDisk", "useAsyncInterpretation"] :
           ["path"]
         const additionalFields = Object.entries(this.props.additionalPropertiesConfig).map(([fieldName, fieldConfig]) => fieldName)

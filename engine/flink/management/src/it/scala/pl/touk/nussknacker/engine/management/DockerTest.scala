@@ -4,31 +4,34 @@ import java.io.File
 import java.nio.file.attribute.{PosixFilePermission, PosixFilePermissions}
 import java.nio.file.{Files, Path}
 import java.util.Collections
-
 import com.spotify.docker.client.{DefaultDockerClient, DockerClient}
 import com.typesafe.config.ConfigValueFactory.fromAnyRef
 import com.typesafe.config.{Config, ConfigFactory, ConfigValueFactory}
-import com.typesafe.scalalogging.LazyLogging
+import com.typesafe.scalalogging.{LazyLogging, Logger}
 import com.whisk.docker.impl.spotify.SpotifyDockerFactory
 import com.whisk.docker.scalatest.DockerTestKit
 import com.whisk.docker.{ContainerLink, DockerContainer, DockerFactory, DockerReadyChecker, LogLineReceiver, VolumeMapping}
 import org.apache.commons.io.{FileUtils, IOUtils}
 import org.scalatest.Suite
+import org.slf4j.LoggerFactory
 import pl.touk.nussknacker.engine.ProcessingTypeConfig
 import pl.touk.nussknacker.engine.api.deployment.User
 import pl.touk.nussknacker.engine.util.config.ScalaMajorVersionConfig
-import pl.touk.nussknacker.test.ExtremelyPatientScalaFutures
+import pl.touk.nussknacker.engine.version.BuildInfo
+import pl.touk.nussknacker.test.{ExtremelyPatientScalaFutures, VeryPatientScalaFutures}
 
 import scala.concurrent.duration._
 
-trait DockerTest extends DockerTestKit with ExtremelyPatientScalaFutures with LazyLogging {
+trait DockerTest extends DockerTestKit with ExtremelyPatientScalaFutures {
   self: Suite =>
+
+  protected lazy val logger = Logger(LoggerFactory.getLogger("DockerTest"))
 
   override val StartContainersTimeout: FiniteDuration = 5.minutes
   override val StopContainersTimeout: FiniteDuration = 2.minutes
 
 
-  private val flinkEsp = s"flinkesp:1.10.0-scala_${ScalaMajorVersionConfig.scalaMajorVersion}"
+  private val flinkEsp = s"nussknacker-flink-test:${BuildInfo.version}_${ScalaMajorVersionConfig.scalaMajorVersion}"
 
   private val client: DockerClient = DefaultDockerClient.fromEnv().build()
 
@@ -55,7 +58,8 @@ trait DockerTest extends DockerTestKit with ExtremelyPatientScalaFutures with La
   val KafkaPort = 9092
   val ZookeeperDefaultPort = 2181
   val FlinkJobManagerRestPort = 8081
-  val taskManagerSlotCount = 8
+  val FlinkTaskManagerQueryPort = 9069
+  def taskManagerSlotCount = 8
 
   lazy val zookeeperContainer =
     DockerContainer("wurstmeister/zookeeper:3.4.6", name = Some("zookeeper"))
@@ -63,10 +67,11 @@ trait DockerTest extends DockerTestKit with ExtremelyPatientScalaFutures with La
   def baseFlink(name: String) = DockerContainer(flinkEsp, Some(name))
 
   lazy val jobManagerContainer: DockerContainer = {
+    logger.debug(s"Running with number TASK_MANAGER_NUMBER_OF_TASK_SLOTS=$taskManagerSlotCount")
     val savepointDir = prepareVolumeDir()
     baseFlink("jobmanager")
       .withCommand("jobmanager")
-      .withEnv(s"SAVEPOINT_DIR_NAME=${savepointDir.getFileName}")
+      .withEnv(s"SAVEPOINT_DIR_NAME=${savepointDir.getFileName}", s"TASK_MANAGER_NUMBER_OF_TASK_SLOTS=$taskManagerSlotCount")
       .withReadyChecker(DockerReadyChecker.LogLineContains("Recover all persisted job graphs").looped(5, 1 second))
       .withLinks(ContainerLink(zookeeperContainer, "zookeeper"))
       .withVolumes(List(VolumeMapping(savepointDir.toString, savepointDir.toString, rw = true)))
@@ -74,6 +79,8 @@ trait DockerTest extends DockerTestKit with ExtremelyPatientScalaFutures with La
         logger.debug(s"jobmanager: $s")
       }))
   }
+
+  def taskManagerContainer: DockerContainer
 
   def buildTaskManagerContainer(additionalLinks: Seq[ContainerLink] = Nil,
                                 volumes: Seq[VolumeMapping] = Nil): DockerContainer = {
@@ -102,6 +109,7 @@ trait DockerTest extends DockerTestKit with ExtremelyPatientScalaFutures with La
 
   def config: Config = ConfigFactory.load()
     .withValue("deploymentConfig.restUrl", fromAnyRef(s"http://${jobManagerContainer.getIpAddresses().futureValue.head}:$FlinkJobManagerRestPort"))
+    .withValue("deploymentConfig.queryableStateProxyUrl", fromAnyRef(s"${taskManagerContainer.getIpAddresses().futureValue.head}:$FlinkTaskManagerQueryPort"))
     .withValue("modelConfig.classPath", ConfigValueFactory.fromIterable(Collections.singletonList(classPath)))
     .withFallback(additionalConfig)
 

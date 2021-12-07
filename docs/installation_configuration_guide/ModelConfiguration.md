@@ -9,6 +9,8 @@ This part of configuration defines how to configure the Executor (e.g. Flink job
 * defaultModelConfig.conf is currently resolved both on designer (to extract information about types of data or during scenario testing) and on execution engine (e.g. on Flink). That’s why all environment variables used there have to be defined also on all Flink hosts (!). This is a technical limitation and may change in the future.
 * Some Components can use a special mechanism which resolves and adds additional configuration during deployment, which is then passed to the execution engine. Such configuration is read and resolved only at the designer. Example: OpenAPI enrichers need to read its definition from external sites - so e.g. Flink cluster does not have to have access to the site with the definition. 
 
+Look at [configuration areas](./Configuration#configuration-areas) to understand where Model configuration should be placed in Nussknacker configuration.
+
 ## Common settings settings 
 
 | Parameter name                                     | Importance | Type     | Default value          | Description                                                                                                                                                                   |
@@ -21,15 +23,15 @@ This part of configuration defines how to configure the Executor (e.g. Flink job
 | checkpointConfig.minPauseBetweenCheckpoints        | Low        | duration | checkpointInterval / 2 | [Minimal pause](https://ci.apache.org/projects/flink/flink-docs-stable/docs/deployment/config/#execution-checkpointing-min-pause) between checkpoints                         |
 | checkpointConfig.maxConcurrentCheckpoints          | Low        | int      | 1                      | [Maximum concurrent checkpoints](https://ci.apache.org/projects/flink/flink-docs-stable/docs/deployment/config/#execution-checkpointing-max-concurrent-checkpoints) setting   |
 | checkpointConfig.tolerableCheckpointFailureNumber  | Low        | int      |                        | [Tolerable failed checkpoint](https://ci.apache.org/projects/flink/flink-docs-stable/docs/deployment/config/#execution-checkpointing-tolerable-failed-checkpoints) setting    |
-| rocksDB.enable                                     | Medium     | boolean  | true                   | Enable RocksDB state backend support
+| rocksDB.enable                                     | Medium     | boolean  | true                   | Enable RocksDB state backend support                                                                                                                                          |
 | rocksDB.incrementalCheckpoints                     | Medium     | boolean  | true                   | Should incremental checkpoints be used                                                                                                                                        |
 | rocksDB.dbStoragePath                              | Low        | string   |                        | Allows to override RocksDB local data storage                                                                                                                                 |
 | enableObjectReuse                                  | Low        | boolean  | true                   | Should allow [object reuse](https://ci.apache.org/projects/flink/flink-docs-stable/docs/dev/execution/execution_configuration/)                                               |
 | nkGlobalParameters.explicitUidInStatefulOperators  | Low        | boolean  | true                   | Should consistent [operator uids](https://ci.apache.org/projects/flink/flink-docs-stable/docs/ops/upgrading/#matching-operator-state) be used                                 |
 | nkGlobalParameters.useTypingResultTypeInformation  | Low        | boolean  | true                   | Enables using Nussknacker additional typing information for state serialization. It makes serialization much faster, currently consider it as experimental                    |
 | eventTimeMetricSlideDuration                       | Low        | duration | 10 seconds             | We use sliding window reservoir sampling for some metrics, this configures slide length                                                                                       |
-| nodeCategoryMapping                                | Low        | map      |                        | Override default grouping of basic nodes and components in toolbox categories. Component names are keys, while values are toolbox categories (e.g. sources, enrichers etc.)   |
-
+| componentsGroupMapping                             | Low        | map      |                        | Override default grouping of basic components in toolbox panels. Component names are keys, while values are toolbox panels name (e.g. sources, enrichers etc.)                |
+| componentActions                                   | Low        | `list[{id: string, title: string, icon: string, url: option[string], supportedComponentTypes: option[List[string]]}]` | `[{id: "usages", title: "Usages of component", icon: "/assets/components/actions/usages.svg"}]` | Component's actions configuration which are displayed at list of components.  Fields `title`, `icon`, `url` can contain templates: `$componentId` nad `$componentName` which are replaced by component data. Parameter `url` isn't required because some of actions like `usages` are build-in FE actions. Url is required when you want to do redirect to another page. Param `supportedComponentTypes` means component's types which can support actions.  |
 
 <!-- TODO 
 ### Object naming
@@ -121,7 +123,7 @@ in most cases you should not need to defined these settings. The settings you ca
 * icons - `icon` property
 * documentation - `docsUrl` property
 * should component be disabled - `disabled` property
-* in which toolbox category the component should appear (`category` property)  
+* in which toolbox panel the component should appear (`componentGroup` property)  
 * `params` configuration (allows to override default component settings):
   * `editor` - `BoolParameterEditor`, `StringParameterEditor`, `DateParameterEditor` etc. 
   * `validators` - `MandatoryParameterValidator`, `NotBlankParameterValidator`, `RegexpParameterValidator`
@@ -130,7 +132,7 @@ in most cases you should not need to defined these settings. The settings you ca
 
 Example (see [dev application config](https://github.com/TouK/nussknacker/blob/staging/engine/flink/management/sample/src/main/resources/defaultModelConfig.conf#L18) for more examples):
 ```
-  nodes {
+  componentsUiConfig {
     customerService {
       params {
         serviceIdParameter {
@@ -206,7 +208,7 @@ Important thing to remember is that Kafka server addresses/schema registry addre
 ### Configuration of component providers
 
 ```
-  componentProviders {
+  components {
     sqlHsql {
       providerType: sql
       jdbcUrl: jdbc:hsql...//

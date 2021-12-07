@@ -2,7 +2,6 @@ package pl.touk.nussknacker.ui.integration
 
 import java.io.File
 import java.util.UUID
-
 import akka.http.javadsl.model.headers.HttpCredentials
 import akka.http.scaladsl.model.{ContentTypeRange, ContentTypes, HttpEntity, MediaTypes, StatusCodes}
 import akka.http.scaladsl.testkit.{RouteTestTimeout, ScalatestRouteTest}
@@ -12,10 +11,11 @@ import de.heikoseeberger.akkahttpcirce.FailFastCirceSupport
 import io.circe.{Decoder, Json}
 import org.apache.commons.io.FileUtils
 import org.scalatest._
-import pl.touk.nussknacker.engine.api.StreamMetaData
+import pl.touk.nussknacker.engine.api.{FragmentSpecificData, StreamMetaData}
+import pl.touk.nussknacker.engine.api.component.{ComponentGroupName, SingleComponentConfig}
 import pl.touk.nussknacker.engine.api.context.ProcessCompilationError.RedundantParameters
 import pl.touk.nussknacker.engine.api.definition.{FixedExpressionValue, FixedValuesParameterEditor, FixedValuesValidator, LiteralParameterValidator, MandatoryParameterValidator, StringParameterEditor}
-import pl.touk.nussknacker.engine.api.process.{ParameterConfig, SingleNodeConfig}
+import pl.touk.nussknacker.engine.api.component.ParameterConfig
 import pl.touk.nussknacker.engine.build.EspProcessBuilder
 import pl.touk.nussknacker.engine.canonize.ProcessCanonizer
 import pl.touk.nussknacker.engine.graph.EspProcess
@@ -23,18 +23,20 @@ import pl.touk.nussknacker.engine.graph.evaluatedparam.Parameter
 import pl.touk.nussknacker.engine.graph.exceptionhandler.ExceptionHandlerRef
 import pl.touk.nussknacker.engine.graph.expression.Expression
 import pl.touk.nussknacker.engine.graph.node.SubprocessInputDefinition.{SubprocessClazzRef, SubprocessParameter}
-import pl.touk.nussknacker.engine.graph.node.{SubprocessInputDefinition, SubprocessOutputDefinition}
+import pl.touk.nussknacker.engine.graph.node.{Processor, SubprocessInputDefinition, SubprocessOutputDefinition}
+import pl.touk.nussknacker.engine.graph.service.ServiceRef
 import pl.touk.nussknacker.engine.spel
 import pl.touk.nussknacker.restmodel.definition.UiAdditionalPropertyConfig
 import pl.touk.nussknacker.restmodel.displayedgraph.displayablenode.Edge
 import pl.touk.nussknacker.restmodel.displayedgraph.{DisplayableProcess, ProcessProperties}
+import pl.touk.nussknacker.restmodel.validation.PrettyValidationErrors
 import pl.touk.nussknacker.restmodel.validation.ValidationResults.{ValidationErrors, ValidationResult}
 import pl.touk.nussknacker.test.PatientScalaFutures
+import pl.touk.nussknacker.ui.api.NodeValidationRequest
 import pl.touk.nussknacker.ui.{NusskanckerDefaultAppRouter, NussknackerAppInitializer}
 import pl.touk.nussknacker.ui.api.helpers.{TestFactory, TestProcessUtil, TestProcessingTypes}
 import pl.touk.nussknacker.ui.process.marshall.ProcessConverter
 import pl.touk.nussknacker.ui.util.{ConfigWithScalaVersion, MultipartUtils}
-import pl.touk.nussknacker.ui.validation.PrettyValidationErrors
 
 import scala.concurrent.duration._
 import scala.util.Properties
@@ -92,21 +94,22 @@ class BaseFlowTest extends FunSuite with ScalatestRouteTest with FailFastCirceSu
 
   test("ensure nodes config is properly parsed") {
     Get("/api/processDefinitionData/streaming?isSubprocess=false") ~> addCredentials(credentials) ~> mainRoute ~> checkWithClue {
-      val settingsJson = responseAs[Json].hcursor.downField("nodesConfig").focus.get
-      val settings = Decoder[Map[String, SingleNodeConfig]].decodeJson(settingsJson).right.get
+      val settingsJson = responseAs[Json].hcursor.downField("componentsConfig").focus.get
+      val settings = Decoder[Map[String, SingleComponentConfig]].decodeJson(settingsJson).right.get
 
       val underTest = Map(
         //docs url comes from reference.conf in managementSample
-        "filter" -> SingleNodeConfig(None, None, Some("https://touk.github.io/nussknacker/filter"), None),
-        "test1" -> SingleNodeConfig(None, Some("Sink.svg"), None, None),
-        "enricher" -> SingleNodeConfig(
+        "filter" -> SingleComponentConfig(None, None, Some("https://touk.github.io/nussknacker/filter"), None, None),
+        "test1" -> SingleComponentConfig(None, Some("/assets/components/Sink.svg"), None, None, None),
+        "enricher" -> SingleComponentConfig(
           Some(Map("param" -> ParameterConfig(Some("'default value'"), Some(StringParameterEditor), None, None))),
-          Some("Filter.svg"),
+          Some("/assets/components/Filter.svg"),
           //docs url comes from reference.conf in managementSample
           Some("https://touk.github.io/nussknacker/enricher"),
+          None,
           None
         ),
-        "multipleParamsService" -> SingleNodeConfig(
+        "multipleParamsService" -> SingleComponentConfig(
           Some(Map(
             "foo" -> ParameterConfig(None, Some(FixedValuesParameterEditor(List(FixedExpressionValue("'test'", "test")))), None, None),
             "bar" -> ParameterConfig(None, Some(StringParameterEditor), None, None),
@@ -114,27 +117,32 @@ class BaseFlowTest extends FunSuite with ScalatestRouteTest with FailFastCirceSu
           )),
           None,
           None,
+          None,
           None
         ),
-        "accountService" -> SingleNodeConfig(None, None, Some("accountServiceDocs"), None),
-        "sub1" -> SingleNodeConfig(
+        "accountService" -> SingleComponentConfig(None, None, Some("accountServiceDocs"), None, None),
+        "sub1" -> SingleComponentConfig(
           Some(Map(
             "param1" -> ParameterConfig(None, Some(StringParameterEditor), None, None)
           )),
           None,
+          Some("http://nussknacker.io"),
           None,
-          None
+          None,
         ),
-        "optionalTypesService" -> SingleNodeConfig(
+        "optionalTypesService" -> SingleComponentConfig(
           Some(Map(
             "overriddenByFileConfigParam" -> ParameterConfig(None, None, Some(List.empty), None),
             "overriddenByDevConfigParam" -> ParameterConfig(None, None, Some(List(MandatoryParameterValidator)), None)
           )),
           None,
           None,
-          Some("types")
+          Some(ComponentGroupName("types")),
+          None
         ),
-        "providedComponent-component-v1" -> SingleNodeConfig(None, None, Some("https://nussknacker.io/Configuration.html"), None)
+        "providedComponent-component-v1" -> SingleComponentConfig(None, None, Some("https://nussknacker.io/Configuration.html"), None, None),
+        "$properties" -> SingleComponentConfig(None, None,
+          Some("https://nussknacker.io/documentation/docs/installation_configuration_guide/ModelConfiguration/#additional-properties"), None, None)
       )
 
       val (relevant, other) = settings.partition { case (k, _) => underTest.keySet contains k }
@@ -151,19 +159,19 @@ class BaseFlowTest extends FunSuite with ScalatestRouteTest with FailFastCirceSu
       val settings = Decoder[Map[String, UiAdditionalPropertyConfig]].decodeJson(settingsJson).right.get
 
       val underTest = Map(
-        "environment" -> new UiAdditionalPropertyConfig(
+        "environment" -> UiAdditionalPropertyConfig(
           Some("test"),
           StringParameterEditor,
           List(MandatoryParameterValidator),
           Some("Environment")
         ),
-        "maxEvents" -> new UiAdditionalPropertyConfig(
+        "maxEvents" -> UiAdditionalPropertyConfig(
           None,
           StringParameterEditor,
           List(LiteralParameterValidator.integerValidator),
           Some("Max events")
         ),
-        "numberOfThreads" -> new UiAdditionalPropertyConfig(
+        "numberOfThreads" -> UiAdditionalPropertyConfig(
           Some("1"),
           FixedValuesParameterEditor(fixedPossibleValues),
           List(FixedValuesValidator(fixedPossibleValues)),
@@ -196,7 +204,7 @@ class BaseFlowTest extends FunSuite with ScalatestRouteTest with FailFastCirceSu
 
     val process = DisplayableProcess(
       id = processId,
-      properties = ProcessProperties(StreamMetaData(), ExceptionHandlerRef(List()), isSubprocess = true, subprocessVersions = Map()),
+      properties = ProcessProperties(FragmentSpecificData(), ExceptionHandlerRef(List()), subprocessVersions = Map()),
       nodes = List(SubprocessInputDefinition("input1", List(SubprocessParameter("badParam", SubprocessClazzRef("i.do.not.exist")))),
         SubprocessOutputDefinition("output1", "out1")),
       edges = List(Edge("input1", "output1", None)),
@@ -230,7 +238,7 @@ class BaseFlowTest extends FunSuite with ScalatestRouteTest with FailFastCirceSu
       .exceptionHandler()
       .source("source", "csv-source")
       .enricher("enricher", "out", "complexReturnObjectService")
-      .sink("end", "#input", "sendSms")
+      .emptySink("end", "sendSms", "value" -> "''")
 
     saveProcess(process)
 
@@ -253,12 +261,16 @@ class BaseFlowTest extends FunSuite with ScalatestRouteTest with FailFastCirceSu
       }
     }
 
-    def processWithService(params: (String, Expression)*): EspProcess = EspProcessBuilder
-      .id("test")
-      .additionalFields(properties = Map("environment" -> "someNotEmptyString"))
-      .exceptionHandlerNoParams()
-      .source("start", "csv-source")
-      .processorEnd("end", "dynamicService", params:_*)
+    val processId = "test"
+    val nodeUsingDynamicServiceId = "end"
+    def processWithService(params: (String, Expression)*): EspProcess = {
+      EspProcessBuilder
+        .id(processId)
+        .additionalFields(properties = Map("environment" -> "someNotEmptyString"))
+        .exceptionHandlerNoParams()
+        .source("start", "csv-source")
+        .processorEnd(nodeUsingDynamicServiceId, "dynamicService", params: _*)
+    }
 
     def firstMockedResult(result: Json): Option[String] = result.hcursor
       .downField("results")
@@ -270,23 +282,23 @@ class BaseFlowTest extends FunSuite with ScalatestRouteTest with FailFastCirceSu
       .flatMap(_.asString)
 
     def dynamicServiceParameters: Option[List[String]] = {
-      Get("/api/processDefinitionData/services") ~> addCredentials(credentials) ~> mainRoute ~> checkWithClue {
+      val request = NodeValidationRequest(Processor(nodeUsingDynamicServiceId, ServiceRef("dynamicService", List.empty)), ProcessProperties(StreamMetaData(), ExceptionHandlerRef(List.empty)), Map.empty, None).asJson
+      Post(s"/api/nodes/$processId/validation", request) ~> addCredentials(credentials) ~> mainRoute ~> checkWithClue {
         status shouldEqual StatusCodes.OK
-        val parameters = responseAs[Json].hcursor
-          .downField("streaming")
-          .downField("dynamicService")
+        val responseJson = responseAs[Json]
+        val parameters = responseJson.hcursor
           .downField("parameters")
           .focus.flatMap(_.asArray)
         parameters.map(_.flatMap(_.asObject).flatMap(_.apply("name")).flatMap(_.asString).toList)
       }
     }
-    val dynamicServiceParametersBeforeReload = dynamicServiceParameters
     //we check that buildInfo does not change
     val beforeReload = generationTime
     val beforeReload2 = generationTime
     beforeReload shouldBe beforeReload2
     //process without errors - no parameter required
     saveProcess(processWithService()).errors shouldBe ValidationErrors.success
+    val dynamicServiceParametersBeforeReload = dynamicServiceParameters
     firstMockedResult(testProcess(processWithService(), "field1|field2")) shouldBe Some("")
 
 
