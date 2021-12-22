@@ -128,15 +128,11 @@ class HttpRequestResponseClient(managementUrl: String)(implicit backend: SttpBac
   }
 
   //We don't want to pass ResponseRequest Engine error directly to user, as it usually contains stacktrace etc.
-  private def handleClientError(body: String, status: StatusCode, action: String) = {
-    val decodedErrors = CirceUtil.decodeJson[ResponseRequestError](body).fold(error => ResponseRequestError(List(s"Failed to decode: $error")), identity)
-    logger.error(s"Failed to $action, status code: $status, errors from RequestResponse Engine: ${decodedErrors.errors.mkString("\n")}")
+  private def handleClientError(body: String, status: StatusCode, action: String): Future[Nothing] = {
+    logger.error(s"Failed to $action, status code: $status, errors from RequestResponse Engine: $body.")
     Future.failed(ResponseRequestClientError(s"RequestResponse Engine failed to $action. Detailed error information in logs"))
   }
 
   case class ResponseRequestClientError(message: String) extends Exception(message)
-
-  @JsonCodec case class ResponseRequestError(errors: List[String])
-
 }
 

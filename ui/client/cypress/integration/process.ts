@@ -37,7 +37,7 @@ describe("Process", () => {
       cy.location("href").should("contain", "-renamed")
     })
 
-    it("should open properites from tips panel", () => {
+    it.skip("should open properites from tips panel", () => {
       cy.viewport("macbook-15")
       cy.contains(/^properties/i).should("be.enabled").click()
       cy.get("[data-testid=window]").should("be.visible").find("input").within(inputs => {
