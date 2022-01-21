@@ -1,19 +1,15 @@
 package pl.touk.nussknacker.engine.flink.util.transformer.aggregate
 
-import java.time.Duration
-import java.util.concurrent.ConcurrentLinkedQueue
 import cats.data.NonEmptyList
 import com.typesafe.config.ConfigFactory
 import org.apache.flink.api.common.typeinfo.TypeInformation
-import org.apache.flink.api.scala._
 import org.apache.flink.runtime.execution.ExecutionState
 import org.apache.flink.streaming.api.functions.co.CoProcessFunction
-import org.apache.flink.streaming.api.scala.StreamExecutionEnvironment
 import org.scalatest.{FunSuite, Matchers}
 import pl.touk.nussknacker.engine.api._
 import pl.touk.nussknacker.engine.api.context.ProcessCompilationError
 import pl.touk.nussknacker.engine.api.deployment.DeploymentData
-import pl.touk.nussknacker.engine.api.process.{ExpressionConfig, ProcessObjectDependencies, SinkFactory, SourceFactory, WithCategories}
+import pl.touk.nussknacker.engine.api.process.{ProcessObjectDependencies, SinkFactory, SourceFactory, WithCategories}
 import pl.touk.nussknacker.engine.api.typed.typing.TypingResult
 import pl.touk.nussknacker.engine.build.GraphBuilder
 import pl.touk.nussknacker.engine.flink.test.FlinkSpec
@@ -32,11 +28,14 @@ import pl.touk.nussknacker.engine.testmode.{ResultsCollectingListener, ResultsCo
 import pl.touk.nussknacker.engine.util.process.EmptyProcessConfigCreator
 import pl.touk.nussknacker.test.VeryPatientScalaFutures
 
+import java.time.Duration
 import java.util.Collections.{emptyList, singletonList}
+import java.util.concurrent.ConcurrentLinkedQueue
 import scala.concurrent.duration.FiniteDuration
 import scala.jdk.CollectionConverters.mapAsScalaMapConverter
 
 class SingleSideJoinTransformerSpec extends FunSuite with FlinkSpec with Matchers with VeryPatientScalaFutures {
+
 
   import SingleSideJoinTransformerSpec._
   import pl.touk.nussknacker.engine.spel.Implicits._
@@ -80,6 +79,9 @@ class SingleSideJoinTransformerSpec extends FunSuite with FlinkSpec with Matcher
     ))
 
     val key = "fooKey"
+
+    implicit val tif: TypeInformation[OneRecord] = TypeInformation.of(classOf[OneRecord])
+
     val input1 = BlockingQueueSource.create[OneRecord](_.timestamp, Duration.ofHours(1))
     val input2 = List(
       OneRecord(key, 1, 123)
@@ -112,7 +114,7 @@ class SingleSideJoinTransformerSpec extends FunSuite with FlinkSpec with Matcher
     val model = modelData(input1, input2, collectingListener)
     val stoppableEnv = flinkMiniCluster.createExecutionEnvironment()
     val registrar = FlinkProcessRegistrar(new FlinkProcessCompiler(model), ExecutionConfigPreparer.unOptimizedChain(model))
-    registrar.register(new StreamExecutionEnvironment(stoppableEnv), testProcess, ProcessVersion.empty, DeploymentData.empty)
+    registrar.register(stoppableEnv, testProcess, ProcessVersion.empty, DeploymentData.empty)
     val id = stoppableEnv.executeAndWaitForStart(testProcess.id)
     (id, stoppableEnv)
   }
@@ -129,6 +131,8 @@ object SingleSideJoinTransformerSpec {
   val elementsAddedToState = new ConcurrentLinkedQueue[StringKeyedValue[AnyRef]]()
 
   class Creator(mainRecordsSource: BlockingQueueSource[OneRecord], joinedRecords: List[OneRecord], collectingListener: ResultsCollectingListener) extends EmptyProcessConfigCreator {
+
+    implicit val tif: TypeInformation[OneRecord] = TypeInformation.of(classOf[OneRecord])
 
     override def customStreamTransformers(processObjectDependencies: ProcessObjectDependencies): Map[String, WithCategories[CustomStreamTransformer]] =
       Map(

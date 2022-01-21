@@ -5,7 +5,6 @@ import org.apache.flink.api.common.state.ValueStateDescriptor
 import org.apache.flink.api.common.typeinfo.TypeInformation
 import org.apache.flink.api.common.{ExecutionConfig, JobID}
 import org.apache.flink.queryablestate.client.QueryableStateClient
-import org.apache.flink.streaming.api.scala._
 import pl.touk.nussknacker.engine.api.queryablestate.{QueryableClient, QueryableState}
 
 import scala.compat.java8.FutureConverters
@@ -57,9 +56,10 @@ class FlinkQueryableClient(createClients: => List[QueryableStateClient]) extends
 
   private lazy val clients = createClients
 
+  private implicit val keyTypeInfo: TypeInformation[String] = TypeInformation.of(classOf[String])
+
   def fetchState[V: TypeInformation](jobId: String, queryName: String, key: String)
                                     (implicit ec: ExecutionContext): Future[V] = {
-    val keyTypeInfo = implicitly[TypeInformation[String]]
     val valueTypeInfo = implicitly[TypeInformation[V]]
     val flinkJobId = JobID.fromHexString(jobId)
     val stateDescriptor = new ValueStateDescriptor[V](key, valueTypeInfo)

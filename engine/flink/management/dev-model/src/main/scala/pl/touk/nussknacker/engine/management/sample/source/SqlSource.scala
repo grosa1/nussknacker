@@ -1,6 +1,7 @@
 package pl.touk.nussknacker.engine.management.sample.source
 
-import org.apache.flink.streaming.api.scala.{StreamExecutionEnvironment, _}
+import org.apache.flink.api.common.typeinfo.TypeInformation
+import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment
 import pl.touk.nussknacker.engine.api.editor.{DualEditor, DualEditorMode, SimpleEditor, SimpleEditorType}
 import pl.touk.nussknacker.engine.api.process.SourceFactory
 import pl.touk.nussknacker.engine.api.typed.typing.Unknown
@@ -16,5 +17,6 @@ object SqlSource extends SourceFactory {
                simpleEditor = new SimpleEditor(`type` = SimpleEditorType.SQL_EDITOR),
                defaultMode = DualEditorMode.SIMPLE
              )  sql: String) =
-    new CollectionSource[Any](StreamExecutionEnvironment.getExecutionEnvironment.getConfig, List.empty, None, Unknown)
+    new CollectionSource[Any](StreamExecutionEnvironment.getExecutionEnvironment.getConfig,
+      List.empty, None, Unknown)(TypeInformation.of(classOf[Any]))
 }

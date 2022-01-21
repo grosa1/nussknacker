@@ -1,7 +1,7 @@
 package pl.touk.nussknacker.engine.flink.util
 
 import org.apache.flink.api.common.typeinfo.TypeInformation
-import org.apache.flink.streaming.api.scala._
+import org.apache.flink.streaming.api.datastream.{DataStream, KeyedStream, SingleOutputStreamOperator}
 import pl.touk.nussknacker.engine.api.{Context, LazyParameter, ValueWithContext}
 import pl.touk.nussknacker.engine.flink.api.compat.ExplicitUidInOperatorsSupport
 import pl.touk.nussknacker.engine.flink.api.process.FlinkCustomNodeContext
@@ -25,7 +25,7 @@ object richflink {
         .keyBy((k: ValueWithContext[KeyedValue[String, T]]) => k.value.key)
   }
 
-  implicit class ExplicitUid[T](dataStream: DataStream[T]) {
+  implicit class ExplicitUid[T](dataStream: SingleOutputStreamOperator[T]) {
 
     //we set operator name to nodeId in custom transformers, so that some internal Flink metrics (e.g. RocksDB) are
     //reported with operator_name tag equal to nodeId.

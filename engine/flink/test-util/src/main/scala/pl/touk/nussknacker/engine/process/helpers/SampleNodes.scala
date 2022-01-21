@@ -5,12 +5,14 @@ import cats.data.ValidatedNel
 import io.circe.generic.JsonCodec
 import org.apache.flink.api.common.ExecutionConfig
 import org.apache.flink.api.common.eventtime.WatermarkStrategy
-import org.apache.flink.api.common.functions.{FilterFunction, FlatMapFunction}
-import org.apache.flink.streaming.api.datastream.DataStreamSink
-import org.apache.flink.streaming.api.functions.co.RichCoFlatMapFunction
+import org.apache.flink.api.common.functions.{FilterFunction, FlatMapFunction, MapFunction}
+import org.apache.flink.api.common.typeinfo.TypeInformation
+import org.apache.flink.api.java.functions.KeySelector
+import org.apache.flink.streaming.api.datastream.{DataStream, DataStreamSink}
+import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment
+import org.apache.flink.streaming.api.functions.co.{CoMapFunction, RichCoFlatMapFunction}
 import org.apache.flink.streaming.api.functions.sink.SinkFunction
 import org.apache.flink.streaming.api.operators.{AbstractStreamOperator, OneInputStreamOperator}
-import org.apache.flink.streaming.api.scala.{DataStream, _}
 import org.apache.flink.streaming.api.windowing.assigners.TumblingEventTimeWindows
 import org.apache.flink.streaming.api.windowing.time.Time
 import org.apache.flink.streaming.runtime.streamrecord.StreamRecord
@@ -45,6 +47,10 @@ import scala.concurrent.{ExecutionContext, Future}
 //TODO: clean up sample objects...
 object SampleNodes {
 
+  //FIXME:
+  def mapF[K, V](fun: K =>V): MapFunction[K, V] = (value: K) => fun(value)
+  def keyF[K, V](fun: K =>V): KeySelector[K, V] = (value: K) => fun(value)
+
   // Unfortunately we can't use scala Enumeration because of limited scala TypeInformation macro - see note in TypedDictInstance
   case class SimpleRecord(id: String, value1: Long, value2: String, date: Date, value3Opt: Option[BigDecimal] = None,
                           value3: BigDecimal = 1, intAsAny: Any = 1, enumValue: SimpleJavaEnum = SimpleJavaEnum.ONE)
@@ -60,7 +66,7 @@ object SampleNodes {
     @MethodToInvoke
     def create(@ParamName("param") param: Int) = new CollectionSource[Int](config = exConfig,
       list = List(param),
-      timestampAssigner = None, returnType = Typed[Int])
+      timestampAssigner = None, returnType = Typed[Int])(TypeInformation.of(classOf[Int]))
 
   }
 
@@ -219,15 +225,19 @@ object SampleNodes {
       setUidToNodeIdIfNeed(context,
         start
           .flatMap(context.lazyParameterHelper.lazyMapFunction(groupBy))
-          .keyBy(_.value)
-          .mapWithState[ValueWithContext[AnyRef], Long] {
+          .keyBy(keyF[ValueWithContext[String], String](_.value))
+          //FIIXME
+          .map(new MapFunction[ValueWithContext[String], ValueWithContext[AnyRef]] {
+            override def map(value: ValueWithContext[String]): ValueWithContext[AnyRef] = value.map(k => k:AnyRef)
+          }))
+          /*.mapWithState[ValueWithContext[AnyRef], Long] {
             case (SimpleFromValueWithContext(ctx, sr), Some(oldState)) =>
               (ValueWithContext(
                 SimpleRecordWithPreviousValue(sr, oldState, stringVal), ctx), Some(sr.value1))
             case (SimpleFromValueWithContext(ctx, sr), None) =>
               (ValueWithContext(
                 SimpleRecordWithPreviousValue(sr, 0, stringVal), ctx), Some(sr.value1))
-          })
+          })*/
     })
 
     object SimpleFromValueWithContext {
@@ -277,7 +287,7 @@ object SampleNodes {
         .implementedBy(FlinkCustomStreamTransformation((start: DataStream[Context], context: FlinkCustomNodeContext) => {
           start
             .flatMap(context.lazyParameterHelper.lazyMapFunction(value))
-            .keyBy(_.value)
+            .keyBy(keyF[ValueWithContext[String], String](_.value))
             .map(_ => ValueWithContext[AnyRef](null, Context("new")))
         }))
     }
@@ -296,7 +306,10 @@ object SampleNodes {
             val inputFromIr = (ir: Context) => ValueWithContext(ir.variables("input").asInstanceOf[AnyRef], ir)
             inputs("end1")
               .connect(inputs("end2"))
-              .map(inputFromIr, inputFromIr)
+              .map(new CoMapFunction[Context, Context, ValueWithContext[AnyRef]]() {
+                override def map1(value: Context): ValueWithContext[AnyRef] = inputFromIr(value)
+                override def map2(value: Context): ValueWithContext[AnyRef] = inputFromIr(value)
+              })
           }
         })
     }
@@ -330,6 +343,7 @@ object SampleNodes {
     @MethodToInvoke(returnType = classOf[Long])
     def methodToInvoke(@ParamName("timestampToSet") timestampToSet: Long): FlinkCustomStreamTransformation
       = FlinkCustomStreamTransformation(_.transform("collectTimestamp",
+        TypeInformation.of(classOf[ValueWithContext[AnyRef]]),
         new AbstractStreamOperator[ValueWithContext[AnyRef]] with OneInputStreamOperator[Context, ValueWithContext[AnyRef]] {
           override def processElement(element: StreamRecord[Context]): Unit = {
             output.collect(new StreamRecord[ValueWithContext[AnyRef]](ValueWithContext(element.getTimestamp.underlying(), element.getValue), timestampToSet))
@@ -400,8 +414,8 @@ object SampleNodes {
         .implementedBy(
           FlinkCustomStreamTransformation((start: DataStream[Context], context: FlinkCustomNodeContext) => {
             start
-              .map(_ => 1: java.lang.Integer)
-              .keyBy(_ => "")
+              .map(mapF(_ => 1: java.lang.Integer))
+              .keyBy(keyF[Integer, String](_ => ""))
               .window(TumblingEventTimeWindows.of(Time.seconds(seconds)))
               .reduce((k, v) => k + v: java.lang.Integer)
               .map(i => ValueWithContext[AnyRef](i, Context(UUID.randomUUID().toString)))
@@ -443,7 +457,11 @@ object SampleNodes {
       FlinkCustomStreamTransformation((start: DataStream[Context], context: FlinkCustomNodeContext) => {
         val afterMap = start
           .flatMap(context.lazyParameterHelper.lazyMapFunction[AnyRef](param))
-        afterMap.addSink(element => MockService.add(element.value))
+        afterMap.addSink(new SinkFunction[ValueWithContext[AnyRef]] {
+          override def invoke(element: ValueWithContext[AnyRef], context: SinkFunction.Context): Unit = {
+            MockService.add(element.value)
+          }
+        })
         afterMap
       })
 
@@ -598,7 +616,7 @@ object SampleNodes {
 
     override def implementation(params: Map[String, Any], dependencies: List[NodeDependencyValue], finalState: Option[State]): Source = {
       val out = params("type") + "-" + params("version")
-      CollectionSource(StreamExecutionEnvironment.getExecutionEnvironment.getConfig, out::Nil, None, Typed[String])
+      CollectionSource(StreamExecutionEnvironment.getExecutionEnvironment.getConfig, out::Nil, None, Typed[String])(TypeInformation.of(classOf[String]))
     }
 
     override def nodeDependencies: List[NodeDependency] = OutputVariableNameDependency :: Nil
@@ -657,7 +675,7 @@ object SampleNodes {
       import scala.collection.JavaConverters._
       val elements = params(`elementsParamName`).asInstanceOf[java.util.List[String]].asScala.toList
 
-      new CollectionSource(StreamExecutionEnvironment.getExecutionEnvironment.getConfig, elements, None, Typed[String])
+      new CollectionSource(StreamExecutionEnvironment.getExecutionEnvironment.getConfig, elements, None, Typed[String])(TypeInformation.of(classOf[String]))
         with TestDataGenerator
         with FlinkSourceTestSupport[String] {
 
@@ -744,7 +762,7 @@ object SampleNodes {
   }
 
   def simpleRecordSource(data: List[SimpleRecord]): SourceFactory = SourceFactory.noParam[SimpleRecord](
-    new CollectionSource[SimpleRecord](new ExecutionConfig, data, Some(ascendingTimestampExtractor), Typed[SimpleRecord]) with FlinkSourceTestSupport[SimpleRecord] {
+    new CollectionSource[SimpleRecord](new ExecutionConfig, data, Some(ascendingTimestampExtractor), Typed[SimpleRecord])(TypeInformation.of(classOf[SimpleRecord])) with FlinkSourceTestSupport[SimpleRecord] {
       override def testDataParser: TestDataParser[SimpleRecord] = newLineSplittedTestDataParser
 
       override def timestampAssignerForTest: Option[TimestampWatermarkHandler[SimpleRecord]] = timestampAssigner
@@ -752,7 +770,7 @@ object SampleNodes {
 
 
   val jsonSource: SourceFactory = SourceFactory.noParam[SimpleJsonRecord](
-    new CollectionSource[SimpleJsonRecord](new ExecutionConfig, List(), None, Typed[SimpleJsonRecord]) with FlinkSourceTestSupport[SimpleJsonRecord] {
+    new CollectionSource[SimpleJsonRecord](new ExecutionConfig, List(), None, Typed[SimpleJsonRecord])(TypeInformation.of(classOf[SimpleJsonRecord])) with FlinkSourceTestSupport[SimpleJsonRecord] {
       override def testDataParser: TestDataParser[SimpleJsonRecord] = new EmptyLineSplittedTestDataParser[SimpleJsonRecord] {
 
         override def parseElement(json: String): SimpleJsonRecord = {
@@ -769,7 +787,7 @@ object SampleNodes {
 
     @MethodToInvoke
     def create(processMetaData: MetaData, runMode: RunMode, @ParamName("type") definition: java.util.Map[String, _]): Source = {
-      new CollectionSource[TypedMap](new ExecutionConfig, List(), None, Typed[TypedMap]) with FlinkSourceTestSupport[TypedMap] with ReturningType {
+      new CollectionSource[TypedMap](new ExecutionConfig, List(), None, Typed[TypedMap])(TypeInformation.of(classOf[TypedMap])) with FlinkSourceTestSupport[TypedMap] with ReturningType {
 
         override def testDataParser: TestDataParser[TypedMap] = new EmptyLineSplittedTestDataParser[TypedMap] {
           override def parseElement(json: String): TypedMap = {

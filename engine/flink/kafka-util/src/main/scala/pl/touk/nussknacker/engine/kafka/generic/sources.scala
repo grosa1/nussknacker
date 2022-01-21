@@ -1,9 +1,7 @@
 package pl.touk.nussknacker.engine.kafka.generic
 
 import io.circe.Decoder
-import org.apache.flink.api.common.eventtime.SerializableTimestampAssigner
 import org.apache.flink.api.common.typeinfo.TypeInformation
-import org.apache.flink.api.scala._
 import pl.touk.nussknacker.engine.api.CirceUtil
 import pl.touk.nussknacker.engine.api.process.ProcessObjectDependencies
 import pl.touk.nussknacker.engine.api.typed._
@@ -16,6 +14,8 @@ import pl.touk.nussknacker.engine.kafka.serialization.schemas._
 import pl.touk.nussknacker.engine.kafka.source.KafkaSourceFactory
 import pl.touk.nussknacker.engine.kafka.source.delayed.DelayedKafkaSourceFactory
 import pl.touk.nussknacker.engine.kafka.source.flink.FlinkKafkaSourceImplFactory
+
+import java.util
 
 //TODO: Move it to source package
 object sources {
@@ -34,6 +34,9 @@ object sources {
       formatterFactory,
       processObjectDependencies,
       new FlinkKafkaDelayedSourceImplFactory(timestampAssigner, TypedJsonTimestampFieldAssigner(_)))
+
+  implicit val ti1: TypeInformation[util.Map[_, _]] = TypeInformation.of(classOf[java.util.Map[_, _]])
+  implicit val ti2: TypeInformation[TypedMap] = TypeInformation.of(classOf[TypedMap])
 
   object JsonMapDeserialization extends EspDeserializationSchema[java.util.Map[_, _]](deserializeToMap)
 

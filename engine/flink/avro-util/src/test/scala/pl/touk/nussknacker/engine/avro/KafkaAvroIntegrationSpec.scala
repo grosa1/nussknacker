@@ -2,7 +2,6 @@ package pl.touk.nussknacker.engine.avro
 
 import io.circe.generic.JsonCodec
 import org.apache.avro.{AvroRuntimeException, Schema}
-import org.apache.flink.streaming.api.scala.StreamExecutionEnvironment
 import org.apache.kafka.common.record.TimestampType
 import org.scalatest.{Assertion, BeforeAndAfter}
 import pl.touk.nussknacker.engine.api.ProcessVersion
@@ -247,7 +246,7 @@ class KafkaAvroIntegrationSpec extends KafkaAvroSpecMixin with BeforeAndAfter {
      */
     pushMessage(PaymentV2.recordWithData, topicConfig.input)
     val env = flinkMiniCluster.createExecutionEnvironment()
-    registrar.register(new StreamExecutionEnvironment(env), process, ProcessVersion.empty, DeploymentData.empty)
+    registrar.register(env, process, ProcessVersion.empty, DeploymentData.empty)
     val executionResult = env.execute(process.id)
     env.waitForFail(executionResult.getJobID, process.id)()
   }

@@ -39,7 +39,6 @@ class GenericItSpec extends FunSuite with FlinkSpec with Matchers with KafkaSpec
 
   import KafkaTestUtils._
   import MockSchemaRegistry._
-  import org.apache.flink.streaming.api.scala._
   import spel.Implicits._
 
   private val secondsToWaitForAvro = 30
@@ -336,7 +335,7 @@ class GenericItSpec extends FunSuite with FlinkSpec with Matchers with KafkaSpec
 
   private def run(process: EspProcess)(action: => Unit): Unit = {
     val env = flinkMiniCluster.createExecutionEnvironment()
-    registrar.register(new StreamExecutionEnvironment(env), process, ProcessVersion.empty, DeploymentData.empty)
+    registrar.register(env, process, ProcessVersion.empty, DeploymentData.empty)
     env.withJobRunning(process.id)(action)
   }
 

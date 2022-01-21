@@ -1,28 +1,17 @@
 package pl.touk.nussknacker.engine.process.typeinformation
 
-import org.apache.flink.api.common.ExecutionConfig
 import org.apache.flink.api.common.typeinfo.TypeInformation
-import org.apache.flink.api.common.typeutils.TypeSerializer
-import org.apache.flink.api.java.typeutils.{ListTypeInfo, MapTypeInfo}
-import org.apache.flink.api.scala.typeutils.{CaseClassTypeInfo, OptionTypeInfo, ScalaCaseClassSerializer, TraversableSerializer, TraversableTypeInfo}
-import pl.touk.nussknacker.engine.api.context.ValidationContext
-import pl.touk.nussknacker.engine.api.typed.TypedMap
+//import org.apache.flink.api.scala.typeutils.{CaseClassTypeInfo, OptionTypeInfo, ScalaCaseClassSerializer, TraversableSerializer, TraversableTypeInfo}
 import pl.touk.nussknacker.engine.api.typed.typing._
 import pl.touk.nussknacker.engine.flink.api.typeinformation.{TypeInformationDetection, TypingResultAwareTypeInformationCustomisation}
-import pl.touk.nussknacker.engine.api.{Context, InterpretationResult, PartReference, ValueWithContext}
-import pl.touk.nussknacker.engine.process.typeinformation.internal.typedobject.{TypedJavaMapTypeInformation, TypedMapTypeInformation, TypedScalaMapTypeInformation}
-import pl.touk.nussknacker.engine.process.typeinformation.internal.{FixedValueSerializers, InterpretationResultMapTypeInfo}
 import pl.touk.nussknacker.engine.util.Implicits._
-import pl.touk.nussknacker.engine.util.loader.ScalaServiceLoader
-
-import scala.reflect.ClassTag
 
 object TypingResultAwareTypeInformationDetection {
-
+    /*
   def apply(classLoader: ClassLoader): TypingResultAwareTypeInformationDetection = {
     val customisations = ScalaServiceLoader.load[TypingResultAwareTypeInformationCustomisation](classLoader)
     new TypingResultAwareTypeInformationDetection(new CompositeCustomisation(customisations))
-  }
+  }   */
 
   class CompositeCustomisation(customisations: List[TypingResultAwareTypeInformationCustomisation]) extends TypingResultAwareTypeInformationCustomisation {
     override def customise(originalDetection: TypeInformationDetection): PartialFunction[TypingResult, TypeInformation[_]] =
@@ -40,6 +29,7 @@ object TypingResultAwareTypeInformationDetection {
   To use it for serialization between operators use TypeInformationDetection service loading.
   To use it for state serialization one can use it directly in operators/process functions (compatibility is *NOT* guaranteed ATM).
  */
+/*
 class TypingResultAwareTypeInformationDetection(customisation:
                                                 TypingResultAwareTypeInformationCustomisation) extends TypeInformationDetection {
 
@@ -144,7 +134,7 @@ class TypingResultAwareTypeInformationDetection(customisation:
   private def fallback[T](kl: Class[T]): TypeInformation[T] = TypeInformation.of(kl)
 
 }
-
+  */
 private object TraversableType {
 
   //we have to pick exact types, to avoid problems with "::" classes etc.

@@ -3,8 +3,9 @@ package pl.touk.nussknacker.engine.flink.util.transformer
 import cats.data.ValidatedNel
 import org.apache.flink.api.common.state.ValueStateDescriptor
 import org.apache.flink.api.common.typeinfo.TypeInformation
+import org.apache.flink.streaming.api.datastream.DataStream
 import org.apache.flink.streaming.api.functions.KeyedProcessFunction
-import org.apache.flink.streaming.api.scala._
+import org.apache.flink.streaming.api.functions.co.CoMapFunction
 import org.apache.flink.streaming.runtime.operators.windowing.TimestampedValue
 import org.apache.flink.util.Collector
 import pl.touk.nussknacker.engine.api._
@@ -50,14 +51,17 @@ class UnionWithMemoTransformer(timestampAssigner: Option[TimestampWatermarkHandl
                   .flatMap(new StringKeyedValueMapper(context, keyParam, valueParam))
                   .map(_.map(_.mapValue(v => (ContextTransformation.sanitizeBranchName(branchId), v))))
             }
-            val connectedStream = keyedInputStreams.reduce(_.connect(_).map(mapElement, mapElement))
+            val connectedStream = keyedInputStreams.reduce(_.connect(_).map(new CoMapFunction[ValueWithContext[KeyedValue[String, (String, AnyRef)]], ValueWithContext[KeyedValue[String, (String, AnyRef)]], ValueWithContext[KeyedValue[String, (String, AnyRef)]]] {
+              override def map1(value: ValueWithContext[KeyedValue[String, (String, AnyRef)]]): ValueWithContext[KeyedValue[String, (String, AnyRef)]] = mapElement(value)
+              override def map2(value: ValueWithContext[KeyedValue[String, (String, AnyRef)]]): ValueWithContext[KeyedValue[String, (String, AnyRef)]] = mapElement(value)
+            }))
 
             val afterOptionalAssigner = timestampAssigner
-              .map(new TimestampAssignmentHelper[ValueWithContext[StringKeyedValue[(String, AnyRef)]]](_).assignWatermarks(connectedStream))
+              .map(new TimestampAssignmentHelper[ValueWithContext[StringKeyedValue[(String, AnyRef)]]](_)(TypeInformation.of(classOf[ValueWithContext[StringKeyedValue[(String, AnyRef)]]])).assignWatermarks(connectedStream))
               .getOrElse(connectedStream)
 
             setUidToNodeIdIfNeed(context, afterOptionalAssigner
-              .keyBy(_.value.key)
+              .keyBy((v: ValueWithContext[StringKeyedValue[(String, AnyRef)]]) => v.value.key)
               .process(new UnionMemoFunction(stateTimeout)))
           }
         }
@@ -88,7 +92,7 @@ class UnionMemoFunction(stateTimeout: Duration) extends LatelyEvictableStateFunc
   import scala.collection.JavaConverters._
 
   override protected def stateDescriptor: ValueStateDescriptor[Map[String, AnyRef]] =
-    new ValueStateDescriptor("state", implicitly[TypeInformation[Map[String, AnyRef]]])
+    new ValueStateDescriptor("state", TypeInformation.of(classOf[Map[String, AnyRef]]))
 
   override def processElement(valueWithCtx: ValueWithContext[StringKeyedValue[(String, AnyRef)]], ctx: FlinkCtx, out: Collector[ValueWithContext[AnyRef]]): Unit = {
     val currentState = Option(readState()).getOrElse(Map.empty)

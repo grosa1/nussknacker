@@ -1,9 +1,9 @@
 package pl.touk.nussknacker.engine.flink.api.process
 
-import org.apache.flink.streaming.api.scala.DataStream
+import org.apache.flink.streaming.api.datastream.DataStream
 import pl.touk.nussknacker.engine.api.typed.typing.TypingResult
 import pl.touk.nussknacker.engine.api.typed.{ReturningType, typing}
-import pl.touk.nussknacker.engine.api.{Context, InterpretationResult, ValueWithContext}
+import pl.touk.nussknacker.engine.api.{Context, ValueWithContext}
 
 object FlinkCustomStreamTransformation {
   def apply(fun: DataStream[Context] => DataStream[ValueWithContext[AnyRef]]): FlinkCustomStreamTransformation

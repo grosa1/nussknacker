@@ -8,12 +8,11 @@ import org.apache.flink.streaming.api.functions.source.SourceFunction
 import org.apache.flink.streaming.api.functions.source.SourceFunction.SourceContext
 import pl.touk.nussknacker.engine.api.test.{NewLineSplittedTestDataParser, TestDataParser}
 import pl.touk.nussknacker.engine.flink.api.process.{BasicFlinkSource, FlinkSourceTestSupport}
-import org.apache.flink.streaming.api.scala._
 import pl.touk.nussknacker.engine.flink.api.timestampwatermark.{StandardTimestampWatermarkHandler, TimestampWatermarkHandler}
 
 //this not ending source is more reliable in tests than CollectionSource, which terminates quickly
 class NoEndingSource extends BasicFlinkSource[String] with FlinkSourceTestSupport[String] {
-  override val typeInformation: TypeInformation[String] = implicitly[TypeInformation[String]]
+  override val typeInformation: TypeInformation[String] = TypeInformation.of(classOf[String])
 
   override def timestampAssigner: Option[TimestampWatermarkHandler[String]] = Option(StandardTimestampWatermarkHandler
     .boundedOutOfOrderness[String]((_: String) => System.currentTimeMillis(), Duration.ofMinutes(10)))

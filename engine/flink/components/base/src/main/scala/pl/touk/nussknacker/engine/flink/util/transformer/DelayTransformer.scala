@@ -1,13 +1,12 @@
 package pl.touk.nussknacker.engine.flink.util.transformer
 
 import java.time.Duration
-
 import javax.annotation.Nullable
 import org.apache.flink.api.common.state.{MapState, MapStateDescriptor}
 import org.apache.flink.api.common.typeinfo.TypeInformation
 import org.apache.flink.configuration.Configuration
+import org.apache.flink.streaming.api.datastream.DataStream
 import org.apache.flink.streaming.api.functions.KeyedProcessFunction
-import org.apache.flink.streaming.api.scala._
 import org.apache.flink.util.Collector
 import pl.touk.nussknacker.engine.api
 import pl.touk.nussknacker.engine.api._
@@ -27,11 +26,11 @@ class DelayTransformer extends CustomStreamTransformer with ExplicitUidInOperato
         Option(key).map { _ =>
           stream
             .flatMap(new StringKeyOnlyMapper(nodeCtx.lazyParameterHelper, key))
-            .keyBy(_.value)
+            .keyBy((k: ValueWithContext[String]) => k.value)
         }.getOrElse {
           stream
             .map(ctx => ValueWithContext(defaultKey(ctx), ctx))
-            .keyBy(_.value)
+            .keyBy((k: ValueWithContext[String]) => k.value)
         }
       setUidToNodeIdIfNeed(nodeCtx, keyedStream
         .process(prepareDelayFunction(nodeCtx.nodeId, delay)))
@@ -51,7 +50,8 @@ class DelayFunction(delay: Duration)
   type FlinkCtx = KeyedProcessFunction[String, ValueWithContext[String], ValueWithContext[AnyRef]]#Context
   type FlinkTimerCtx = KeyedProcessFunction[String, ValueWithContext[String], ValueWithContext[AnyRef]]#OnTimerContext
 
-  private val descriptor = new MapStateDescriptor[Long, List[api.Context]]("state", implicitly[TypeInformation[Long]], implicitly[TypeInformation[List[api.Context]]])
+  private val descriptor = new MapStateDescriptor[Long, List[api.Context]]("state",
+    TypeInformation.of(classOf[Long]), TypeInformation.of(classOf[List[api.Context]]))
 
   @transient private var state : MapState[Long, List[api.Context]] = _
 

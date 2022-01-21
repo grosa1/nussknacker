@@ -1,7 +1,6 @@
 package pl.touk.nussknacker.engine.kafka.exception
 
 import com.typesafe.config.ConfigValueFactory.fromAnyRef
-import org.apache.flink.streaming.api.scala.StreamExecutionEnvironment
 import org.scalatest.{FunSuite, Matchers}
 import pl.touk.nussknacker.engine.api.{CirceUtil, ProcessVersion}
 import pl.touk.nussknacker.engine.api.deployment.DeploymentData
@@ -47,7 +46,7 @@ class KafkaExceptionConsumerSpec extends FunSuite with FlinkSpec with KafkaSpec 
       .emptySink("end", "sink")
 
     val env = flinkMiniCluster.createExecutionEnvironment()
-    registrar.register(new StreamExecutionEnvironment(env), process, ProcessVersion.empty, DeploymentData.empty)
+    registrar.register(env, process, ProcessVersion.empty, DeploymentData.empty)
     env.withJobRunning(process.id) {
 
       val consumer = kafkaClient.createConsumer()

@@ -1,8 +1,8 @@
 package pl.touk.nussknacker.engine.management.sample.transformer
 
 import org.apache.flink.api.common.state.ValueStateDescriptor
+import org.apache.flink.streaming.api.datastream.DataStream
 import org.apache.flink.streaming.api.functions.KeyedProcessFunction
-import org.apache.flink.streaming.api.scala._
 import org.apache.flink.util.Collector
 import pl.touk.nussknacker.engine.api.{Context, CustomStreamTransformer, LazyParameter, ValueWithContext}
 import pl.touk.nussknacker.engine.api.context.{ProcessCompilationError, ValidationContext}
@@ -53,7 +53,7 @@ object LastVariableFilterTransformer extends CustomStreamTransformer with Single
     FlinkCustomStreamTransformation((str: DataStream[Context], ctx: FlinkCustomNodeContext) => {
       str
         .flatMap(new StringKeyedValueMapper(ctx, groupBy, value))
-        .keyBy(_.value.key)
+        .keyBy((k: ValueWithContext[StringKeyedValue[AnyRef]]) => k.value.key)
         .process(new ConditionalUpdateFunction(condition, ctx.lazyParameterHelper))
     })
   }

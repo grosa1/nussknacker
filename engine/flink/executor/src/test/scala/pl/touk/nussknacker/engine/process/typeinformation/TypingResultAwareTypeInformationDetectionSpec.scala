@@ -1,34 +1,11 @@
 package pl.touk.nussknacker.engine.process.typeinformation
 
-import com.esotericsoftware.kryo.io.{Input, Output}
-import com.esotericsoftware.kryo.{Kryo, Serializer}
-
-import java.util.Collections
-import org.apache.flink.api.common.ExecutionConfig
-import org.apache.flink.api.common.typeinfo.TypeInformation
-import org.apache.flink.api.common.typeutils.base.{IntSerializer, LongSerializer, StringSerializer}
-import org.apache.flink.api.common.typeutils.{TypeSerializer, TypeSerializerSnapshot}
-import org.apache.flink.api.java.typeutils.runtime.kryo.KryoSerializer
-import org.apache.flink.api.scala.typeutils.ScalaCaseClassSerializer
-import org.scalatest.Inside.inside
-import org.scalatest.{Assertion, FunSuite, Matchers}
-import pl.touk.nussknacker.engine.api.context.ValidationContext
-import pl.touk.nussknacker.engine.api.typed.typing
-import pl.touk.nussknacker.engine.api.typed.typing.Typed.fromInstance
-import pl.touk.nussknacker.engine.api.typed.typing.{Typed, TypedObjectTypingResult, TypingResult}
-import pl.touk.nussknacker.engine.api.{Context, ValueWithContext}
-import pl.touk.nussknacker.engine.flink.api.typeinformation.{TypeInformationDetection, TypingResultAwareTypeInformationCustomisation}
+import org.scalatest.{FunSuite, Matchers}
 import pl.touk.nussknacker.engine.flink.serialization.FlinkTypeInformationSerializationMixin
-import pl.touk.nussknacker.engine.process.typeinformation.internal.typedobject.{BaseJavaMapBasedSerializer, TypedObjectBasedSerializerSnapshot, TypedObjectBasedTypeInformation, TypedObjectBasedTypeSerializer, TypedScalaMapSerializer}
-import pl.touk.nussknacker.engine.process.typeinformation.testTypedObject.{CustomObjectTypeInformation, CustomTypedObject}
-import pl.touk.nussknacker.engine.util.Implicits._
-
-import java.util
-import scala.collection.JavaConverters._
-import scala.collection.immutable.ListMap
 
 class TypingResultAwareTypeInformationDetectionSpec extends FunSuite with Matchers with FlinkTypeInformationSerializationMixin {
 
+  /*
   private val informationDetection = new TypingResultAwareTypeInformationDetection(new TypingResultAwareTypeInformationCustomisation {
     override def customise(originalDetection: TypeInformationDetection): PartialFunction[typing.TypingResult, TypeInformation[_]] = {
       case e: TypedObjectTypingResult if e.objType == Typed.typedClass[CustomTypedObject] =>
@@ -239,5 +216,5 @@ object testTypedObject {
       = CustomObjectTypeSerializer(restored)
 
   }
-
+    */
 }

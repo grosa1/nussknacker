@@ -1,7 +1,7 @@
 package pl.touk.nussknacker.engine.management.sample.source
 
-import org.apache.flink.api.scala._
-import org.apache.flink.streaming.api.scala.StreamExecutionEnvironment
+import org.apache.flink.api.common.typeinfo.TypeInformation
+import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment
 import pl.touk.nussknacker.engine.api.context.ProcessCompilationError.NodeId
 import pl.touk.nussknacker.engine.api.context.ValidationContext
 import pl.touk.nussknacker.engine.api.context.transformation.{BaseDefinedParameter, NodeDependencyValue}
@@ -15,7 +15,7 @@ object DynamicParametersSource extends SourceFactory with DynamicParametersMixin
 
   override def implementation(params: Map[String, Any], dependencies: List[NodeDependencyValue], finalState: Option[State]): AnyRef = {
     new CollectionSource[Any](StreamExecutionEnvironment.getExecutionEnvironment.getConfig,
-      List(TypedMap(params.filterNot(_._1 == choiceParamName))), None, Unknown)
+      List(TypedMap(params.filterNot(_._1 == choiceParamName))), None, Unknown)(TypeInformation.of(classOf[Any]))
   }
 
   override protected def result(validationContext: ValidationContext,

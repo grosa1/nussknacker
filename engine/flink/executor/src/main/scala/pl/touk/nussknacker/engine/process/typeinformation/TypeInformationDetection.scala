@@ -28,7 +28,8 @@ object TypeInformationDetectionUtils extends LazyLogging {
     val useTypingResultTypeInformation = NkGlobalParameters.readFromContext(executionConfig)
       .flatMap(_.configParameters).flatMap(_.useTypingResultTypeInformation).getOrElse(true)
     if (useTypingResultTypeInformation) {
-      TypingResultAwareTypeInformationDetection(classLoader)
+      GenericTypeInformationDetection
+      //TypingResultAwareTypeInformationDetection(classLoader)
     } else {
       GenericTypeInformationDetection
     }
@@ -38,16 +39,15 @@ object TypeInformationDetectionUtils extends LazyLogging {
 
 object GenericTypeInformationDetection extends TypeInformationDetection {
 
-  import org.apache.flink.api.scala._
 
-  override def forInterpretationResult(validationContext: ValidationContext, output: Option[TypingResult]): TypeInformation[InterpretationResult] = implicitly[TypeInformation[InterpretationResult]]
+  override def forInterpretationResult(validationContext: ValidationContext, output: Option[TypingResult]): TypeInformation[InterpretationResult] =TypeInformation.of(classOf[InterpretationResult])
 
-  override def forInterpretationResults(results: Map[String, ValidationContext]): TypeInformation[InterpretationResult] = implicitly[TypeInformation[InterpretationResult]]
+  override def forInterpretationResults(results: Map[String, ValidationContext]): TypeInformation[InterpretationResult] = TypeInformation.of(classOf[InterpretationResult])
 
-  override def forContext(validationContext: ValidationContext): TypeInformation[Context] = implicitly[TypeInformation[Context]]
+  override def forContext(validationContext: ValidationContext): TypeInformation[Context] = TypeInformation.of(classOf[Context])
 
   override def forValueWithContext[T](validationContext: ValidationContext, value: TypingResult): TypeInformation[ValueWithContext[T]]
-    = implicitly[TypeInformation[ValueWithContext[AnyRef]]].asInstanceOf[TypeInformation[ValueWithContext[T]]]
+    = TypeInformation.of(classOf[ValueWithContext[AnyRef]]).asInstanceOf[TypeInformation[ValueWithContext[T]]]
 
-  override def forType(typingResult: TypingResult): TypeInformation[AnyRef] = implicitly[TypeInformation[AnyRef]]
+  override def forType(typingResult: TypingResult): TypeInformation[AnyRef] = TypeInformation.of(classOf[AnyRef])
 }

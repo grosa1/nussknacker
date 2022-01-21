@@ -9,12 +9,11 @@ import pl.touk.nussknacker.engine.api.process.TestDataGenerator
 import pl.touk.nussknacker.engine.api.test.{NewLineSplittedTestDataParser, TestDataParser}
 import pl.touk.nussknacker.engine.flink.api.process.{BasicFlinkSource, FlinkSourceTestSupport}
 import pl.touk.nussknacker.engine.management.sample.dto.CsvRecord
-import org.apache.flink.streaming.api.scala._
 import pl.touk.nussknacker.engine.flink.api.timestampwatermark.TimestampWatermarkHandler
 
 class CsvSource extends BasicFlinkSource[CsvRecord] with FlinkSourceTestSupport[CsvRecord] with TestDataGenerator {
 
-  override val typeInformation: TypeInformation[CsvRecord] = implicitly[TypeInformation[CsvRecord]]
+  override val typeInformation: TypeInformation[CsvRecord] = TypeInformation.of(classOf[CsvRecord])
 
   override def flinkSourceFunction: SourceFunction[CsvRecord] = new SourceFunction[CsvRecord] {
     override def cancel(): Unit = {}

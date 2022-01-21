@@ -2,7 +2,7 @@ package pl.touk.nussknacker.engine.flink.util.transformer
 
 import cats.data.NonEmptyList
 import com.typesafe.config.ConfigFactory
-import org.apache.flink.streaming.api.scala._
+import org.apache.flink.api.common.typeinfo.TypeInformation
 import org.scalatest.{FunSuite, Matchers}
 import pl.touk.nussknacker.engine.api._
 import pl.touk.nussknacker.engine.api.deployment.DeploymentData
@@ -66,6 +66,7 @@ class UnionWithMemoTransformerSpec extends FunSuite with FlinkSpec with Matchers
     ))
 
     val key = "fooKey"
+    implicit val tif: TypeInformation[OneRecord] = TypeInformation.of(classOf[OneRecord])
     val sourceFoo = BlockingQueueSource.create[OneRecord](_.timestamp, Duration.ofHours(1))
     val sourceBar = BlockingQueueSource.create[OneRecord](_.timestamp, Duration.ofHours(1))
 
@@ -98,7 +99,7 @@ class UnionWithMemoTransformerSpec extends FunSuite with FlinkSpec with Matchers
     val model = LocalModelData(ConfigFactory.empty(), new UnionWithMemoTransformerSpec.Creator(sourceFoo, sourceBar, collectingListener))
     val stoppableEnv = flinkMiniCluster.createExecutionEnvironment()
     val registrar = FlinkProcessRegistrar(new FlinkProcessCompiler(model), ExecutionConfigPreparer.unOptimizedChain(model))
-    registrar.register(new StreamExecutionEnvironment(stoppableEnv), testProcess, ProcessVersion.empty, DeploymentData.empty)
+    registrar.register(stoppableEnv, testProcess, ProcessVersion.empty, DeploymentData.empty)
     stoppableEnv.withJobRunning(testProcess.id)(action)
   }
 }

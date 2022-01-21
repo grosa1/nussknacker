@@ -1,8 +1,7 @@
 package pl.touk.nussknacker.engine.flink.api.compat
 
 import org.apache.flink.annotation.{Public, PublicEvolving}
-import org.apache.flink.streaming.api.datastream.{DataStreamSink, SingleOutputStreamOperator}
-import org.apache.flink.streaming.api.scala.DataStream
+import org.apache.flink.streaming.api.datastream.{DataStream, DataStreamSink, SingleOutputStreamOperator}
 import pl.touk.nussknacker.engine.flink.api.NkGlobalParameters
 import pl.touk.nussknacker.engine.flink.api.process.FlinkCustomNodeContext
 
@@ -24,14 +23,11 @@ import pl.touk.nussknacker.engine.flink.api.process.FlinkCustomNodeContext
  */
 trait ExplicitUidInOperatorsSupport {
 
-  protected def setUidToNodeIdIfNeed[T](nodeCtx: FlinkCustomNodeContext, stream: DataStream[T]): DataStream[T] =
+  protected def setUidToNodeIdIfNeed[T](nodeCtx: FlinkCustomNodeContext, stream: SingleOutputStreamOperator[T]): DataStream[T] =
     ExplicitUidInOperatorsSupport.setUidIfNeed(explicitUidInStatefulOperators(nodeCtx), nodeCtx.nodeId)(stream)
 
   protected def setUidToNodeIdIfNeed[T](nodeCtx: FlinkCustomNodeContext, stream: DataStreamSink[T]): DataStreamSink[T] =
     ExplicitUidInOperatorsSupport.setUidIfNeedSink(explicitUidInStatefulOperators(nodeCtx), nodeCtx.nodeId)(stream)
-
-  protected def setUidToNodeIdIfNeed[T](nodeCtx: FlinkCustomNodeContext, stream: SingleOutputStreamOperator[T]): SingleOutputStreamOperator[T] =
-    ExplicitUidInOperatorsSupport.setUidIfNeedJava(explicitUidInStatefulOperators(nodeCtx), nodeCtx.nodeId)(stream)
 
   /**
    * Rewrite it if you wan to change globally configured behaviour of setting uid with local one
@@ -45,7 +41,7 @@ trait ExplicitUidInOperatorsSupport {
 object ExplicitUidInOperatorsSupport {
 
   def setUidIfNeed[T](explicitUidInStatefulOperators: Boolean, uidValue: String)
-                     (stream: DataStream[T]): DataStream[T] = {
+                     (stream: SingleOutputStreamOperator[T]): SingleOutputStreamOperator[T] = {
     if (explicitUidInStatefulOperators)
       stream.uid(uidValue)
     else

@@ -4,7 +4,7 @@ import cats.data.NonEmptyList
 import cats.data.Validated.Invalid
 import com.typesafe.config.ConfigFactory
 import com.typesafe.config.ConfigValueFactory.fromAnyRef
-import org.apache.flink.streaming.api.scala._
+import org.apache.flink.api.common.typeinfo.TypeInformation
 import org.scalatest.{FunSuite, Inside, Matchers}
 import pl.touk.nussknacker.engine.api.context.ProcessCompilationError.{CannotCreateObjectError, ExpressionParseError}
 import pl.touk.nussknacker.engine.api.deployment.{DeploymentData, TestProcess}
@@ -380,7 +380,7 @@ class TransformersTest extends FunSuite with FlinkSpec with Matchers with Inside
       override protected def listeners(processObjectDependencies: ProcessObjectDependencies): Seq[ProcessListener] =
         List(collectingListener) ++ super.listeners(processObjectDependencies)
     }, ExecutionConfigPreparer.unOptimizedChain(model))
-    registrar.register(new StreamExecutionEnvironment(stoppableEnv), testProcess, ProcessVersion.empty, DeploymentData.empty)
+    registrar.register(stoppableEnv, testProcess, ProcessVersion.empty, DeploymentData.empty)
     stoppableEnv.executeAndWaitForFinished(testProcess.id)()
   }
 
@@ -479,7 +479,7 @@ class Creator(input: List[TestRecord]) extends EmptyProcessConfigCreator {
 
   override def sourceFactories(processObjectDependencies: ProcessObjectDependencies): Map[String, WithCategories[SourceFactory]] =
     Map("start" -> WithCategories(SourceFactory.noParam[TestRecord](EmitWatermarkAfterEachElementCollectionSource
-      .create[TestRecord](input, _.timestamp, Duration.ofHours(1)))))
+      .create[TestRecord](input, _.timestamp, Duration.ofHours(1))(TypeInformation.of(classOf[TestRecord])))))
 
 
 }

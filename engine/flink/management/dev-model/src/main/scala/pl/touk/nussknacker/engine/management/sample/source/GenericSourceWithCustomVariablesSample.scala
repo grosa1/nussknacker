@@ -1,17 +1,16 @@
 package pl.touk.nussknacker.engine.management.sample.source
 
 import cats.data.ValidatedNel
-import org.apache.flink.streaming.api.scala._
-import org.apache.kafka.clients.consumer.ConsumerRecord
+import org.apache.flink.api.common.typeinfo.TypeInformation
+import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment
 import pl.touk.nussknacker.engine.api.Context
 import pl.touk.nussknacker.engine.api.context.ProcessCompilationError.NodeId
 import pl.touk.nussknacker.engine.api.context.transformation.{NodeDependencyValue, SingleInputGenericNodeTransformation}
 import pl.touk.nussknacker.engine.api.context.{ProcessCompilationError, ValidationContext}
 import pl.touk.nussknacker.engine.api.definition.{NodeDependency, Parameter}
 import pl.touk.nussknacker.engine.api.process._
-import pl.touk.nussknacker.engine.api.runtimecontext.{ContextIdGenerator, EngineRuntimeContext}
+import pl.touk.nussknacker.engine.api.runtimecontext.ContextIdGenerator
 import pl.touk.nussknacker.engine.api.test.{NewLineSplittedTestDataParser, TestDataParser}
-import pl.touk.nussknacker.engine.api.typed.typing
 import pl.touk.nussknacker.engine.api.typed.typing.Typed
 import pl.touk.nussknacker.engine.flink.api.process._
 import pl.touk.nussknacker.engine.flink.api.timestampwatermark.TimestampWatermarkHandler
@@ -70,7 +69,7 @@ object GenericSourceWithCustomVariablesSample extends SourceFactory with SingleI
     import scala.collection.JavaConverters._
     val elements = params(`elementsParamName`).asInstanceOf[java.util.List[String]].asScala.toList
 
-    new CollectionSource[String](StreamExecutionEnvironment.getExecutionEnvironment.getConfig, elements, None, Typed[String])
+    new CollectionSource[String](StreamExecutionEnvironment.getExecutionEnvironment.getConfig, elements, None, Typed[String])(TypeInformation.of(classOf[String]))
       with TestDataGenerator
       with FlinkSourceTestSupport[String] {
 

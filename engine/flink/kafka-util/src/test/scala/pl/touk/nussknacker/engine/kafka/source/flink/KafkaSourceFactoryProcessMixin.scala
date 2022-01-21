@@ -1,7 +1,5 @@
 package pl.touk.nussknacker.engine.kafka.source.flink
 
-import org.apache.flink.runtime.execution.ExecutionState
-import org.apache.flink.streaming.api.scala.StreamExecutionEnvironment
 import org.apache.kafka.common.record.TimestampType
 import org.scalatest.{BeforeAndAfter, FunSuite, Matchers}
 import pl.touk.nussknacker.engine.api.deployment.DeploymentData
@@ -56,13 +54,13 @@ trait KafkaSourceFactoryProcessMixin extends FunSuite with Matchers with KafkaSo
 
   protected def run(process: EspProcess)(action: => Unit): Unit = {
     val env = flinkMiniCluster.createExecutionEnvironment()
-    registrar.register(new StreamExecutionEnvironment(env), process, ProcessVersion.empty, DeploymentData.empty)
+    registrar.register(env, process, ProcessVersion.empty, DeploymentData.empty)
     env.withJobRunning(process.id)(action)
   }
 
   protected def fail(process: EspProcess): Unit = {
     val env = flinkMiniCluster.createExecutionEnvironment()
-    registrar.register(new StreamExecutionEnvironment(env), process, ProcessVersion.empty, DeploymentData.empty)
+    registrar.register(env, process, ProcessVersion.empty, DeploymentData.empty)
     //we don't wait for start, since the job may fail before starting...
     val executionResult = env.execute(process.id)
     env.waitForFail(executionResult.getJobID, process.id)()

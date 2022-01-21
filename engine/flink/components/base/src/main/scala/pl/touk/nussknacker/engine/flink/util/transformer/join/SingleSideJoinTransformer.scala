@@ -2,13 +2,13 @@ package pl.touk.nussknacker.engine.flink.util.transformer.join
 
 import com.typesafe.scalalogging.LazyLogging
 import org.apache.flink.api.common.typeinfo.TypeInformation
+import org.apache.flink.streaming.api.datastream.DataStream
 import org.apache.flink.streaming.api.functions.co.CoProcessFunction
-import org.apache.flink.streaming.api.scala._
 import org.apache.flink.streaming.runtime.operators.windowing.TimestampedValue
 import pl.touk.nussknacker.engine.api._
 import pl.touk.nussknacker.engine.api.context.ProcessCompilationError.{CustomNodeError, NodeId}
 import pl.touk.nussknacker.engine.api.context.transformation._
-import pl.touk.nussknacker.engine.api.context.{OutputVar, ProcessCompilationError, ValidationContext}
+import pl.touk.nussknacker.engine.api.context.{OutputVar, ValidationContext}
 import pl.touk.nussknacker.engine.api.definition._
 import pl.touk.nussknacker.engine.api.typed.typing
 import pl.touk.nussknacker.engine.api.typed.typing.{Typed, TypingResult, Unknown}
@@ -16,10 +16,11 @@ import pl.touk.nussknacker.engine.flink.api.compat.ExplicitUidInOperatorsSupport
 import pl.touk.nussknacker.engine.flink.api.process.{FlinkCustomJoinTransformation, FlinkCustomNodeContext}
 import pl.touk.nussknacker.engine.flink.api.timestampwatermark.TimestampWatermarkHandler
 import pl.touk.nussknacker.engine.flink.util.keyed.{StringKeyOnlyMapper, StringKeyedValue, StringKeyedValueMapper}
+import pl.touk.nussknacker.engine.flink.util.richflink._
 import pl.touk.nussknacker.engine.flink.util.timestamp.TimestampAssignmentHelper
 import pl.touk.nussknacker.engine.flink.util.transformer.aggregate.{AggregateHelper, Aggregator}
-import pl.touk.nussknacker.engine.flink.util.richflink._
 import pl.touk.nussknacker.engine.util.Implicits.RichScalaMap
+import pl.touk.nussknacker.engine.util.KeyedValue
 
 import java.time.Duration
 import java.util.concurrent.TimeUnit
@@ -82,12 +83,12 @@ class SingleSideJoinTransformer(timestampAssigner: Option[TimestampWatermarkHand
         val aggregatorFunction = prepareAggregatorFunction(aggregator, FiniteDuration(window.toMillis, TimeUnit.MILLISECONDS), aggregateBy.returnType, storedTypeInfo)(NodeId(context.nodeId))
         val statefulStreamWithUid = keyedMainBranchStream
           .connect(keyedJoinedStream)
-          .keyBy(v => v.value, v => v.value.key)
+          .keyBy((v: ValueWithContext[String]) => v.value, (v: ValueWithContext[KeyedValue[String, AnyRef]]) => v.value.key)
           .process(aggregatorFunction)
           .setUidWithName(context, ExplicitUidInOperatorsSupport.defaultExplicitUidInStatefulOperators)
 
         timestampAssigner
-          .map(new TimestampAssignmentHelper(_).assignWatermarks(statefulStreamWithUid))
+          .map(new TimestampAssignmentHelper(_)(TypeInformation.of(classOf[ValueWithContext[AnyRef]])).assignWatermarks(statefulStreamWithUid))
           .getOrElse(statefulStreamWithUid)
       }
     }

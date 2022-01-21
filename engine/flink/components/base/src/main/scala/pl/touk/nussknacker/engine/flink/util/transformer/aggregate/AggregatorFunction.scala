@@ -6,7 +6,6 @@ import com.codahale.metrics.{Histogram, SlidingTimeWindowReservoir}
 import org.apache.flink.api.common.functions.RuntimeContext
 import org.apache.flink.api.common.state.ValueStateDescriptor
 import org.apache.flink.api.common.typeinfo.TypeInformation
-import org.apache.flink.api.scala._
 import org.apache.flink.dropwizard.metrics.DropwizardHistogramWrapper
 import org.apache.flink.metrics
 import org.apache.flink.streaming.api.TimerService
@@ -165,7 +164,7 @@ trait AggregatorFunctionMixin[MapT[K,V]] { self: StateHolder[MapT[Long, AnyRef]]
 
   override protected def stateDescriptor: ValueStateDescriptor[MapT[Long, AnyRef]] =
     new ValueStateDescriptor[MapT[Long, AnyRef]]("state",
-      rangeMap.typeInformation[Long, AnyRef](implicitly[TypeInformation[Long]], aggregateTypeInformation))
+      rangeMap.typeInformation[Long, AnyRef](TypeInformation.of(classOf[Long]), aggregateTypeInformation))
 
   protected def aggregateTypeInformation: TypeInformation[AnyRef]
 

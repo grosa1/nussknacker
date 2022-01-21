@@ -1,9 +1,8 @@
 package pl.touk.nussknacker.engine.management.sample.transformer
 
-import org.apache.flink.streaming.api.scala.DataStream
-import pl.touk.nussknacker.engine.api.{AdditionalVariable, AdditionalVariables, Context, CustomStreamTransformer, LazyParameter, MethodToInvoke, ParamName, ValueWithContext}
+import org.apache.flink.streaming.api.datastream.DataStream
+import pl.touk.nussknacker.engine.api._
 import pl.touk.nussknacker.engine.flink.api.process.FlinkCustomStreamTransformation
-import org.apache.flink.streaming.api.scala._
 
 object AdditionalVariableTransformer extends CustomStreamTransformer {
 

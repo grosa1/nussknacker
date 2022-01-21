@@ -3,8 +3,8 @@ package pl.touk.nussknacker.engine.flink.util.signal
 import com.github.ghik.silencer.silent
 import org.apache.flink.api.common.serialization.DeserializationSchema
 import org.apache.flink.api.common.typeinfo.TypeInformation
+import org.apache.flink.streaming.api.datastream.{ConnectedStreams, DataStream}
 import org.apache.flink.streaming.api.functions.IngestionTimeExtractor
-import org.apache.flink.streaming.api.scala.{ConnectedStreams, DataStream}
 import pl.touk.nussknacker.engine.kafka.{KafkaConfig, KafkaUtils}
 import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer
 
@@ -19,7 +19,7 @@ trait KafkaSignalStreamConnector {
     @nowarn("cat=deprecation")
     val signalsSource = new FlinkKafkaConsumer[B](signalsTopic, schema,
       KafkaUtils.toProperties(kafkaConfig, Some(s"$processId-$nodeId-signal")))
-    val signalsStream = start.executionEnvironment
+    val signalsStream = start.getExecutionEnvironment
       .addSource(signalsSource).name(s"signals-$processId-$nodeId")
     val withTimestamps = assignTimestampsAndWatermarks(signalsStream)
     start.connect(withTimestamps)

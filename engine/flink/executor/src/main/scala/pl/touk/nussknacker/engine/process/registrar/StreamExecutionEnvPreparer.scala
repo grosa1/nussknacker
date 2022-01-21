@@ -1,22 +1,17 @@
 package pl.touk.nussknacker.engine.process.registrar
 
-import java.util.function.Consumer
-import com.typesafe.config.Config
 import com.typesafe.scalalogging.LazyLogging
-import org.apache.flink.api.java.tuple
 import org.apache.flink.runtime.execution.librarycache.FlinkUserCodeClassLoaders
 import org.apache.flink.runtime.state.StateBackend
-import org.apache.flink.streaming.api.operators.StreamOperatorFactory
-import org.apache.flink.streaming.api.scala.StreamExecutionEnvironment
-import org.apache.flink.streaming.runtime.operators.windowing.WindowOperator
+import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment
 import pl.touk.nussknacker.engine.api.StreamMetaData
 import pl.touk.nussknacker.engine.process.compiler.FlinkProcessCompilerData
-import pl.touk.nussknacker.engine.process.util.StateConfiguration.RocksDBStateBackendConfig
 import pl.touk.nussknacker.engine.process.util.StateConfiguration
+import pl.touk.nussknacker.engine.process.util.StateConfiguration.RocksDBStateBackendConfig
 import pl.touk.nussknacker.engine.process.{CheckpointConfig, ExecutionConfigPreparer}
 import pl.touk.nussknacker.engine.util.MetaDataExtractor
 
-import scala.collection.JavaConverters._
+import java.util.function.Consumer
 
 /*
   This trait is meant to be the place to configure StreamExecutionEnvironment. Here (e.g. in DefaultStreamExecutionEnvPreparer)

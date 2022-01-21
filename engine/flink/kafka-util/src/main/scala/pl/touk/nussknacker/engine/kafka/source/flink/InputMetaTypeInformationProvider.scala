@@ -1,10 +1,7 @@
 package pl.touk.nussknacker.engine.kafka.source.flink
 
-import org.apache.flink.api.common.ExecutionConfig
 import org.apache.flink.api.common.typeinfo.TypeInformation
-import org.apache.flink.api.common.typeutils.TypeSerializer
 import org.apache.flink.api.java.typeutils.MapTypeInfo
-import org.apache.flink.api.scala.typeutils.{CaseClassTypeInfo, ScalaCaseClassSerializer}
 import org.apache.kafka.common.record.TimestampType
 import pl.touk.nussknacker.engine.api.typed.typing.{TypedObjectTypingResult, TypingResult}
 import pl.touk.nussknacker.engine.flink.api.typeinformation.{TypeInformationDetection, TypingResultAwareTypeInformationCustomisation}
@@ -13,7 +10,7 @@ import pl.touk.nussknacker.engine.kafka.source.InputMeta
 object InputMetaTypeInformationProvider {
 
   // It should be synchronized with InputMeta.withType
-  def typeInformation[K](keyTypeInformation: TypeInformation[K]): CaseClassTypeInfo[InputMeta[K]] = {
+  def typeInformation[K](keyTypeInformation: TypeInformation[K]): TypeInformation[InputMeta[K]] = {
     val fieldNames = List(
       InputMeta.keyParameterName,
       "topic",
@@ -34,10 +31,12 @@ object InputMetaTypeInformationProvider {
       new MapTypeInfo(classOf[String], classOf[String]),
       TypeInformation.of(classOf[Integer])
     )
+    /*
     new CaseClassTypeInfo[InputMeta[K]](classOf[InputMeta[K]], Array.empty, fieldTypes, fieldNames){
       override def createSerializer(config: ExecutionConfig): TypeSerializer[InputMeta[K]] =
         new ScalaCaseClassSerializer[InputMeta[K]](classOf[InputMeta[K]], fieldTypes.map(_.createSerializer(config)).toArray)
-    }
+    } */
+    TypeInformation.of(classOf[InputMeta[K]])
   }
 }
 
