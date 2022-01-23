@@ -3,7 +3,7 @@ package pl.touk.nussknacker.engine.flink.api
 import java.util
 import com.typesafe.config.Config
 
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 import org.apache.flink.api.common.ExecutionConfig
 import org.apache.flink.api.common.ExecutionConfig.GlobalJobParameters
 import pl.touk.nussknacker.engine.api.ProcessVersion

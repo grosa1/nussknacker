@@ -34,7 +34,7 @@ object AvroDefaultExpressionDeterminer {
   */
 class AvroDefaultExpressionDeterminer(handleNotSupported: Boolean) {
   import AvroDefaultExpressionDeterminer._
-  import scala.collection.JavaConverters._
+  import scala.jdk.CollectionConverters._
   import pl.touk.nussknacker.engine.spel.Implicits.asSpelExpression
 
   private val validatedNullExpression: ValidatedNel[AvroDefaultToSpELExpressionError, Option[Expression]] =

@@ -89,7 +89,7 @@ class UnionMemoFunction(stateTimeout: Duration) extends LatelyEvictableStateFunc
 
   type FlinkCtx = KeyedProcessFunction[String, ValueWithContext[StringKeyedValue[(String, AnyRef)]], ValueWithContext[AnyRef]]#Context
 
-  import scala.collection.JavaConverters._
+  import scala.jdk.CollectionConverters._
 
   override protected def stateDescriptor: ValueStateDescriptor[Map[String, AnyRef]] =
     new ValueStateDescriptor("state", TypeInformation.of(classOf[Map[String, AnyRef]]))

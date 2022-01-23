@@ -27,7 +27,7 @@ import java.time.{LocalDate, LocalDateTime}
 import java.util
 import java.util.{Collections, Locale}
 import scala.annotation.varargs
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 import scala.collection.immutable.ListMap
 import scala.language.implicitConversions
 import scala.reflect.runtime.universe._

@@ -10,15 +10,14 @@ import pl.touk.nussknacker.engine.canonicalgraph.CanonicalProcess
 import pl.touk.nussknacker.engine.compile.{NodeTypingInfo, ProcessValidator}
 import pl.touk.nussknacker.engine.graph.node.{Disableable, NodeData, Source, SubprocessInputDefinition}
 import pl.touk.nussknacker.restmodel.displayedgraph.DisplayableProcess
-import pl.touk.nussknacker.restmodel.displayedgraph.displayablenode.{Edge, EdgeType}
+import pl.touk.nussknacker.restmodel.displayedgraph.displayablenode.Edge
 import pl.touk.nussknacker.restmodel.process.ProcessingType
-import pl.touk.nussknacker.restmodel.validation.{CustomProcessValidator, PrettyValidationErrors}
 import pl.touk.nussknacker.restmodel.validation.ValidationResults.{NodeTypingData, ValidationResult}
+import pl.touk.nussknacker.restmodel.validation.{CustomProcessValidator, PrettyValidationErrors}
 import pl.touk.nussknacker.ui.definition.UIProcessObjectsFactory
 import pl.touk.nussknacker.ui.process.marshall.ProcessConverter
 import pl.touk.nussknacker.ui.process.processingtypedata.ProcessingTypeDataProvider
 import pl.touk.nussknacker.ui.process.subprocess.SubprocessResolver
-import shapeless.syntax.typeable._
 
 object ProcessValidation {
   def apply(data: ProcessingTypeDataProvider[ModelData],
@@ -88,7 +87,7 @@ class ProcessValidation(validators: ProcessingTypeDataProvider[ProcessValidator]
             val validated = processValidator.validate(process)
             //FIXME: Validation errors for subprocess nodes are not properly handled by FE
             validated.result.fold(formatErrors, _ => ValidationResult.success)
-              .withNodeResults(validated.typing.mapValues(nodeInfoToResult))
+              .withNodeResults(validated.typing.mapValuesNow(nodeInfoToResult))
           case Invalid(e) => formatErrors(e)
         }
     }

@@ -219,7 +219,7 @@ object TestFactory extends TestPermissions{
       }
     }
 
-    override protected def cancel(deploymentId: ExternalDeploymentId): Future[Unit] = Future.successful(Unit)
+    override protected def cancel(deploymentId: ExternalDeploymentId): Future[Unit] = Future.successful(())
 
     override protected def makeSavepoint(deploymentId: ExternalDeploymentId, savepointDir: Option[String]): Future[SavepointResult] = Future.successful(SavepointResult(path = savepointPath))
 
@@ -246,7 +246,7 @@ object TestFactory extends TestPermissions{
 
     override def close(): Unit = {}
 
-    override def cancel(name: ProcessName, user: User): Future[Unit] = Future.successful(Unit)
+    override def cancel(name: ProcessName, user: User): Future[Unit] = Future.successful(())
 
     override protected def checkRequiredSlotsExceedAvailableSlots(graphProcess: GraphProcess, currentlyDeployedJobId: Option[ExternalDeploymentId]): Future[Unit] = Future.successful(())
 

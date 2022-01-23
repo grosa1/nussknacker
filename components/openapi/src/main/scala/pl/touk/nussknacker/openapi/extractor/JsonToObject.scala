@@ -9,7 +9,7 @@ import pl.touk.nussknacker.engine.api.typed.TypedMap
 
 // TODO: Validated
 object JsonToObject {
-  import scala.collection.JavaConverters._
+  import scala.jdk.CollectionConverters._
 
   case class JsonToObjectError(json: Json, definition: SwaggerTyped)
     extends Exception(s"JSON returned by service has invalid type. Expected: $definition. Returned json: $json")

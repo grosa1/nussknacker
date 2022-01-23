@@ -7,7 +7,7 @@ import io.circe.generic.extras.Configuration
 
 import java.net.URI
 import scala.annotation.tailrec
-import scala.jdk.CollectionConverters.mapAsScalaMapConverter
+import scala.jdk.CollectionConverters._
 
 object CirceUtil {
 

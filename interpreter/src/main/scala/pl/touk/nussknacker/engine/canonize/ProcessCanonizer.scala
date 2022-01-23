@@ -8,6 +8,7 @@ import pl.touk.nussknacker.engine.canonicalgraph._
 import pl.touk.nussknacker.engine.api.context.ProcessCompilationError._
 import pl.touk.nussknacker.engine.graph._
 import pl.touk.nussknacker.engine.graph.node.{BranchEnd, BranchEndData}
+import pl.touk.nussknacker.engine.util.Implicits.RichScalaMap
 
 object ProcessCanonizer {
   import cats.syntax.apply._
@@ -119,7 +120,7 @@ object NodeCanonizer {
       case node.SplitNode(bare, nexts) =>
         canonicalnode.SplitNode(bare, nexts.map(canonize)) :: Nil
       case node.SubprocessNode(input, nexts) =>
-        canonicalnode.Subprocess(input, nexts.mapValues(canonize)) :: Nil
+        canonicalnode.Subprocess(input, nexts.mapValuesNow(canonize)) :: Nil
       case BranchEnd(e:BranchEndData) =>
         canonicalnode.FlatNode(e) :: Nil
     }

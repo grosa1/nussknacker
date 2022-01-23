@@ -108,7 +108,7 @@ case class Parameter(name: String,
               (implicit nodeId: NodeId): ValidatedNel[PartSubGraphCompilationError, Unit] = {
     validators.map { validator =>
       validator.isValid(parameter.name, parameter.expression.expression, None).toValidatedNel
-    }.sequence.map(_ => Unit)
+    }.sequence.map(_ => ())
   }
 
 }

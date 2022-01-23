@@ -28,6 +28,7 @@ import pl.touk.nussknacker.engine.splittedgraph.end.NormalEnd
 import pl.touk.nussknacker.engine.splittedgraph.part._
 import pl.touk.nussknacker.engine.splittedgraph.splittednode.EndingNode
 import pl.touk.nussknacker.engine.resultcollector.PreventInvocationCollector
+import pl.touk.nussknacker.engine.util.Implicits.RichScalaMap
 import pl.touk.nussknacker.engine.util.ThreadUtils
 import pl.touk.nussknacker.engine.variables.GlobalVariablesPreparer
 
@@ -55,7 +56,7 @@ trait ProcessValidator extends LazyLogging {
 
   def validate(process: EspProcess): CompilationResult[Unit] = {
     try {
-      compile(process).map(_ => Unit)
+      compile(process).map(_ => ())
     } catch {
       case NonFatal(e) =>
         logger.warn(s"Unexpected error during compilation of ${process.id}", e)
@@ -121,7 +122,7 @@ protected trait ProcessCompilerBase {
           id
       }
     if (duplicatedIds.isEmpty)
-      valid(Unit)
+      valid(())
     else
       invalid(DuplicatedNodeIds(duplicatedIds.toSet))
   }
@@ -166,7 +167,7 @@ protected trait ProcessCompilerBase {
     val NodeCompilationResult(typingInfo, parameters, initialCtx, compiledSource, _) = nodeCompiler.compileSource(sourceData)
 
     val validatedSource = sub.validate(part.node, initialCtx.valueOr(_ => contextWithOnlyGlobalVariables))
-    val typesForParts = validatedSource.typing.mapValues(_.inputValidationContext)
+    val typesForParts = validatedSource.typing.mapValuesNow(_.inputValidationContext)
     val nodeTypingInfo = Map(part.id -> NodeTypingInfo(contextWithOnlyGlobalVariables, typingInfo, parameters))
 
     CompilationResult.map4(
@@ -207,7 +208,7 @@ protected trait ProcessCompilerBase {
     val NodeCompilationResult(typingInfo, parameters, validatedNextCtx, compiledNode, _) = nodeCompiler.compileCustomNodeObject(data, ctx.right.map(_.contextsForJoin(data.id)), ending = false)
 
     val nextPartsValidation = sub.validate(node, validatedNextCtx.valueOr(_ => ctx.left.getOrElse(contextWithOnlyGlobalVariables)))
-    val typesForParts = nextPartsValidation.typing.mapValues(_.inputValidationContext)
+    val typesForParts = nextPartsValidation.typing.mapValuesNow(_.inputValidationContext)
     val nodeTypingInfo = Map(node.id -> NodeTypingInfo(ctx.left.getOrElse(contextWithOnlyGlobalVariables), typingInfo, parameters))
 
     CompilationResult.map4(

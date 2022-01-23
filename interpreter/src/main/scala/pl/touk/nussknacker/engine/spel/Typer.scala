@@ -220,6 +220,7 @@ private[spel] class Typer(classLoader: ClassLoader, commonSupertypeFinder: Commo
         case TypingResultWithContext(left, _) :: Nil if left.canBeSubclassOf(Typed[Number]) => Valid(TypingResultWithContext(left))
         case TypingResultWithContext(left, _) :: Nil => invalid(s"Operator '${e.getOperatorName}' used with non numeric type: ${left.display}")
         case Nil => invalid("Empty minus")
+        case _ => throw new IllegalArgumentException("Should not happen")
       }
       case e: OpModulus => checkTwoOperandsArithmeticOperation(validationContext, e, current)(NumberTypesPromotionStrategy.ForMathOperation)
       case e: OpMultiply => checkTwoOperandsArithmeticOperation(validationContext, e, current)(NumberTypesPromotionStrategy.ForMathOperation)
@@ -233,6 +234,7 @@ private[spel] class Typer(classLoader: ClassLoader, commonSupertypeFinder: Commo
         case TypingResultWithContext(left, _) :: Nil if left.canBeSubclassOf(Typed[Number]) => Valid(TypingResultWithContext(left))
         case TypingResultWithContext(left, _) :: Nil => invalid(s"Operator '${e.getOperatorName}' used with non numeric type: ${left.display}")
         case Nil => invalid("Empty plus")
+        case _ => throw new IllegalArgumentException("Should not happen")
       }
       case e: OperatorBetween => fixed(TypingResultWithContext(Typed[Boolean]))
       case e: OperatorInstanceof => fixed(TypingResultWithContext(Typed[Boolean]))

@@ -18,12 +18,13 @@ import pl.touk.nussknacker.engine.lite.api.interpreterTypes.{ScenarioInputBatch,
 import pl.touk.nussknacker.engine.lite.kafka.KafkaTransactionalScenarioInterpreter.{EngineConfig, Input, Output}
 import pl.touk.nussknacker.engine.lite.kafka.api.LiteKafkaSource
 import pl.touk.nussknacker.engine.lite.metrics.SourceMetrics
+import pl.touk.nussknacker.engine.util.Implicits.RichScalaMap
 import pl.touk.nussknacker.engine.util.exception.WithExceptionExtractor
 
 import java.util.UUID
 import scala.compat.java8.DurationConverters.FiniteDurationops
 import scala.concurrent.{Await, ExecutionContext, Future}
-import scala.jdk.CollectionConverters.{asJavaCollectionConverter, asScalaIteratorConverter, iterableAsScalaIterableConverter, mapAsJavaMapConverter}
+import scala.jdk.CollectionConverters._
 import scala.util.control.NonFatal
 
 class KafkaSingleScenarioTaskRun(taskId: String,
@@ -46,7 +47,7 @@ class KafkaSingleScenarioTaskRun(taskId: String,
     case (sourceId, kafkaSource: LiteKafkaSource) =>
       kafkaSource.topics.map(topic => topic -> (sourceId, kafkaSource))
     case (sourceId, other) => throw new IllegalArgumentException(s"Unexpected source: $other for ${sourceId.value}")
-  }.groupBy(_._1).mapValues(_.values.toMap)
+  }.groupBy(_._1).mapValuesNow(_.values.toMap)
 
   def init(): Unit = {
     configSanityCheck()
@@ -153,7 +154,7 @@ class KafkaSingleScenarioTaskRun(taskId: String,
     records.iterator().asScala.map { rec =>
       val upcomingOffset = rec.offset() + 1
       (new TopicPartition(rec.topic(), rec.partition()), upcomingOffset)
-    }.toList.groupBy(_._1).mapValues(_.map(_._2).max).mapValues(new OffsetAndMetadata(_))
+    }.toList.groupBy(_._1).mapValuesNow(_.map(_._2).max).mapValuesNow(new OffsetAndMetadata(_))
   }
 
   //Errors from this method will be considered as fatal, handled by uncaughtExceptionHandler and probably causing System.exit

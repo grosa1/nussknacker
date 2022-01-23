@@ -23,7 +23,7 @@ object Implicits {
     def sequenceMap: Map[V, Iterable[K]] = {
       m.map { case (k, values) =>
         values.map(v => v -> k)
-      }.toList.flatten.groupBy(_._1).mapValues(_.map(_._2))
+      }.toList.flatten.groupBy(_._1).view.mapValues(_.map(_._2)).toMap
     }
   }
 

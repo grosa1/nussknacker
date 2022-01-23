@@ -7,7 +7,7 @@ import pl.touk.nussknacker.engine.api.util.{NotNothing, ReflectUtils}
 
 import scala.reflect.ClassTag
 import scala.reflect.runtime.universe._
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 import scala.collection.immutable.ListMap
 import scala.language.implicitConversions
 
@@ -210,7 +210,7 @@ object typing {
       }
     }
 
-    private def typeMapFields(map: Map[String, _]) = map.map {
+    private def typeMapFields(map: Map[String, _]) = map.map[String, TypingResult] {
         case (k, v) => k -> fromInstance(v)
       }.toList
 

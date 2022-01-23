@@ -34,7 +34,7 @@ import pl.touk.nussknacker.engine.util.process.EmptyProcessConfigCreator
 import java.time.Duration
 import java.util
 import java.util.Arrays.asList
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 import scala.collection.immutable.ListMap
 
 class TransformersTest extends FunSuite with FlinkSpec with Matchers with Inside {

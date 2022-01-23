@@ -29,6 +29,7 @@ import pl.touk.nussknacker.ui.api.helpers.TestFactory.{emptyProcessingTypeDataPr
 import pl.touk.nussknacker.ui.api.helpers.TestProcessingTypes
 import pl.touk.nussknacker.ui.validation.ProcessValidation
 import pl.touk.nussknacker.engine.spel.Implicits._
+import pl.touk.nussknacker.engine.util.Implicits.RichScalaMap
 
 class ProcessConverterSpec extends FunSuite with Matchers with TableDrivenPropertyChecks {
 
@@ -131,7 +132,7 @@ class ProcessConverterSpec extends FunSuite with Matchers with TableDrivenProper
     // because I'm lazy
     val displayableWithClearedTypingInfo = displayableProcess.copy(
       validationResult = displayableProcess.validationResult.copy(
-        nodeResults = displayableProcess.validationResult.nodeResults.mapValues(_.copy(typingInfo = Map.empty))
+        nodeResults = displayableProcess.validationResult.nodeResults.mapValuesNow(_.copy(typingInfo = Map.empty))
       )
     )
     displayableWithClearedTypingInfo shouldBe process

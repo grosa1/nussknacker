@@ -1,6 +1,7 @@
 package pl.touk.nussknacker.ui.process.subprocess
 
 import pl.touk.nussknacker.engine.canonicalgraph.CanonicalProcess
+import pl.touk.nussknacker.engine.util.Implicits.RichScalaMap
 import pl.touk.nussknacker.ui.db.{DbConfig, EspTables}
 import pl.touk.nussknacker.ui.process.marshall.ProcessConverter
 import slick.jdbc.JdbcProfile
@@ -47,7 +48,7 @@ class DbSubprocessRepository(db: DbConfig, ec: ExecutionContext) extends Subproc
     val fetchedSubprocesses = for {
       subprocesses <- versionSubprocesses
       latestSubprocesses <- listLatestSubprocesses()
-    } yield latestSubprocesses.groupBy(_.canonical.metaData.id).mapValues(_.head) ++ subprocesses.groupBy(_.canonical.metaData.id).mapValues(_.head)
+    } yield latestSubprocesses.groupBy(_.canonical.metaData.id).mapValuesNow(_.head) ++ subprocesses.groupBy(_.canonical.metaData.id).mapValuesNow(_.head)
 
     fetchedSubprocesses.map(_.values.toSet)
   }

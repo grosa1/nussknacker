@@ -293,6 +293,7 @@ class NussknackerAppInitializer(baseUnresolvedConfig: Config) extends LazyLoggin
       case Some(jdbcUrlPattern("postgresql")) => PostgresProfile
       case Some(jdbcUrlPattern("hsqldb")) => HsqldbProfile
       case None => HsqldbProfile
+      case _ => throw new IllegalArgumentException("Should not happen")
     }
   }
 

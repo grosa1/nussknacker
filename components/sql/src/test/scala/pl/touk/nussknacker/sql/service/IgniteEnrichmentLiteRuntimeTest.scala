@@ -10,7 +10,7 @@ import pl.touk.nussknacker.engine.testing.LocalModelData
 import pl.touk.nussknacker.sql.utils._
 import pl.touk.nussknacker.sql.utils.ignite.WithIgniteDB
 
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 
 class IgniteEnrichmentLiteRuntimeTest extends FunSuite with Matchers with LiteRuntimeTest with BeforeAndAfterAll
   with WithIgniteDB {

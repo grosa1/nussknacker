@@ -1,11 +1,9 @@
 package pl.touk.nussknacker.engine.util.cache
 
-import java.util.concurrent.Executor
-
 import com.github.benmanes.caffeine.cache
 import com.github.benmanes.caffeine.cache.{Caffeine, Expiry, Ticker}
 
-import scala.compat.java8.FunctionConverters.asJavaBiFunction
+import java.util.concurrent.Executor
 import scala.concurrent.duration.{Deadline, FiniteDuration, NANOSECONDS}
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -73,10 +71,10 @@ class DefaultAsyncCache[K, V](cacheConfig: CacheConfig[K, V], ticker: Ticker = T
 
 class SingleValueCache[T](expireAfterAccess: Option[FiniteDuration], expireAfterWrite: Option[FiniteDuration]) {
 
-  private val cache = new DefaultCache[Unit.type, T](CacheConfig(1, expireAfterAccess, expireAfterWrite))
+  private val cache = new DefaultCache[Unit, T](CacheConfig(1, expireAfterAccess, expireAfterWrite))
 
-  def getOrCreate(value: => T): T = cache.getOrCreate(Unit)(value)
+  def getOrCreate(value: => T): T = cache.getOrCreate(())(value)
 
-  def get(): Option[T] = cache.get(Unit)
-  def put(value: T): Unit = cache.put(Unit)(value)
+  def get(): Option[T] = cache.get(())
+  def put(value: T): Unit = cache.put(())(value)
 }

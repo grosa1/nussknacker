@@ -4,10 +4,11 @@ import org.scalatest.prop.TableDrivenPropertyChecks
 import org.scalatest.{FunSuite, Matchers}
 import pl.touk.nussknacker.engine.api.typed.typing.{Typed, TypedClass, TypedObjectTypingResult, TypingResult, Unknown}
 import pl.touk.nussknacker.engine.flink.util.transformer.aggregate.aggregates.{FirstAggregator, LastAggregator, ListAggregator, MapAggregator, MaxAggregator, MinAggregator, SetAggregator, SumAggregator}
+import pl.touk.nussknacker.engine.util.Implicits.RichScalaMap
+
 import java.lang.{Integer => JInt, Long => JLong}
 import java.util.{List => JList, Map => JMap, Set => JSet}
-
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 
 class AggregatesSpec extends FunSuite with TableDrivenPropertyChecks with Matchers {
 
@@ -61,11 +62,11 @@ class AggregatesSpec extends FunSuite with TableDrivenPropertyChecks with Matche
 
     val namedAggregators = aggregators.indices.map(id => s"field$id").zip(aggregators).tail.toMap
 
-    val mapAggregator = new MapAggregator(namedAggregators.mapValues(_._1.asInstanceOf[Aggregator]).asJava)
-    val input = TypedObjectTypingResult(namedAggregators.mapValues(_._2).toList, objType = Typed.typedClass[JMap[_, _]])
-    val el = namedAggregators.mapValues(_._3).asJava
-    val stored = TypedObjectTypingResult(namedAggregators.mapValues(_._4).toList, objType = Typed.typedClass(classOf[Map[_, _]], List(Typed[String], Unknown)))
-    val output = TypedObjectTypingResult(namedAggregators.mapValues(_._5).toList, objType = Typed.typedClass(classOf[JMap[_, _]], List(Typed[String], Unknown)))
+    val mapAggregator = new MapAggregator(namedAggregators.mapValuesNow(_._1.asInstanceOf[Aggregator]).asJava)
+    val input = TypedObjectTypingResult(namedAggregators.mapValuesNow(_._2).toList, objType = Typed.typedClass[JMap[_, _]])
+    val el = namedAggregators.mapValuesNow(_._3).asJava
+    val stored = TypedObjectTypingResult(namedAggregators.mapValuesNow(_._4).toList, objType = Typed.typedClass(classOf[Map[_, _]], List(Typed[String], Unknown)))
+    val output = TypedObjectTypingResult(namedAggregators.mapValuesNow(_._5).toList, objType = Typed.typedClass(classOf[JMap[_, _]], List(Typed[String], Unknown)))
     checkAggregator(mapAggregator, input, el, stored, output)
   }
 
@@ -76,7 +77,7 @@ class AggregatesSpec extends FunSuite with TableDrivenPropertyChecks with Matche
     val oldState = Map[String, AnyRef]("field1" -> (5: java.lang.Integer), "field0" -> "ddd")
 
     def resultFor(maps: Map[String, Any]*): AnyRef = aggregator.getResult(
-      maps.map(_.mapValues(_.asInstanceOf[AnyRef]).asJava).foldRight(oldState)(aggregator.addElement)
+      maps.map(_.mapValuesNow(_.asInstanceOf[AnyRef]).asJava).foldRight(oldState)(aggregator.addElement)
     )
 
     resultFor() shouldBe Map("field1" -> 5, "field2" -> null).asJava

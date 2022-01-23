@@ -10,7 +10,7 @@ import pl.touk.nussknacker.engine.flink.api.exception.{FlinkEspExceptionConsumer
 import pl.touk.nussknacker.engine.util.namespaces.DefaultNamespacedObjectNaming
 import pl.touk.nussknacker.test.ClassLoaderWithServices
 
-import scala.jdk.CollectionConverters.mapAsJavaMapConverter
+import scala.jdk.CollectionConverters._
 
 class FlinkExceptionHandlerSpec extends FunSuite with Matchers {
 

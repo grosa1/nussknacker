@@ -10,6 +10,7 @@ import pl.touk.nussknacker.engine.management.periodic.db.PeriodicProcessesReposi
 import pl.touk.nussknacker.engine.management.periodic.model.PeriodicProcessDeploymentStatus.PeriodicProcessDeploymentStatus
 import pl.touk.nussknacker.engine.management.periodic.model._
 import pl.touk.nussknacker.engine.marshall.ScenarioParser
+
 import java.time.chrono.ChronoLocalDateTime
 import java.time.{LocalDateTime, ZoneId}
 import java.util.concurrent.atomic.AtomicLong
@@ -46,7 +47,6 @@ class InMemPeriodicProcessesRepository extends PeriodicProcessesRepository {
 
   def addOnlyProcess(processName: ProcessName,
                      scheduleProperty: ScheduleProperty = CronScheduleProperty("0 0 * * * ?")): PeriodicProcessId = {
-    import pl.touk.nussknacker.engine.spel.Implicits.asSpelExpression
 
     val id = PeriodicProcessId(ProcessIdSequence.incrementAndGet())
     val entity = PeriodicProcessEntity(
@@ -149,7 +149,7 @@ class InMemPeriodicProcessesRepository extends PeriodicProcessesRepository {
   override def findProcessData(processName: ProcessName): Seq[PeriodicProcess] =
     processEntities
       .filter(activeProcess(processName))
-      .map(PeriodicProcessesRepository.createPeriodicProcess)
+      .map(PeriodicProcessesRepository.createPeriodicProcess).toList
 
   override def markDeployed(id: PeriodicProcessDeploymentId): Unit = {
     update(id)(_.copy(status = PeriodicProcessDeploymentStatus.Deployed, deployedAt = Some(LocalDateTime.now())))
@@ -202,10 +202,10 @@ class InMemPeriodicProcessesRepository extends PeriodicProcessesRepository {
   }
 
   private def findActive(status: PeriodicProcessDeploymentStatus): Seq[PeriodicProcessDeployment] =
-    for {
+    (for {
       p <- processEntities if p.active
       d <- deploymentEntities if d.periodicProcessId == p.id && d.status == status
-    } yield createPeriodicProcessDeployment(p, d)
+    } yield createPeriodicProcessDeployment(p, d)).toList
 
   private def readyToRun(deployments: Seq[PeriodicProcessDeployment]): Seq[PeriodicProcessDeployment] = {
     val now = LocalDateTime.now()

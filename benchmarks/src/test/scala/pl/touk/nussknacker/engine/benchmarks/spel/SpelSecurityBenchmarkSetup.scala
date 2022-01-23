@@ -1,7 +1,6 @@
 package pl.touk.nussknacker.engine.benchmarks.spel
 
 import cats.data.Validated.{Invalid, Valid}
-import org.openjdk.jmh.annotations._
 import pl.touk.nussknacker.engine.TypeDefinitionSet
 import pl.touk.nussknacker.engine.api.context.ProcessCompilationError.NodeId
 import pl.touk.nussknacker.engine.api.context.ValidationContext
@@ -12,8 +11,7 @@ import pl.touk.nussknacker.engine.compile.ExpressionCompiler
 import pl.touk.nussknacker.engine.definition.ProcessDefinitionExtractor.ExpressionDefinition
 import pl.touk.nussknacker.engine.dict.SimpleDictRegistry
 import pl.touk.nussknacker.engine.graph.expression.Expression
-
-import java.util.concurrent.TimeUnit
+import pl.touk.nussknacker.engine.util.Implicits.RichScalaMap
 
 /* This is helper class for testing SpEL expressions, see SampleSpelBenchmark for usage */
 class SpelSecurityBenchmarkSetup(expression: String, vars: Map[String, AnyRef]) {
@@ -26,7 +24,7 @@ class SpelSecurityBenchmarkSetup(expression: String, vars: Map[String, AnyRef]) 
   private val expressionCompiler = ExpressionCompiler.withOptimization(
     getClass.getClassLoader, new SimpleDictRegistry(Map.empty), expressionDefinition, settings = ClassExtractionSettings.Default, typeDefinitionSet = TypeDefinitionSet.empty)
 
-  private val validationContext = ValidationContext(vars.mapValues(Typed.fromInstance), Map.empty)
+  private val validationContext = ValidationContext(vars.mapValuesNow(Typed.fromInstance), Map.empty)
 
   private val compiledExpression = expressionCompiler.compile(Expression(language = "spel", expression = expression),
     None, validationContext, Unknown)(NodeId("")) match {

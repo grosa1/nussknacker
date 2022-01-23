@@ -16,7 +16,7 @@ import pl.touk.nussknacker.engine.util.process.EmptyProcessConfigCreator
 import pl.touk.nussknacker.test.{FailingContextClassloader, VeryPatientScalaFutures}
 
 import scala.concurrent.ExecutionContext.Implicits._
-import scala.jdk.CollectionConverters.mapAsJavaMapConverter
+import scala.jdk.CollectionConverters._
 import java.util.UUID
 
 trait BaseEmbeddedDeploymentManagerTest extends FunSuite with KafkaSpec with Matchers with VeryPatientScalaFutures {

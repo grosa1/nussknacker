@@ -76,7 +76,7 @@ class FlinkRestManagerSpec extends FunSuite with Matchers with PatientScalaFutur
                                        exceptionOnDeploy: Option[Exception] = None
                                       ): (FlinkRestManager, mutable.Buffer[HistoryEntry])
   = {
-    import scala.collection.JavaConverters._
+    import scala.jdk.CollectionConverters._
     val history: mutable.Buffer[HistoryEntry] = Collections.synchronizedList(new java.util.ArrayList[HistoryEntry]()).asScala
     val manager = createManagerWithBackend(SttpBackendStub.asynchronousFuture.whenRequestMatchesPartial { case req =>
       val toReturn = (req.uri.path, req.method) match {
@@ -112,6 +112,7 @@ class FlinkRestManagerSpec extends FunSuite with Matchers with PatientScalaFutur
         case (List("jars", "upload"), Method.POST) if acceptDeploy =>
           history.append(HistoryEntry("uploadJar", None))
           UploadJarResponse(uploadedJarPath)
+        case _ => throw new IllegalArgumentException("Should not happen")
       }
       Response(Right(toReturn), statusCode)
     })

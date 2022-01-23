@@ -5,7 +5,6 @@ import org.apache.flink.api.common.ExecutionConfig
 import org.apache.flink.api.common.typeinfo.TypeInformation
 import org.apache.flink.api.common.typeutils.{CompositeTypeSerializerUtil, TypeSerializer, TypeSerializerSchemaCompatibility, TypeSerializerSnapshot}
 import org.apache.flink.core.memory.{DataInputView, DataOutputView}
-import org.apache.flink.util.InstantiationUtil
 
 import scala.reflect.ClassTag
 
@@ -44,7 +43,7 @@ abstract class TypedObjectBasedTypeInformation[T:ClassTag](informations: Array[(
       case (k, v) => (k, v.createSerializer(config))
     }.asInstanceOf[Array[(String, TypeSerializer[_])]])
 
-  override def canEqual(obj: Any): Boolean = obj.isInstanceOf[TypedObjectBasedTypeInformation[T]]
+  override def canEqual(obj: Any): Boolean = obj.isInstanceOf[TypedObjectBasedTypeInformation[T@unchecked]]
 
   def createSerializer(serializers: Array[(String, TypeSerializer[_])]): TypeSerializer[T]
 }

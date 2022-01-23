@@ -26,7 +26,7 @@ class SharedServiceSpec extends FunSuite with Matchers {
   }
 
   test("should returned cached instance") {
-    val first::others = (1 to 10).par.map(_ => TestSharedServiceHolder.retrieveService("test1")).toList
+    val first::others = (1 to 10).map(_ => TestSharedServiceHolder.retrieveService("test1")).toList
     others.foreach { service =>
       //we test reference equality here!
       first eq service shouldBe true
@@ -50,11 +50,11 @@ class SharedServiceSpec extends FunSuite with Matchers {
     val data = "closing"
 
     val total = 100
-    (1 to total).par.foreach(_ => TestSharedServiceHolder.retrieveService(data))
+    (1 to total).foreach(_ => TestSharedServiceHolder.retrieveService(data))
     val oneMore = TestSharedServiceHolder.retrieveService(data)
     oneMore.isClosed.get() shouldBe false
 
-    (1 to total).par.foreach(_ => TestSharedServiceHolder.returnService(data))
+    (1 to total).foreach(_ => TestSharedServiceHolder.returnService(data))
     oneMore.isClosed.get() shouldBe false
     TestSharedServiceHolder.returnService(data)
     oneMore.isClosed.get() shouldBe true

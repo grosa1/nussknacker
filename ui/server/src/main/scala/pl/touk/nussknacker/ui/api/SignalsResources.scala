@@ -7,6 +7,7 @@ import de.heikoseeberger.akkahttpcirce.FailFastCirceSupport
 import io.circe.generic.JsonCodec
 import pl.touk.nussknacker.engine.ModelData
 import pl.touk.nussknacker.engine.definition.SignalDispatcher
+import pl.touk.nussknacker.engine.util.Implicits.RichScalaMap
 import pl.touk.nussknacker.ui.process.ProcessObjectsFinder
 import pl.touk.nussknacker.ui.process.repository.FetchingProcessRepository
 import pl.touk.nussknacker.restmodel.displayedgraph.DisplayableProcess
@@ -33,7 +34,7 @@ class SignalsResources(modelData: ProcessingTypeDataProvider[ModelData],
             complete {
               processRepository.fetchLatestProcessDetailsForProcessId[Unit](processId.id).map[ToResponseMarshallable] {
                 case Some(process) =>
-                  SignalDispatcher.dispatchSignal(modelData.forTypeUnsafe(process.processingType))(signalType, processId.name.value, params.mapValues(_.asInstanceOf[AnyRef]))
+                  SignalDispatcher.dispatchSignal(modelData.forTypeUnsafe(process.processingType))(signalType, processId.name.value, params.mapValuesNow(_.asInstanceOf[AnyRef]))
                 case None =>
                   HttpResponse(status = StatusCodes.NotFound, entity = "Scenario not found")
               }

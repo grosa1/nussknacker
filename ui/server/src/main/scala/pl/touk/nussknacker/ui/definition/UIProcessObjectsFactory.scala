@@ -52,9 +52,9 @@ object UIProcessObjectsFactory {
 
     val customTransformerAdditionalData = chosenProcessDefinition.customStreamTransformers.mapValuesNow(_._2)
 
-    val dynamicComponentsConfig = uiProcessDefinition.allDefinitions.mapValues(_.componentConfig)
+    val dynamicComponentsConfig = uiProcessDefinition.allDefinitions.mapValuesNow(_.componentConfig)
 
-    val subprocessesComponentsConfig = subprocessInputs.mapValues(_.componentConfig)
+    val subprocessesComponentsConfig = subprocessInputs.mapValuesNow(_.componentConfig)
     //we append fixedComponentsConfig, because configuration of default components (filters, switches) etc. will not be present in dynamicComponentsConfig...
     //maybe we can put them also in uiProcessDefinition.allDefinitions?
     val finalComponentsConfig = ComponentDefinitionPreparer.combineComponentsConfig(subprocessesComponentsConfig, fixedComponentsUiConfig, dynamicComponentsConfig)
@@ -64,7 +64,7 @@ object UIProcessObjectsFactory {
     val additionalPropertiesConfig = processConfig
       .getOrElse[Map[String, AdditionalPropertyConfig]]("additionalPropertiesConfig", Map.empty)
       .filter(_ => !isSubprocess) // fixme: it should be introduced separate config for additionalPropertiesConfig for fragments. For now we skip that
-      .mapValues(createUIAdditionalPropertyConfig)
+      .mapValuesNow(createUIAdditionalPropertyConfig)
 
     val defaultUseAsyncInterpretationFromConfig = processConfig.as[Option[Boolean]]("asyncExecutionConfig.defaultUseAsyncInterpretation")
     val defaultAsyncInterpretation: DefaultAsyncInterpretationValue = DefaultAsyncInterpretationValueDeterminer.determine(defaultUseAsyncInterpretationFromConfig)
@@ -94,8 +94,8 @@ object UIProcessObjectsFactory {
 
   private def prepareClazzDefinition(definition: ClazzDefinition): UIClazzDefinition = {
     // TODO: present all overloaded methods on FE
-    val methodsWithHighestArity = definition.methods.mapValues(_.maxBy(_.parameters.size))
-    val staticMethodsWithHighestArity = definition.staticMethods.mapValues(_.maxBy(_.parameters.size))
+    val methodsWithHighestArity = definition.methods.mapValuesNow(_.maxBy(_.parameters.size))
+    val staticMethodsWithHighestArity = definition.staticMethods.mapValuesNow(_.maxBy(_.parameters.size))
     UIClazzDefinition(definition.clazzName, methodsWithHighestArity, staticMethodsWithHighestArity)
   }
 
@@ -148,13 +148,13 @@ object UIProcessObjectsFactory {
                                 processCategoryService: ProcessCategoryService): UIProcessDefinition = {
     def createUIObjectDef(objDef: ObjectDefinition) = createUIObjectDefinition(objDef, processCategoryService)
     val uiProcessDefinition = UIProcessDefinition(
-      services = processDefinition.services.mapValues(createUIObjectDef),
-      sourceFactories = processDefinition.sourceFactories.mapValues(createUIObjectDef),
-      sinkFactories = processDefinition.sinkFactories.mapValues(createUIObjectDef),
-      subprocessInputs = subprocessInputs.mapValues(createUIObjectDef),
-      customStreamTransformers = processDefinition.customStreamTransformers.mapValues(e => createUIObjectDef(e._1)),
-      signalsWithTransformers = processDefinition.signalsWithTransformers.mapValues(e => createUIObjectDef(e._1)),
-      globalVariables = processDefinition.expressionConfig.globalVariables.mapValues(createUIObjectDef),
+      services = processDefinition.services.mapValuesNow(createUIObjectDef),
+      sourceFactories = processDefinition.sourceFactories.mapValuesNow(createUIObjectDef),
+      sinkFactories = processDefinition.sinkFactories.mapValuesNow(createUIObjectDef),
+      subprocessInputs = subprocessInputs.mapValuesNow(createUIObjectDef),
+      customStreamTransformers = processDefinition.customStreamTransformers.mapValuesNow(e => createUIObjectDef(e._1)),
+      signalsWithTransformers = processDefinition.signalsWithTransformers.mapValuesNow(e => createUIObjectDef(e._1)),
+      globalVariables = processDefinition.expressionConfig.globalVariables.mapValuesNow(createUIObjectDef),
       typesInformation = types
     )
     uiProcessDefinition

@@ -11,7 +11,7 @@ import pl.touk.nussknacker.engine.api.definition._
 import pl.touk.nussknacker.engine.api.process._
 import pl.touk.nussknacker.engine.api.test.{NewLineSplittedTestDataParser, TestDataParser}
 import pl.touk.nussknacker.engine.api.typed.typing.{Typed, TypedObjectTypingResult, Unknown}
-import pl.touk.nussknacker.engine.compile.validationHelpers.MissingParamHandleGenericNodeTransformation
+import pl.touk.nussknacker.engine.util.Implicits.RichScalaMap
 
 import scala.concurrent.Future
 
@@ -226,7 +226,7 @@ object validationHelpers {
       case TransformationStep(("paramWithFixedValues", DefinedEagerParameter(paramWithFixedValues: Int, _)) :: Nil, _) =>
         FinalResults(context, state = Some(Valid(paramWithFixedValues)))
       case TransformationStep(("paramWithFixedValues", FailedToDefineParameter) :: Nil, _) =>
-        FinalResults(context, state = Some(Invalid(Unit)))
+        FinalResults(context, state = Some(Invalid(())))
     }
 
     override def implementation(params: Map[String, Any], dependencies: List[NodeDependencyValue], finalState: Option[State]): Validated[Unit, Int] = finalState.get
@@ -372,7 +372,7 @@ object validationHelpers {
           Some("isLeft"))) else Nil
         NextParameters(
           List(Parameter[Any]("rightValue").copy(isLazyParameter = true,
-            additionalVariables = contexts(right(byBranch)).localVariables.mapValues(AdditionalVariableProvidedInRuntime(_)))), error)
+            additionalVariables = contexts(right(byBranch)).localVariables.mapValuesNow(AdditionalVariableProvidedInRuntime(_)))), error)
       case TransformationStep(("isLeft", DefinedEagerBranchParameter(byBranch: Map[String, Boolean]@unchecked, _)) :: ("rightValue", rightValue: DefinedSingleParameter) ::Nil, _)
         =>
         val out = rightValue.returnType

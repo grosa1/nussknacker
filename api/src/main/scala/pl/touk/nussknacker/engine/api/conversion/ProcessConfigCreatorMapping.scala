@@ -6,7 +6,7 @@ import pl.touk.nussknacker.engine.api.{CustomStreamTransformer, ProcessListener,
 
 object ProcessConfigCreatorMapping {
 
-  import scala.collection.JavaConverters._
+  import scala.jdk.CollectionConverters._
 
     def toProcessConfigCreator(creator: pl.touk.nussknacker.engine.javaapi.process.ProcessConfigCreator): ProcessConfigCreator =
       javaToScala(creator)
@@ -54,9 +54,9 @@ object ProcessConfigCreatorMapping {
       override def classExtractionSettings(processObjectDependencies: ProcessObjectDependencies): ClassExtractionSettings = {
         val jSettings = jcreator.classExtractionSettings(processObjectDependencies)
         ClassExtractionSettings(
-          jSettings.getExcludeClassPredicates.asScala,
-          jSettings.getExcludeClassMemberPredicates.asScala,
-          jSettings.getIncludeClassMemberPredicates.asScala,
+          jSettings.getExcludeClassPredicates.asScala.toSeq,
+          jSettings.getExcludeClassMemberPredicates.asScala.toSeq,
+          jSettings.getIncludeClassMemberPredicates.asScala.toSeq,
           jSettings.getPropertyExtractionStrategy)
       }
     }

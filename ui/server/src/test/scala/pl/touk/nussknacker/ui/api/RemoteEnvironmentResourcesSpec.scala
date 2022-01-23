@@ -11,6 +11,7 @@ import pl.touk.nussknacker.engine.api.process.ProcessName
 import pl.touk.nussknacker.engine.api.typed.typing.Unknown
 import pl.touk.nussknacker.engine.graph.expression.Expression
 import pl.touk.nussknacker.engine.graph.node.Filter
+import pl.touk.nussknacker.engine.util.Implicits.RichScalaMap
 import pl.touk.nussknacker.restmodel.displayedgraph.{DisplayableProcess, ValidatedDisplayableProcess}
 import pl.touk.nussknacker.restmodel.processdetails
 import pl.touk.nussknacker.restmodel.processdetails.ProcessVersion
@@ -169,7 +170,7 @@ class RemoteEnvironmentResourcesSpec extends FlatSpec with ScalatestRouteTest wi
   private def withDecodedTypes(process: ValidatedDisplayableProcess) = {
     val validationResult = process.validationResult
     process.copy(validationResult = validationResult.copy(nodeResults = validationResult
-        .nodeResults.mapValues(v => v.copy(variableTypes = v.variableTypes.mapValues(_ => Unknown)))))
+        .nodeResults.mapValuesNow(v => v.copy(variableTypes = v.variableTypes.mapValuesNow(_ => Unknown)))))
   }
 
   class MockRemoteEnvironment(testMigrationResults: List[TestMigrationResult] = List(),

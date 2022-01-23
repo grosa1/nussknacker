@@ -8,7 +8,7 @@ import pl.touk.nussknacker.engine.api.typed.typing.{SingleTypingResult, Typed, T
 import pl.touk.nussknacker.openapi.parser.SwaggerRefSchemas
 
 import scala.annotation.tailrec
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 
 @JsonCodec sealed trait SwaggerTyped { self =>
   def typingResult: SingleTypingResult =

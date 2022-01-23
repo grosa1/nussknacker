@@ -15,6 +15,7 @@ import pl.touk.nussknacker.engine.expression.ExpressionEvaluator
 import pl.touk.nussknacker.engine.graph.EspProcess
 import pl.touk.nussknacker.engine.graph.node.{NodeData, WithComponent}
 import pl.touk.nussknacker.engine.resultcollector.ResultCollector
+import pl.touk.nussknacker.engine.util.Implicits.RichScalaMap
 import pl.touk.nussknacker.engine.variables.GlobalVariablesPreparer
 import pl.touk.nussknacker.engine.{Interpreter, TypeDefinitionSet}
 
@@ -60,7 +61,7 @@ object ProcessCompilerData {
       interpreter,
       process,
       listeners,
-      servicesDefs.mapValues(_.obj.asInstanceOf[Lifecycle])
+      servicesDefs.mapValuesNow(_.obj.asInstanceOf[Lifecycle])
     )
 
   }

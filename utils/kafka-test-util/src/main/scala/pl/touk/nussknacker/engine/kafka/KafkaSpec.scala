@@ -24,6 +24,7 @@ trait KafkaSpec extends BeforeAndAfterAll with WithConfig { self: Suite =>
           zkPort = zkPort,
           kafkaBrokerConfig = kafkaBrokerConfig
         )
+      case _ => throw new IllegalArgumentException("Should not happen")
     }
     kafkaClient = new KafkaClient(kafkaAddress = kafkaZookeeperServer.kafkaAddress, self.suiteName)
   }

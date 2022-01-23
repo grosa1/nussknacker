@@ -22,7 +22,7 @@ import pl.touk.nussknacker.engine.kafka.source.flink.FlinkKafkaSource.defaultMax
 
 import java.time.Duration
 import scala.annotation.nowarn
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 
 class FlinkKafkaSource[T](preparedTopics: List[PreparedKafkaTopic],
                           val kafkaConfig: KafkaConfig,

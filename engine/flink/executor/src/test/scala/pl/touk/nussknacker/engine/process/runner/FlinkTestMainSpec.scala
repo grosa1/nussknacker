@@ -25,7 +25,7 @@ import scala.concurrent.{Await, Future}
 
 class FlinkTestMainSpec extends FunSuite with Matchers with Inside with BeforeAndAfterEach {
 
-  import scala.collection.JavaConverters._
+  import scala.jdk.CollectionConverters._
   import spel.Implicits._
 
   override protected def beforeEach(): Unit = {

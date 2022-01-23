@@ -7,7 +7,7 @@ import org.apache.flink.api.common.time.Time
 import org.scalatest.{FunSuite, Matchers}
 import pl.touk.nussknacker.engine.api.{MetaData, ProcessAdditionalFields, StreamMetaData}
 
-import scala.jdk.CollectionConverters.mapAsJavaMapConverter
+import scala.jdk.CollectionConverters._
 
 class RestartStrategyFromConfigurationSpec extends FunSuite with Matchers {
 

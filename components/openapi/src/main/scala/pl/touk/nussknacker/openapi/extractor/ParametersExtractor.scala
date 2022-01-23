@@ -6,7 +6,7 @@ import pl.touk.nussknacker.openapi._
 object ParametersExtractor {
 
   def queryParams(paramDef: QueryParameter, paramInput: Any): List[(String, String)] = {
-    import scala.collection.JavaConverters._
+    import scala.jdk.CollectionConverters._
     paramDef.`type` match {
       case SwaggerObject(fieldDefs, _) =>
         val inputs = paramInput.asInstanceOf[java.util.Map[String, AnyRef]].asScala

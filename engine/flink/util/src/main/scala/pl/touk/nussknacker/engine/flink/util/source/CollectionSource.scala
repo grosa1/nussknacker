@@ -8,7 +8,7 @@ import pl.touk.nussknacker.engine.api.typed.ReturningType
 import pl.touk.nussknacker.engine.flink.api.process.BasicFlinkSource
 import pl.touk.nussknacker.engine.flink.api.timestampwatermark.TimestampWatermarkHandler
 
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 
 case class CollectionSource[T: TypeInformation](config: ExecutionConfig,
                                                 list: List[T],

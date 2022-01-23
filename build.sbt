@@ -16,7 +16,7 @@ import scala.xml.transform.{RewriteRule, RuleTransformer}
 
 // Warning: Flink doesn't work correctly with 2.12.11
 // Warning: 2.12.13 + crossVersion break sbt-scoverage: https://github.com/scoverage/sbt-scoverage/issues/319
-val scala212 = "2.12.10"
+val scala212 = "2.13.8"
 lazy val supportedScalaVersions = List(scala212)
 
 // Silencer must be compatible with exact scala version - see compatibility matrix: https://search.maven.org/search?q=silencer-plugin
@@ -24,7 +24,7 @@ lazy val supportedScalaVersions = List(scala212)
 // Silencer (and all '@silent' annotations) can be removed after we can upgrade to 2.12.13...
 // https://www.scala-lang.org/2021/01/12/configuring-and-suppressing-warnings.html
 val silencerV_2_12 = "1.6.0"
-val silencerV = "1.7.0"
+val silencerV = "1.7.8"
 
 //TODO: replace configuration by system properties with configuration via environment after removing travis scripts
 //then we can change names to snake case, for "normal" env variables
@@ -169,20 +169,21 @@ lazy val commonSettings =
       ),
       // We ignore k8s tests to keep development setup low-dependency
       Test / testOptions ++= Seq(scalaTestReports, ignoreSlowTests, ignoreExternalDepsTests),
-      addCompilerPlugin("org.scalamacros" % "paradise" % "2.1.1" cross CrossVersion.full),
+      //addCompilerPlugin("org.scalamacros" % "paradise" % "2.1.1" cross CrossVersion.full),
       addCompilerPlugin("org.typelevel" % "kind-projector" % "0.13.2" cross CrossVersion.full),
       // We can't use addCompilerPlugin because it not support usage of scalaVersion.value
       libraryDependencies += compilerPlugin("com.github.ghik" % "silencer-plugin" % forScalaVersion(scalaVersion.value,
         silencerV, (2, 12) -> silencerV_2_12) cross CrossVersion.full),
       scalacOptions := Seq(
         "-unchecked",
-        "-deprecation",
+        //"-deprecation",
         "-encoding", "utf8",
         "-Xfatal-warnings",
         "-feature",
         "-language:postfixOps",
         "-language:existentials",
-        "-Ypartial-unification",
+        //"-Ypartial-unification",
+        "-Ymacro-annotations",
         // We use jdk standard lib classes from java 11, but Scala 2.12 does not support target > 8 and
         // -release option has no influence on class version so we at least setup target to 8 and check java version
         // at the begining of our Apps
@@ -249,8 +250,7 @@ val flinkV = "1.15-SNAPSHOT"
 val avroV = "1.9.2" // for java time logical types conversions purpose
 //we should use max(version used by confluent, version used by flink), https://docs.confluent.io/platform/current/installation/versions-interoperability.html - confluent version reference
 //however, we stick to 2.4.1, as it's last version supported by scala 2.11 (we use kafka server in tests...)
-val kafkaV = "2.4.1"
-val kafkaServerV = "2.4.1"
+val kafkaV = "3.0.0"
 val springV = "5.1.19.RELEASE"
 val scalaTestV = "3.0.8"
 val scalaCheckV = "1.14.0"
@@ -263,7 +263,7 @@ val scalaParsersV = "1.0.4"
 val everitSchemaV = "1.13.0"
 val slf4jV = "1.7.30"
 val scalaLoggingV = "3.9.2"
-val scalaCompatV = "0.9.1"
+val scalaCompatV = "1.0.0"
 val ficusV = "1.4.7"
 val configV = "1.4.1"
 val commonsLangV = "3.3.2"
@@ -1245,6 +1245,7 @@ lazy val ui = (project in file("ui/server"))
         //It's needed by flinkDeploymentManager which has disabled includingScala
         "org.scala-lang" % "scala-compiler" % scalaVersion.value,
         "org.scala-lang" % "scala-reflect" % scalaVersion.value,
+        "org.scala-lang.modules" %% "scala-xml" % "1.2.0",
 
         "com.typesafe.slick" %% "slick" % slickV,
         "com.typesafe.slick" %% "slick-hikaricp" % slickV,

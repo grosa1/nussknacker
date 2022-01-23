@@ -16,7 +16,7 @@ import pl.touk.nussknacker.engine.process.registrar.FlinkProcessRegistrar
 import pl.touk.nussknacker.engine.testing.LocalModelData
 import pl.touk.nussknacker.test.PatientScalaFutures
 
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 
 class FlinkStreamingProcessRegistrarOperatorUidSpec extends FunSuite with ProcessTestHelpers with Matchers with OptionValues with PatientScalaFutures {
 

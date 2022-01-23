@@ -14,8 +14,7 @@ import pl.touk.nussknacker.engine.kafka.KafkaTestUtils.richConsumer
 import pl.touk.nussknacker.engine.marshall.ScenarioParser
 import pl.touk.nussknacker.engine.spel.Implicits._
 import pl.touk.nussknacker.streaming.embedded.EmbeddedStateStatus.DetailedFailedStateStatus
-
-import scala.jdk.CollectionConverters.mapAsJavaMapConverter
+import scala.jdk.CollectionConverters._
 
 class EmbeddedDeploymentManagerTest extends BaseEmbeddedDeploymentManagerTest {
 

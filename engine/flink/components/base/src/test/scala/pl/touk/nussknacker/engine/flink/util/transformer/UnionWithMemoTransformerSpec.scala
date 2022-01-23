@@ -25,7 +25,7 @@ import pl.touk.nussknacker.test.VeryPatientScalaFutures
 import java.time.Duration
 import java.util.concurrent.ConcurrentLinkedQueue
 import java.{util => jul}
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 
 class UnionWithMemoTransformerSpec extends FunSuite with FlinkSpec with Matchers with VeryPatientScalaFutures {
 

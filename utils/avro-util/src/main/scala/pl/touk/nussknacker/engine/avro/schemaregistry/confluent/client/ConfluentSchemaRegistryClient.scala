@@ -8,7 +8,7 @@ import io.confluent.kafka.schemaregistry.client.{SchemaRegistryClient => CSchema
 import pl.touk.nussknacker.engine.avro.AvroUtils
 import pl.touk.nussknacker.engine.avro.schemaregistry._
 import pl.touk.nussknacker.engine.avro.schemaregistry.confluent.ConfluentUtils
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 
 trait ConfluentSchemaRegistryClient extends SchemaRegistryClient with LazyLogging {
 

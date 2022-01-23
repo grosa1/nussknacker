@@ -6,6 +6,7 @@ import pl.touk.nussknacker.engine.canonicalgraph.canonicalnode._
 import pl.touk.nussknacker.engine.canonicalgraph.{CanonicalProcess, canonicalnode}
 import pl.touk.nussknacker.engine.graph.node._
 import pl.touk.nussknacker.engine.marshall.ProcessMarshaller
+import pl.touk.nussknacker.engine.util.Implicits.RichScalaMap
 import pl.touk.nussknacker.restmodel.displayedgraph.displayablenode.EdgeType.SubprocessOutput
 import pl.touk.nussknacker.restmodel.displayedgraph.displayablenode.{Edge, EdgeType}
 import pl.touk.nussknacker.restmodel.displayedgraph.{DisplayableProcess, ProcessProperties, displayablenode}
@@ -102,7 +103,7 @@ object ProcessConverter {
   }
 
   def fromDisplayable(process: DisplayableProcess): CanonicalProcess = {
-    val nodesMap = process.nodes.groupBy(_.id).mapValues(_.head)
+    val nodesMap = process.nodes.groupBy(_.id).mapValuesNow(_.head)
     val edgesFromMapStart = process.edges.groupBy(_.from)
     val rootsUnflattened = findRootNodes(process).map(headNode => unFlattenNode(nodesMap, None)(headNode, edgesFromMapStart))
     val nodes = rootsUnflattened.headOption.getOrElse(List.empty)

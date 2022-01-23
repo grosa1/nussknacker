@@ -8,6 +8,7 @@ import pl.touk.nussknacker.engine.graph.evaluatedparam
 import pl.touk.nussknacker.engine.graph.node.SubprocessInputDefinition.{SubprocessClazzRef, SubprocessParameter}
 import pl.touk.nussknacker.engine.graph.node.{Source, SubprocessInput, SubprocessInputDefinition}
 import pl.touk.nussknacker.engine.spel.Implicits._
+import pl.touk.nussknacker.engine.util.Implicits.RichScalaMap
 import pl.touk.nussknacker.restmodel.displayedgraph.ValidatedDisplayableProcess
 import pl.touk.nussknacker.restmodel.validation.ValidationResults.{ValidationErrors, ValidationResult, ValidationWarnings}
 import pl.touk.nussknacker.ui.api.helpers.TestProcessUtil._
@@ -141,7 +142,7 @@ class TestModelMigrationsSpec extends FunSuite with Matchers {
   }
 
   private def errorTypes(validationResult: ValidationResult): Map[String, List[String]]
-  = validationResult.errors.invalidNodes.mapValues(_.map(_.typ))
+  = validationResult.errors.invalidNodes.mapValuesNow(_.map(_.typ))
 
   private def newTestModelMigrations(testMigrations: TestMigrations): TestModelMigrations = {
     new TestModelMigrations(mapProcessingTypeDataProvider(Streaming -> testMigrations), processValidation)

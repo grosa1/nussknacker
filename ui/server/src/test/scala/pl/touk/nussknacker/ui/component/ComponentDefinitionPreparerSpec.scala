@@ -10,6 +10,7 @@ import pl.touk.nussknacker.engine.graph.expression.Expression
 import pl.touk.nussknacker.engine.graph.node.WithParameters
 import pl.touk.nussknacker.engine.testing.ProcessDefinitionBuilder
 import pl.touk.nussknacker.engine.testing.ProcessDefinitionBuilder.ObjectProcessDefinition
+import pl.touk.nussknacker.engine.util.Implicits.RichScalaMap
 import pl.touk.nussknacker.restmodel.definition.{ComponentGroup, NodeEdges, NodeTypeId}
 import pl.touk.nussknacker.restmodel.displayedgraph.displayablenode.EdgeType._
 import pl.touk.nussknacker.ui.api.helpers.{ProcessTestData, TestFactory, TestPermissions, TestProcessingTypes}
@@ -152,16 +153,16 @@ class ComponentDefinitionPreparerSpec extends FunSuite with Matchers with TestPe
 
   test("should merge default value maps") {
     val fixed = Map(
-      "service" -> SingleComponentConfig(Some(Map("a" -> "x", "b" -> "y").mapValues(dv => ParameterConfig(Some(dv), None, None, None))), None, Some("doc"), None, None)
+      "service" -> SingleComponentConfig(Some(Map("a" -> "x", "b" -> "y").mapValuesNow(dv => ParameterConfig(Some(dv), None, None, None))), None, Some("doc"), None, None)
     )
 
     val dynamic = Map(
-      "service" -> SingleComponentConfig(Some(Map("a" -> "xx", "c" -> "z").mapValues(dv => ParameterConfig(Some(dv), None, None, None))), None, Some("doc1"), None, None)
+      "service" -> SingleComponentConfig(Some(Map("a" -> "xx", "c" -> "z").mapValuesNow(dv => ParameterConfig(Some(dv), None, None, None))), None, Some("doc1"), None, None)
     )
 
     val expected = Map(
       "service" -> SingleComponentConfig(
-        Some(Map("a" -> "x", "b" -> "y", "c" -> "z").mapValues(dv => ParameterConfig(Some(dv), None, None, None))),
+        Some(Map("a" -> "x", "b" -> "y", "c" -> "z").mapValuesNow(dv => ParameterConfig(Some(dv), None, None, None))),
         None,
         Some("doc"),
         None,
@@ -181,8 +182,8 @@ class ComponentDefinitionPreparerSpec extends FunSuite with Matchers with TestPe
     // TODO: this is a copy paste from UIProcessObjectsFactory.prepareUIProcessObjects - should be refactored somehow
     val subprocessInputs = Map[String, ObjectDefinition]()
     val uiProcessDefinition = UIProcessObjectsFactory.createUIProcessDefinition(processDefinition, subprocessInputs, Set.empty, processCategoryService)
-    val dynamicComponentsConfig = uiProcessDefinition.allDefinitions.mapValues(_.componentConfig)
-    val fixedComponentsConfig = fixedConfig.mapValues(v => SingleComponentConfig(None, None, None, Some(ComponentGroupName(v)), None))
+    val dynamicComponentsConfig = uiProcessDefinition.allDefinitions.mapValuesNow(_.componentConfig)
+    val fixedComponentsConfig = fixedConfig.mapValuesNow(v => SingleComponentConfig(None, None, None, Some(ComponentGroupName(v)), None))
     val componentsConfig = ComponentDefinitionPreparer.combineComponentsConfig(fixedComponentsConfig, dynamicComponentsConfig)
 
     val groups = ComponentDefinitionPreparer.prepareComponentsGroupList(
@@ -192,7 +193,7 @@ class ComponentDefinitionPreparerSpec extends FunSuite with Matchers with TestPe
       componentsConfig = componentsConfig,
       componentsGroupMapping = componentsGroupMapping,
       processCategoryService = processCategoryService,
-      customTransformerAdditionalData = processDefinition.customStreamTransformers.mapValues(_._2),
+      customTransformerAdditionalData = processDefinition.customStreamTransformers.mapValuesNow(_._2),
       TestProcessingTypes.Streaming
     )
     groups
@@ -207,7 +208,7 @@ class ComponentDefinitionPreparerSpec extends FunSuite with Matchers with TestPe
       componentsConfig = Map(),
       componentsGroupMapping =  Map(),
       processCategoryService = processCategoryService,
-      customTransformerAdditionalData = processDefinition.customStreamTransformers.mapValues(_._2),
+      customTransformerAdditionalData = processDefinition.customStreamTransformers.mapValuesNow(_._2),
       TestProcessingTypes.Streaming
     )
     groups

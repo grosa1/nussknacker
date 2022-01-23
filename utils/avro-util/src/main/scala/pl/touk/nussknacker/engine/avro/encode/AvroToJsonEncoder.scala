@@ -3,7 +3,7 @@ package pl.touk.nussknacker.engine.avro.encode
 import io.circe.Json
 import pl.touk.nussknacker.engine.util.json.{BestEffortJsonEncoder, ToJsonEncoder}
 
-import scala.jdk.CollectionConverters.asScalaBufferConverter
+import scala.jdk.CollectionConverters._
 
 class AvroToJsonEncoder extends ToJsonEncoder {
 

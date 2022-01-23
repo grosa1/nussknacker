@@ -21,7 +21,7 @@ import scala.math.BigDecimal.RoundingMode
 
 class BestEffortAvroEncoder(avroSchemaEvolution: AvroSchemaEvolution, validationMode: ValidationMode) {
 
-  import scala.collection.JavaConverters._
+  import scala.jdk.CollectionConverters._
 
   type WithError[T] = ValidatedNel[String, T]
 
@@ -82,13 +82,13 @@ class BestEffortAvroEncoder(avroSchemaEvolution: AvroSchemaEvolution, validation
       case (Schema.Type.FIXED | Schema.Type.BYTES, number: Number) if schema.getLogicalType != null && schema.getLogicalType.isInstanceOf[LogicalTypes.Decimal] =>
         Valid(alignDecimalScale(new java.math.BigDecimal(number.toString), schema))
       case (Schema.Type.INT, number: Number) =>
-        Valid(number.intValue().underlying())
+        Valid(number.intValue(): java.lang.Integer)
       case (Schema.Type.INT, time: LocalTime) if schema.getLogicalType == LogicalTypes.timeMillis() =>
         Valid(time)
       case (Schema.Type.INT, time: LocalDate) if schema.getLogicalType == LogicalTypes.date() =>
         Valid(time)
       case (Schema.Type.LONG, number: Number) =>
-        Valid(number.longValue().underlying())
+        Valid(number.longValue(): java.lang.Long)
       case (Schema.Type.LONG, instant: Instant) if schema.getLogicalType == LogicalTypes.timestampMillis() || schema.getLogicalType == LogicalTypes.timestampMicros() =>
         Valid(instant)
       case (Schema.Type.LONG, zoned: ChronoZonedDateTime[_]) if schema.getLogicalType == LogicalTypes.timestampMillis() || schema.getLogicalType == LogicalTypes.timestampMicros() =>
@@ -98,9 +98,9 @@ class BestEffortAvroEncoder(avroSchemaEvolution: AvroSchemaEvolution, validation
       case (Schema.Type.LONG, time: LocalTime) if schema.getLogicalType == LogicalTypes.timeMicros() =>
         Valid(time)
       case (Schema.Type.FLOAT, number: Number) =>
-        Valid(number.floatValue().underlying())
+        Valid(number.floatValue(): java.lang.Float)
       case (Schema.Type.DOUBLE, number: Number) =>
-        Valid(number.doubleValue().underlying())
+        Valid(number.doubleValue(): java.lang.Double)
       case (Schema.Type.BOOLEAN, boolean: java.lang.Boolean) =>
         Valid(boolean)
       case (Schema.Type.NULL, null) =>
@@ -163,14 +163,14 @@ class BestEffortAvroEncoder(avroSchemaEvolution: AvroSchemaEvolution, validation
   }
 
   private def encodeMap(map: collection.Map[_, _], schema: Schema): WithError[util.Map[CharSequence, AnyRef]] = {
-    map.map {
+    map.toList.map {
       case (k: String, v) =>
         encode(v, schema.getValueType, Some(k)).map(encodeString(k) -> _)
       case (k: CharSequence, v) =>
         encode(v, schema.getValueType, Some(k.toString)).map(k -> _)
       case (k, v) =>
         error(s"Not expected type: ${k.getClass.getName} as a key of map for schema: $schema")
-    }.toList.sequence.map(m => new util.HashMap(m.toMap.asJava))
+    }.sequence.map(m => new util.HashMap(m.toMap.asJava))
   }
 
   private def encodeCollection(collection: Traversable[_], schema: Schema): WithError[java.util.List[AnyRef]] = {

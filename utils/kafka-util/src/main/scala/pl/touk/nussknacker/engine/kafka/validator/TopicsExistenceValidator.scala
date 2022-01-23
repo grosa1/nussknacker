@@ -12,7 +12,7 @@ import org.apache.kafka.common.config.ConfigResource
 import pl.touk.nussknacker.engine.api.context.ProcessCompilationError.CustomNodeError
 import pl.touk.nussknacker.engine.kafka.validator.CachedTopicsExistenceValidatorConfig._
 
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 
 trait TopicsExistenceValidator extends Serializable  {
 

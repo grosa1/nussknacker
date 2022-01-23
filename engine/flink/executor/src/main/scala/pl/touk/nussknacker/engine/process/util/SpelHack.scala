@@ -4,7 +4,7 @@ import com.esotericsoftware.kryo.Kryo
 import com.esotericsoftware.kryo.io.{Input, Output}
 import pl.touk.nussknacker.engine.flink.api.serialization.SerializerWithSpecifiedClass
 
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 
 //By default SpEL list (i.e "{'a', 'b'}") is represented as java.util.Collections.UnmodifiableCollection, which
 //Kryo won't serialize properly since Kry uses java.util.Collection.add() method which in case of UnmodifiableCollection
@@ -32,7 +32,7 @@ object SpelHack extends SerializerWithSpecifiedClass[java.util.List[_]](false, t
     val size = in.readInt(true)
     // Go ahead and be faster, and not as functional cool, and be mutable in here
     var idx = 0
-    val builder = scala.collection.immutable.List.canBuildFrom[AnyRef]()
+    val builder = scala.collection.immutable.List.newBuilder[AnyRef]
     builder.sizeHint(size)
 
     while (idx < size) {
@@ -68,7 +68,7 @@ object SpelMapHack extends SerializerWithSpecifiedClass[java.util.Map[_, _]](fal
     val size = in.readInt(true)
     // Go ahead and be faster, and not as functional cool, and be mutable in here
     var idx = 0
-    val builder = scala.collection.immutable.Map.canBuildFrom[AnyRef, AnyRef]()
+    val builder = scala.collection.immutable.Map.newBuilder[AnyRef, AnyRef]
     builder.sizeHint(size)
 
     while (idx < size) {

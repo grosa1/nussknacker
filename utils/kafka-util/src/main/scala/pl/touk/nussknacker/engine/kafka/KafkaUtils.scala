@@ -1,20 +1,19 @@
 package pl.touk.nussknacker.engine.kafka
 
-import java.util.concurrent.TimeUnit
-import java.util.{Collections, Locale, Properties}
 import com.typesafe.scalalogging.LazyLogging
 import org.apache.kafka.clients.KafkaClient
 import org.apache.kafka.clients.admin.{Admin, AdminClient}
 import org.apache.kafka.clients.consumer.{ConsumerConfig, ConsumerRecord, KafkaConsumer}
-import org.apache.kafka.clients.producer.{Callback, KafkaProducer, Producer, ProducerRecord, RecordMetadata}
-import org.apache.kafka.common.TopicPartition
-import org.apache.kafka.common.requests.IsolationLevel
+import org.apache.kafka.clients.producer.{Callback, Producer, ProducerRecord, RecordMetadata}
 import org.apache.kafka.common.serialization.{ByteArrayDeserializer, ByteArraySerializer}
+import org.apache.kafka.common.{IsolationLevel, TopicPartition}
 import pl.touk.nussknacker.engine.api.namespaces.{KafkaUsageKey, NamingContext}
 import pl.touk.nussknacker.engine.api.process.ProcessObjectDependencies
 import pl.touk.nussknacker.engine.kafka.validator.CachedTopicsExistenceValidator
 import pl.touk.nussknacker.engine.util.ThreadUtils
 
+import java.util.concurrent.TimeUnit
+import java.util.{Collections, Locale, Properties}
 import scala.collection.mutable.ArrayBuffer
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, Future, Promise}
@@ -22,8 +21,8 @@ import scala.util.{Failure, Success, Using}
 
 object KafkaUtils extends LazyLogging {
 
-  import scala.collection.JavaConverters._
   import scala.concurrent.ExecutionContext.Implicits.global
+  import scala.jdk.CollectionConverters._
 
   val defaultTimeoutMillis = 10000
 

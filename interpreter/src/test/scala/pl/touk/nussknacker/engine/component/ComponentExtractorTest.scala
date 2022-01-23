@@ -9,10 +9,11 @@ import pl.touk.nussknacker.engine.api.process.{ProcessObjectDependencies, Sink, 
 import pl.touk.nussknacker.engine.api.{MethodToInvoke, Service}
 import pl.touk.nussknacker.engine.component.ComponentExtractorTest.largeMajorVersion
 import pl.touk.nussknacker.engine.modelconfig.DefaultModelConfigLoader
+import pl.touk.nussknacker.engine.util.Implicits.RichScalaMap
 import pl.touk.nussknacker.engine.util.namespaces.DefaultNamespacedObjectNaming
 import pl.touk.nussknacker.test.ClassLoaderWithServices
 
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 import scala.concurrent.Future
 
 object ComponentExtractorTest {
@@ -157,7 +158,7 @@ class ComponentExtractorTest extends FunSuite with Matchers {
     }
   }
 
-  private def fromMap(map: (String, Any)*): Config = ConfigFactory.parseMap(map.toMap.mapValues {
+  private def fromMap(map: (String, Any)*): Config = ConfigFactory.parseMap(map.toMap.mapValuesNow {
     case map: Map[String, Any]@unchecked => fromMap(map.toSeq: _*).root()
     case other => other
   }.asJava)

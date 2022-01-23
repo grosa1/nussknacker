@@ -99,6 +99,7 @@ class CommonSupertypeFinder(classResolutionStrategy: SupertypeClassResolutionStr
           Nil // fields type collision - skipping this field
         else
           (fieldName, leastUpperBound) :: Nil
+      case _ => throw new IllegalArgumentException("Should not happen...")
     }
     leftFieldsWithRightCommonFields ++ rightDoesNotIntersect
 }

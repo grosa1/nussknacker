@@ -28,6 +28,7 @@ import pl.touk.nussknacker.engine.process.{CheckpointConfig, ExecutionConfigPrep
 import pl.touk.nussknacker.engine.resultcollector.{ProductionServiceInvocationCollector, ResultCollector}
 import pl.touk.nussknacker.engine.splittedgraph.end.BranchEnd
 import pl.touk.nussknacker.engine.testmode.{SinkInvocationCollector, TestRunId, TestServiceInvocationCollector}
+import pl.touk.nussknacker.engine.util.Implicits.RichScalaMap
 import pl.touk.nussknacker.engine.util.loader.ScalaServiceLoader
 import pl.touk.nussknacker.engine.util.{MetaDataExtractor, ThreadUtils}
 
@@ -167,7 +168,7 @@ class FlinkProcessRegistrar(compileProcess: (EspProcess, ProcessVersion, Deploym
       val newContextFun = (ir: ValueWithContext[_]) => ir.context.withVariable(outputVar, ir.value)
 
       val newStart = transformer
-        .transform(inputs.mapValues(_._1), nodeContext(nodeComponentInfoFrom(joinPart), Right(inputs.mapValues(_._2))))
+        .transform(inputs.mapValuesNow(_._1), nodeContext(nodeComponentInfoFrom(joinPart), Right(inputs.mapValuesNow(_._2))))
         .map(mapF(newContextFun), typeInformationDetection.forContext(joinPart.validationContext))
 
       val afterSplit = wrapAsync(newStart, joinPart, "branchInterpretation")

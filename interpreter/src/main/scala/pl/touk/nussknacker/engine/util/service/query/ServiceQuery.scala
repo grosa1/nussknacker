@@ -22,6 +22,7 @@ import pl.touk.nussknacker.engine.graph.evaluatedparam
 import pl.touk.nussknacker.engine.graph.expression.Expression
 import pl.touk.nussknacker.engine.graph.service.ServiceRef
 import pl.touk.nussknacker.engine.resultcollector.ResultCollector
+import pl.touk.nussknacker.engine.util.Implicits.RichScalaMap
 import pl.touk.nussknacker.engine.util.metrics.{MetricsProviderForScenario, NoOpMetricsProviderForScenario}
 import pl.touk.nussknacker.engine.variables.GlobalVariablesPreparer
 
@@ -63,8 +64,8 @@ class ServiceQuery(modelData: ModelData) {
     withOpenedService(serviceName, definitions) {
 
       val variablesPreparer = GlobalVariablesPreparer(definitions.expressionConfig)
-      val validationContext = variablesPreparer.validationContextWithLocalVariables(metaData, localVariables.mapValues(_._2))
-      val ctx = Context("", localVariables.mapValues(_._1), None)
+      val validationContext = variablesPreparer.validationContextWithLocalVariables(metaData, localVariables.mapValuesNow(_._2))
+      val ctx = Context("", localVariables.mapValuesNow(_._1), None)
       implicit val runMode: RunMode = RunMode.Normal
 
       val compiled = compiler.compileService(ServiceRef(serviceName, params), validationContext, Some(OutputVar.enricher("output")))(NodeId(""), metaData)

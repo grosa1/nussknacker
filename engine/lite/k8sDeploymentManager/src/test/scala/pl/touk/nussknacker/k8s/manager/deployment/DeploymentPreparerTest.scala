@@ -11,7 +11,7 @@ import skuber.EnvVar.FieldRef
 import skuber.apps.v1.Deployment
 import skuber.{Container, EnvVar, HTTPGetAction, LabelSelector, ObjectMeta, Pod, Probe, Volume}
 
-import scala.jdk.CollectionConverters.seqAsJavaListConverter
+import scala.jdk.CollectionConverters._
 
 class DeploymentPreparerTest extends FunSuite {
 

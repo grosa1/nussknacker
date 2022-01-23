@@ -14,9 +14,6 @@ import pl.touk.nussknacker.engine.api.exception.NuExceptionInfo
 import pl.touk.nussknacker.engine.api.process.{ProcessObjectDependencies, RunMode, Source}
 import pl.touk.nussknacker.engine.api.runtimecontext.EngineRuntimeContext
 import pl.touk.nussknacker.engine.api.typed.typing.TypingResult
-import pl.touk.nussknacker.engine.lite.api.commonTypes.{DataBatch, ResultType, monoid}
-import pl.touk.nussknacker.engine.lite.api.customComponentTypes._
-import pl.touk.nussknacker.engine.lite.api.interpreterTypes.{EndResult, ScenarioInputBatch, ScenarioInterpreter, SourceId}
 import pl.touk.nussknacker.engine.compile._
 import pl.touk.nussknacker.engine.compiledgraph.CompiledProcessParts
 import pl.touk.nussknacker.engine.compiledgraph.node.Node
@@ -29,6 +26,7 @@ import pl.touk.nussknacker.engine.lite.api.interpreterTypes.{EndResult, Scenario
 import pl.touk.nussknacker.engine.resultcollector.{ProductionServiceInvocationCollector, ResultCollector}
 import pl.touk.nussknacker.engine.split.{NodesCollector, ProcessSplitter}
 import pl.touk.nussknacker.engine.splittedgraph.splittednode.SplittedNode
+import pl.touk.nussknacker.engine.util.Implicits.RichScalaMap
 import pl.touk.nussknacker.engine.util.metrics.common.{EndCountingListener, ExceptionCountingListener, NodeCountingListener}
 import pl.touk.nussknacker.engine.{ModelData, compiledgraph}
 
@@ -233,7 +231,7 @@ object ScenarioInterpreterFactory {
     private def compilePartInvokers(parts: List[SubsequentPart]): CompilationResult[Map[String, PartInterpreterType]] =
       parts.map(part => compiledPartInvoker(part).map(compiled => part.id -> compiled))
         .sequence.map { res =>
-        Writer(res.flatMap(_._2.written).toMap, res.toMap.mapValues(_.value))
+        Writer(res.flatMap(_._2.written).toMap, res.toMap.mapValuesNow(_.value))
       }
 
     private def partInvoker(node: compiledgraph.node.Node, parts: List[SubsequentPart]): CompilationResult[PartInterpreterType] = {

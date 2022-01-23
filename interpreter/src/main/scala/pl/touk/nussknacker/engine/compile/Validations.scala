@@ -25,7 +25,7 @@ object Validations {
     (validatedRedundant,
       validatedMissing,
       validatedCustom
-      ).mapN { (_, _, _) => Unit }
+      ).mapN { (_, _, _) => () }
   }
 
   def validateSubProcessParameters(definedParamNamesSet: Set[String],
@@ -36,21 +36,21 @@ object Validations {
 
     (validatedRedundant,
       validatedMissing
-      ).mapN { (_, _) => Unit }
+      ).mapN { (_, _) => () }
   }
 
   private def validateRedundancy(definedParamNamesSet: Set[String],
                                  usedParamNamesSet: Set[String])
                                 (implicit nodeId: NodeId) = {
     val redundantParams = usedParamNamesSet.diff(definedParamNamesSet)
-    if (redundantParams.nonEmpty) invalid(RedundantParameters(redundantParams)).toValidatedNel else valid(Unit)
+    if (redundantParams.nonEmpty) invalid(RedundantParameters(redundantParams)).toValidatedNel else valid(())
   }
 
   private def validateMissingness(definedParamNamesSet: Set[String],
                                   usedParamNamesSet: Set[String])
                                  (implicit nodeId: NodeId) = {
     val notUsedParams = definedParamNamesSet.diff(usedParamNamesSet)
-    if (notUsedParams.nonEmpty) invalid(MissingParameters(notUsedParams)).toValidatedNel else valid(Unit)
+    if (notUsedParams.nonEmpty) invalid(MissingParameters(notUsedParams)).toValidatedNel else valid(())
   }
 
   private def validateWithCustomValidators(parameterDefinitions: List[Parameter],
@@ -62,7 +62,7 @@ object Validations {
       paramDefinition <- definitionsMap.get(param.name)
       paramValidationResult = paramDefinition.validate(param)
     } yield paramValidationResult
-    validationResults.sequence.map(_ => Unit)
+    validationResults.sequence.map(_ => ())
   }
 
 }

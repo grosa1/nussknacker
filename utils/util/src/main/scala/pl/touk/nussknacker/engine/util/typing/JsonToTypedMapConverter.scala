@@ -6,7 +6,7 @@ import org.everit.json.schema.{ArraySchema, BooleanSchema, FalseSchema, NullSche
 import pl.touk.nussknacker.engine.api.typed.TypedMap
 import pl.touk.nussknacker.engine.api.typed.typing.{Typed, TypedObjectTypingResult, TypingResult}
 
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 
 object JsonToTypedMapConverter {
 

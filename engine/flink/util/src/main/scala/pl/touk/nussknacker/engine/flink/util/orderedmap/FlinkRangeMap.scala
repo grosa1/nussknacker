@@ -61,7 +61,7 @@ object FlinkRangeMap {
 
     override def to[K: Ordering, V](map: SortedMap[K, V], key: K): SortedMap[K, V] = map.to(key)
 
-    override def filterKeys[K, V](map: SortedMap[K, V], p: K => Boolean): SortedMap[K, V] = map.filterKeys(p)
+    override def filterKeys[K, V](map: SortedMap[K, V], p: K => Boolean): SortedMap[K, V] = map.filter(k => p(k._1))
 
     override def updated[K, V](map: SortedMap[K, V], key: K, value: V): SortedMap[K, V] = map.updated(key, value)
 
@@ -80,7 +80,7 @@ object FlinkRangeMap {
    */
   implicit object JavaHashMapFlinkRangeMap extends FlinkRangeMap[jul.Map] {
 
-    import scala.collection.JavaConverters._
+    import scala.jdk.CollectionConverters._
 
     override def typeInformation[K: TypeInformation, V: TypeInformation]: TypeInformation[jul.Map[K, V]] =
       new MapTypeInfo[K, V](implicitly[TypeInformation[K]], implicitly[TypeInformation[V]])
@@ -105,9 +105,9 @@ object FlinkRangeMap {
 
     // read-only methods
 
-    override def fromRO[K: Ordering, V](map: jul.Map[K, V], key: K): jul.Map[K, V] = transformAsScalaMapRO(map, _.filterKeys(_ >= key))
+    override def fromRO[K: Ordering, V](map: jul.Map[K, V], key: K): jul.Map[K, V] = transformAsScalaMapRO(map, _.filter(_._1 >= key))
 
-    override def toRO[K: Ordering, V](map: jul.Map[K, V], key: K): jul.Map[K, V] = transformAsScalaMapRO(map, _.filterKeys(_ <= key))
+    override def toRO[K: Ordering, V](map: jul.Map[K, V], key: K): jul.Map[K, V] = transformAsScalaMapRO(map, _.filter(_._1 <= key))
 
     private def transformAsScalaMapRO[K, V](map: jul.Map[K, V],
                                             transform: collection.Map[K, V] => collection.Map[K, V]): jul.Map[K, V] =

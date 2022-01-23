@@ -10,6 +10,7 @@ import pl.touk.nussknacker.engine.api.{Context, SpelExpressionExcludeList}
 import pl.touk.nussknacker.engine.dict.SimpleDictRegistry
 import pl.touk.nussknacker.engine.spel.SpelExpressionParser
 import pl.touk.nussknacker.engine.spel.internal.DefaultSpelConversionsProvider
+import pl.touk.nussknacker.engine.util.Implicits.RichScalaMap
 
 import java.text.ParseException
 import java.time.{Clock, ZoneOffset, ZonedDateTime}
@@ -25,7 +26,7 @@ trait BaseSpelSpec {
     "DATE_FORMAT" -> new DateFormatUtils(Locale.US))
 
   protected def evaluate[T: TypeTag](expr: String, localVariables: Map[String, Any]): T = {
-    val validationCtx = ValidationContext(localVariables.mapValues(Typed.fromInstance), globalVariables.mapValues(Typed.fromInstance))
+    val validationCtx = ValidationContext(localVariables.mapValuesNow(Typed.fromInstance), globalVariables.mapValuesNow(Typed.fromInstance))
     val evaluationCtx = Context("fooId").withVariables(localVariables)
     parse(expr, validationCtx).value.expression.evaluate[T](evaluationCtx, globalVariables)
   }

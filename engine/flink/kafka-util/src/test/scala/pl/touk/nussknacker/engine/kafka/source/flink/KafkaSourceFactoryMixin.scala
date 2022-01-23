@@ -14,7 +14,6 @@ import pl.touk.nussknacker.engine.api.process.ProcessObjectDependencies
 import pl.touk.nussknacker.engine.kafka.consumerrecord.{ConsumerRecordDeserializationSchemaFactory, ConsumerRecordToJsonFormatterFactory}
 import pl.touk.nussknacker.engine.kafka.serialization.schemas.BaseSimpleSerializationSchema
 import pl.touk.nussknacker.engine.kafka.source.KafkaSourceFactory
-import pl.touk.nussknacker.engine.kafka.source.KafkaSourceFactory.KafkaSourceImplFactory
 import pl.touk.nussknacker.engine.kafka.source.flink.KafkaSourceFactoryMixin._
 import pl.touk.nussknacker.engine.kafka.{ConsumerRecordUtils, KafkaConfig, KafkaSpec, serialization}
 import pl.touk.nussknacker.engine.util.namespaces.ObjectNamingProvider
@@ -40,9 +39,9 @@ trait KafkaSourceFactoryMixin extends FunSuite with Matchers with KafkaSpec with
 
   protected def objToSerializeSerializationSchema(topic: String): serialization.KafkaSerializationSchema[Any] = new BaseSimpleSerializationSchema[ObjToSerialize](
     topic,
-    obj => Option(obj.value).map(v => implicitly[Encoder[SampleValue]].apply(v).noSpaces).orNull,
-    obj => Option(obj.key).map(k => implicitly[Encoder[SampleKey]].apply(k).noSpaces).orNull,
-    obj => ConsumerRecordUtils.toHeaders(obj.headers)
+    (obj: ObjToSerialize) => Option(obj.value).map(v => implicitly[Encoder[SampleValue]].apply(v).noSpaces).orNull,
+    (obj: ObjToSerialize) => Option(obj.key).map(k => implicitly[Encoder[SampleKey]].apply(k).noSpaces).orNull,
+    (obj: ObjToSerialize) => ConsumerRecordUtils.toHeaders(obj.headers)
   ).asInstanceOf[serialization.KafkaSerializationSchema[Any]]
 
   protected def createTopic(name: String, partitions: Int = 1): String = {

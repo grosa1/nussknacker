@@ -41,7 +41,7 @@ import pl.touk.nussknacker.test.WithDataList
 import java.util.concurrent.atomic.AtomicInteger
 import java.util.{Date, Optional, UUID}
 import javax.annotation.Nullable
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 import scala.concurrent.{ExecutionContext, Future}
 
 //TODO: clean up sample objects...
@@ -346,7 +346,7 @@ object SampleNodes {
         TypeInformation.of(classOf[ValueWithContext[AnyRef]]),
         new AbstractStreamOperator[ValueWithContext[AnyRef]] with OneInputStreamOperator[Context, ValueWithContext[AnyRef]] {
           override def processElement(element: StreamRecord[Context]): Unit = {
-            output.collect(new StreamRecord[ValueWithContext[AnyRef]](ValueWithContext(element.getTimestamp.underlying(), element.getValue), timestampToSet))
+            output.collect(new StreamRecord[ValueWithContext[AnyRef]](ValueWithContext(element.getTimestamp: java.lang.Long, element.getValue), timestampToSet))
           }
         }))
 
@@ -401,7 +401,7 @@ object SampleNodes {
     def invoke(@ParamName("throw") throwing: Boolean): Future[Unit] = {
       if (throwing) {
         Future.failed(exception)
-      } else  Future.successful(Unit)
+      } else  Future.successful(())
     }
   }
 
@@ -512,7 +512,7 @@ object SampleNodes {
   case object SinkForAny extends SinkForType[AnyRef]
 
   object EmptyService extends Service {
-    def invoke(): Future[Unit.type] = Future.successful(Unit)
+    def invoke(): Future[Unit] = Future.successful(())
   }
 
   object GenericParametersNode extends CustomStreamTransformer with SingleInputGenericNodeTransformation[AnyRef] {
@@ -672,7 +672,7 @@ object SampleNodes {
     }
 
     override def implementation(params: Map[String, Any], dependencies: List[NodeDependencyValue], finalState: Option[State]): Source = {
-      import scala.collection.JavaConverters._
+      import scala.jdk.CollectionConverters._
       val elements = params(`elementsParamName`).asInstanceOf[java.util.List[String]].asScala.toList
 
       new CollectionSource(StreamExecutionEnvironment.getExecutionEnvironment.getConfig, elements, None, Typed[String])(TypeInformation.of(classOf[String]))

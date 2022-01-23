@@ -109,7 +109,7 @@ class LoopUntilClosed(prepareSingleRunner: () => Task, waitAfterFailureDelay: Fi
           } { }
         } else {
           logger.warn(s"Failed to run. Restarting...", e)
-          Success(Unit)
+          Success(())
         }
     }
   }
@@ -134,7 +134,7 @@ class LoopUntilClosed(prepareSingleRunner: () => Task, waitAfterFailureDelay: Fi
                                       (handleFinally: => Unit): Try[Unit] = {
     try {
       runWithSomeWaiting
-      Success(Unit)
+      Success(())
     } catch {
       /*
         After setting closed = true, we close pool, which interrupts all threads.
@@ -145,7 +145,7 @@ class LoopUntilClosed(prepareSingleRunner: () => Task, waitAfterFailureDelay: Fi
         //This is important - as it's the only way to clear interrupted flag...
         val wasInterrupted = Thread.interrupted()
         logger.debug(s"Interrupted: $wasInterrupted, finishing normally")
-        Success(Unit)
+        Success(())
       case NonFatal(e) =>
         Failure(e)
     } finally {

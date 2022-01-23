@@ -1,6 +1,6 @@
 package pl.touk.nussknacker.openapi
 
-import com.typesafe.config.{Config, ConfigFactory, ConfigList, ConfigRenderOptions, ConfigValueFactory}
+import com.typesafe.config.{Config, ConfigFactory, ConfigRenderOptions, ConfigValueFactory}
 import com.typesafe.scalalogging.LazyLogging
 import io.circe.syntax.EncoderOps
 import net.ceedubs.ficus.Ficus._
@@ -16,7 +16,7 @@ import pl.touk.nussknacker.openapi.parser.SwaggerParser
 
 import java.net.URL
 import java.nio.charset.StandardCharsets
-import scala.jdk.CollectionConverters.seqAsJavaListConverter
+import scala.jdk.CollectionConverters._
 import scala.util.control.NonFatal
 
 class OpenAPIComponentProvider extends ComponentProvider with LazyLogging {

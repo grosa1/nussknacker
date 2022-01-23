@@ -30,7 +30,7 @@ object OutputValidator {
       // checkReaderWriterCompatibility is more accurate than our validateSchemasUsingCanBeSubclassOf with given ValidationMode
       val compatibility = SchemaCompatibility.checkReaderWriterCompatibility(schema, valueSchema)
       if (compatibility.getType == SchemaCompatibilityType.COMPATIBLE) {
-        Valid(Unit)
+        Valid(())
       } else {
         // ... but it return verbose message with included schemas, so we try to print more concise one
         incompatibleSchemaErrorWithPrettyMessage(schema, valueSchema)

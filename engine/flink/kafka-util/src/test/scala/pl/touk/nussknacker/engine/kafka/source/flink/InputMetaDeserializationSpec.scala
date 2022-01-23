@@ -12,7 +12,7 @@ import pl.touk.nussknacker.engine.kafka.source.flink.InputMetaDeserializationSpe
 import pl.touk.nussknacker.engine.kafka.source.flink.KafkaSourceFactoryMixin.SampleKey
 import pl.touk.nussknacker.engine.process.typeinformation.GenericTypeInformationDetection
 
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 
 class InputMetaDeserializationSpec extends FunSuite with Matchers with FlinkTypeInformationSerializationMixin{
 

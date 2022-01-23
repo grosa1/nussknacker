@@ -9,7 +9,7 @@ import io.swagger.v3.parser.converter.SwaggerConverter
 import io.swagger.v3.parser.core.models.ParseOptions
 import pl.touk.nussknacker.openapi.{OpenAPISecurityConfig, OpenAPIServicesConfig, SwaggerService}
 
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 
 object SwaggerParser {
 

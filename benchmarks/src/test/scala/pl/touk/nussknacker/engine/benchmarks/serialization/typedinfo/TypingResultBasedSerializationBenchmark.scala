@@ -10,7 +10,7 @@ import pl.touk.nussknacker.engine.benchmarks.serialization.SerializationBenchmar
 import pl.touk.nussknacker.engine.process.typeinformation.GenericTypeInformationDetection
 
 import java.util.concurrent.TimeUnit
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 
 /*
   Results for sample run are as follows:

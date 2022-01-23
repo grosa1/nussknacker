@@ -12,7 +12,7 @@ import pl.touk.nussknacker.engine.api.CirceUtil
 
 class RichKafkaConsumer[K, M](consumer: Consumer[K, M]) {
 
-  import scala.collection.JavaConverters._
+  import scala.jdk.CollectionConverters._
 
   def consume(topic: String, secondsToWait: Int = 20): Stream[KeyMessage[K, M]] =
     consumeWithConsumerRecord(topic, secondsToWait)

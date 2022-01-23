@@ -8,7 +8,7 @@ import pl.touk.nussknacker.engine.avro.schemaregistry.confluent.client.Confluent
 import pl.touk.nussknacker.engine.kafka.KafkaConfig
 
 import java.util
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 
 /**
   * This is Kafka Avro Deserialization class. All events will be deserialized to provided schema.

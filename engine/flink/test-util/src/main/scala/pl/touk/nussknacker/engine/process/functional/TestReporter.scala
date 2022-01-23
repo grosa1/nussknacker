@@ -7,7 +7,7 @@ import org.apache.flink.configuration.{ConfigConstants, Configuration, MetricOpt
 import org.apache.flink.metrics.reporter.AbstractReporter
 import org.apache.flink.metrics._
 
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 
 object TestReporterUtil {
 

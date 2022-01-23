@@ -4,6 +4,7 @@ import java.time.format.DateTimeFormatter
 import java.time.{Instant, ZonedDateTime}
 import sttp.client.{NothingT, SttpBackend}
 import com.typesafe.scalalogging.LazyLogging
+import pl.touk.nussknacker.engine.util.Implicits.RichScalaMap
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -76,7 +77,7 @@ object InfluxGenerator extends LazyLogging {
         //in case of our queries we know there will be only one result (we use only first/last aggregations), rest will be handled by aggregations
         val firstResult = oneSeries.toMap.headOption.getOrElse(Map())
         (oneSeries.tags.getOrElse(Map.empty).getOrElse(config.nodeIdTag, "UNKNOWN"), firstResult.getOrElse("count", 0L).asInstanceOf[Number].longValue())
-      }.groupBy(_._1).mapValues(_.map(_._2).sum)
+      }.groupBy(_._1).mapValuesNow(_.map(_._2).sum)
     }
     groupedResults.foreach {
       evaluated => logger.debug(s"Query: $queryString retrieved grouped results: $evaluated")
