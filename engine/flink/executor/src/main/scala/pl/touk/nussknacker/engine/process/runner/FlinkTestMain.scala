@@ -1,15 +1,14 @@
 package pl.touk.nussknacker.engine.process.runner
 
-import org.apache.flink.api.common.ExecutionConfig
+import org.apache.flink.api.common.{ExecutionConfig, RuntimeExecutionMode}
 import org.apache.flink.configuration.Configuration
 import org.apache.flink.runtime.jobgraph.SavepointRestoreSettings
 import pl.touk.nussknacker.engine.ModelData
 import pl.touk.nussknacker.engine.api.ProcessVersion
-import pl.touk.nussknacker.engine.api.deployment.{DeploymentData, GraphProcess}
+import pl.touk.nussknacker.engine.api.deployment.DeploymentData
 import pl.touk.nussknacker.engine.api.deployment.TestProcess.{TestData, TestResults}
 import pl.touk.nussknacker.engine.api.process.ProcessName
 import pl.touk.nussknacker.engine.graph.EspProcess
-import pl.touk.nussknacker.engine.marshall.ScenarioParser
 import pl.touk.nussknacker.engine.process.ExecutionConfigPreparer
 import pl.touk.nussknacker.engine.process.compiler.TestFlinkProcessCompiler
 import pl.touk.nussknacker.engine.process.registrar.FlinkProcessRegistrar
@@ -38,6 +37,7 @@ class FlinkTestMain(val modelData: ModelData,
     try {
       val registrar: FlinkProcessRegistrar = prepareRegistrar(env.getConfig, collectingListener, testData)
       registrar.register(env, process, processVersion, deploymentData, Option(collectingListener.runId))
+      env.setRuntimeMode(RuntimeExecutionMode.BATCH)
       execute(env, SavepointRestoreSettings.none())
       collectingListener.results
     } finally {

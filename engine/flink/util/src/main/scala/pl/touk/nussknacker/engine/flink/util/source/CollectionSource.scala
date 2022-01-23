@@ -2,6 +2,7 @@ package pl.touk.nussknacker.engine.flink.util.source
 
 import org.apache.flink.api.common.ExecutionConfig
 import org.apache.flink.api.common.typeinfo.TypeInformation
+import org.apache.flink.api.connector.source.Boundedness
 import org.apache.flink.streaming.api.functions.source.FromElementsFunction
 import pl.touk.nussknacker.engine.api.typed.typing.TypingResult
 import pl.touk.nussknacker.engine.api.typed.ReturningType
@@ -21,4 +22,5 @@ case class CollectionSource[T: TypeInformation](config: ExecutionConfig,
 
   override val typeInformation: TypeInformation[T] = implicitly[TypeInformation[T]]
 
+  override protected def boundedness: Boundedness = Boundedness.BOUNDED
 }

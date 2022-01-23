@@ -1,7 +1,7 @@
 package pl.touk.nussknacker.engine.flink.test
 
 import com.typesafe.scalalogging.LazyLogging
-import org.apache.flink.api.common.{JobExecutionResult, JobID, JobStatus}
+import org.apache.flink.api.common.{JobExecutionResult, JobID, JobStatus, RuntimeExecutionMode}
 import org.apache.flink.configuration._
 import org.apache.flink.runtime.execution.ExecutionState
 import org.apache.flink.runtime.executiongraph.AccessExecutionGraph
@@ -48,6 +48,8 @@ class MiniClusterExecutionEnvironment(flinkMiniClusterHolder: FlinkMiniClusterHo
   }
 
   def executeAndWaitForFinished[T](jobName: String)(patience: Eventually.PatienceConfig = envConfig.defaultWaitForStatePatience): JobExecutionResult = {
+    //we want to fail fast if we cannot be bounded...
+    setRuntimeMode(RuntimeExecutionMode.BATCH)
     val res = execute(jobName)
     waitForJobState(res.getJobID, jobName, ExecutionState.FINISHED)(patience)
     res

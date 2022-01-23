@@ -257,6 +257,7 @@ object SampleNodes {
           override def filter(value: Context): Boolean = evaluateParameter(value) == stringVal
         })
         .map(ValueWithContext[AnyRef](null, _))
+        .returns(TypeInformation.of(classOf[ValueWithContext[AnyRef]]))
     })
   }
 
@@ -273,6 +274,7 @@ object SampleNodes {
                 override def filter(value: Context): Boolean = evaluateParameter(value) == stringVal
               })
               .map(ValueWithContext[AnyRef](null, _))
+              .returns(TypeInformation.of(classOf[ValueWithContext[AnyRef]]))
           })
     }
 
@@ -289,6 +291,7 @@ object SampleNodes {
             .flatMap(context.lazyParameterHelper.lazyMapFunction(value))
             .keyBy(keyF[ValueWithContext[String], String](_.value))
             .map(_ => ValueWithContext[AnyRef](null, Context("new")))
+            .returns(TypeInformation.of(classOf[ValueWithContext[AnyRef]]))
         }))
     }
 
@@ -419,6 +422,7 @@ object SampleNodes {
               .window(TumblingEventTimeWindows.of(Time.seconds(seconds)))
               .reduce((k, v) => k + v: java.lang.Integer)
               .map(i => ValueWithContext[AnyRef](i, Context(UUID.randomUUID().toString)))
+              .returns(TypeInformation.of(classOf[ValueWithContext[AnyRef]]))
           }))
     }
 
@@ -443,6 +447,7 @@ object SampleNodes {
         val runMode = flinkCustomNodeContext.runMode
         start
           .map(context => ValueWithContext[AnyRef](runMode, context))
+          .returns(TypeInformation.of(classOf[ValueWithContext[AnyRef]]))
       })
     }
 
@@ -549,6 +554,7 @@ object SampleNodes {
         stream
           .filter(new LazyParameterFilterFunction(bool, fctx.lazyParameterHelper))
           .map(ctx => ValueWithContext[AnyRef](TypedMap(map), ctx))
+          .returns(TypeInformation.of(classOf[ValueWithContext[AnyRef]]))
       })
     }
 
@@ -574,6 +580,7 @@ object SampleNodes {
       FlinkCustomStreamTransformation((stream, fctx) => {
         stream
           .map(ctx => ValueWithContext[AnyRef](finalState.get: java.lang.Boolean, ctx))
+          .returns(TypeInformation.of(classOf[ValueWithContext[AnyRef]]))
       })
     }
 
@@ -727,7 +734,9 @@ object SampleNodes {
       override def prepareValue(dataStream: DataStream[Context], flinkNodeContext: FlinkCustomNodeContext): DataStream[ValueWithContext[Value]] = {
         dataStream
           .flatMap(flinkNodeContext.lazyParameterHelper.lazyMapFunction(params("value").asInstanceOf[LazyParameter[String]]))
+          .returns(TypeInformation.of(classOf[ValueWithContext[String]]))
           .map((v: ValueWithContext[String]) => v.copy(value = s"${v.value}+$typ-$version+runMode:${runModeDependency.extract(dependencies)}"))
+          .returns(TypeInformation.of(classOf[ValueWithContext[Value]]))
       }
 
       override def registerSink(dataStream: DataStream[ValueWithContext[String]], flinkNodeContext: FlinkCustomNodeContext): DataStreamSink[_] =

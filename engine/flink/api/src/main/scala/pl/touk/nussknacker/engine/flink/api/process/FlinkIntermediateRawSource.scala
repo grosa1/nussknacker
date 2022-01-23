@@ -2,10 +2,12 @@ package pl.touk.nussknacker.engine.flink.api.process
 
 import org.apache.flink.api.common.functions.{RichMapFunction, RuntimeContext}
 import org.apache.flink.api.common.typeinfo.TypeInformation
+import org.apache.flink.api.connector.source.Boundedness
 import org.apache.flink.configuration.Configuration
-import org.apache.flink.streaming.api.datastream.DataStream
+import org.apache.flink.streaming.api.datastream.{DataStream, DataStreamSource}
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment
-import org.apache.flink.streaming.api.functions.source.SourceFunction
+import org.apache.flink.streaming.api.functions.source.{ParallelSourceFunction, SourceFunction}
+import org.apache.flink.streaming.api.operators.StreamSource
 import pl.touk.nussknacker.engine.api.Context
 import pl.touk.nussknacker.engine.api.process.{BasicContextInitializer, ContextInitializer, ContextInitializingFunction, Source}
 import pl.touk.nussknacker.engine.api.runtimecontext.EngineRuntimeContext
@@ -35,11 +37,22 @@ trait FlinkIntermediateRawSource[Raw] extends ExplicitUidInOperatorsSupport { se
 
   val contextInitializer: ContextInitializer[Raw] = new BasicContextInitializer[Raw](Unknown)
 
+  protected def initializeSource(env: StreamExecutionEnvironment,
+                                 sourceFunction: SourceFunction[Raw]): DataStreamSource[Raw] = {
+
+      val isParallel = sourceFunction.isInstanceOf[ParallelSourceFunction[_]]
+      env.clean(sourceFunction)
+      val sourceOperator = new StreamSource[Raw, SourceFunction[Raw]](sourceFunction)
+      new DataStreamSource[Raw](env, typeInformation, sourceOperator, isParallel, "Custom source", boundedness)
+  }
+
+  //?
+  protected def boundedness: Boundedness = Boundedness.BOUNDED
+
   def prepareSourceStream(env: StreamExecutionEnvironment, flinkNodeContext: FlinkCustomNodeContext, sourceFunction: SourceFunction[Raw]): DataStream[Context] = {
 
     //1. add source and 2. set UID
-    val rawSourceWithUid = setUidToNodeIdIfNeed(flinkNodeContext, env
-      .addSource[Raw](sourceFunction, typeInformation)
+    val rawSourceWithUid = setUidToNodeIdIfNeed(flinkNodeContext, initializeSource(env, sourceFunction)
       .name(flinkNodeContext.nodeId))
 
     //3. assign timestamp and watermark policy
