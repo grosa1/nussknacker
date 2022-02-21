@@ -12,7 +12,9 @@ import org.apache.flink.streaming.api.functions.sink.DiscardingSink
 import org.apache.flink.streaming.api.scala._
 import pl.touk.nussknacker.engine.api._
 import pl.touk.nussknacker.engine.api.component.{ComponentGroupName, ParameterConfig, SingleComponentConfig}
-import pl.touk.nussknacker.engine.api.definition.{FixedExpressionValue, FixedValuesParameterEditor, MandatoryParameterValidator, StringParameterEditor}
+import pl.touk.nussknacker.engine.api.context.ValidationContext
+import pl.touk.nussknacker.engine.api.context.transformation.{NodeDependencyValue, SingleInputGenericNodeTransformation}
+import pl.touk.nussknacker.engine.api.definition.{FixedExpressionValue, FixedValuesParameterEditor, MandatoryParameterValidator, NodeDependency, Parameter, StringParameterEditor}
 import pl.touk.nussknacker.engine.api.process._
 import pl.touk.nussknacker.engine.avro.schemaregistry.SchemaRegistryProvider
 import pl.touk.nussknacker.engine.avro.schemaregistry.confluent.ConfluentSchemaRegistryProvider
@@ -169,7 +171,8 @@ class DevProcessConfigCreator extends ProcessConfigCreator {
     "lastVariableWithFilter" -> all(LastVariableFilterTransformer),
     "enrichWithAdditionalData" -> all(EnrichWithAdditionalDataTransformer),
     "sendCommunication" -> all(DynamicParametersTransformer),
-    "hideVariables" -> all(HidingVariablesTransformer)
+    "hideVariables" -> all(HidingVariablesTransformer),
+    "t1" -> categories(TestTransformer)
   )
 
   override def signals(processObjectDependencies: ProcessObjectDependencies) = Map(
@@ -219,5 +222,33 @@ class DevProcessConfigCreator extends ProcessConfigCreator {
     val schemaFactory = new FixedValueDeserializationSchemaFactory(schema)
     val formatterFactory = new ConsumerRecordToJsonFormatterFactory[String, T]
     new KafkaSourceFactory[String, T](schemaFactory, formatterFactory, processObjectDependencies, new FlinkKafkaSourceImplFactory(None))
+  }
+
+  object TestTransformer extends CustomStreamTransformer with SingleInputGenericNodeTransformation[AnyRef] {
+
+    override type State = Nothing
+
+    override def contextTransformation(context: ValidationContext, dependencies: List[NodeDependencyValue])(implicit nodeId: NodeId): NodeTransformationDefinition = {
+      schemaParamStep(context, dependencies) orElse
+        finalParamStep(context)
+    }
+
+    protected def schemaParamStep(context: ValidationContext, dependencies: List[NodeDependencyValue])(implicit nodeId: NodeId): NodeTransformationDefinition = {
+      case TransformationStep(Nil, _) =>
+        val valueParam = Parameter[String]("param1").copy(defaultValue = Some("'aaa'"))
+        NextParameters(valueParam :: Nil, state = None)
+    }
+
+    protected def finalParamStep(context: ValidationContext)(implicit nodeId: NodeId): NodeTransformationDefinition = {
+      case TransformationStep(params, state) if params.nonEmpty =>
+        FinalResults(context, Nil, state)
+    }
+
+
+    override def nodeDependencies: List[NodeDependency] = Nil
+
+    override def implementation(params: Map[String, Any], dependencies: List[NodeDependencyValue], finalStateOpt: Option[State]): AnyRef = {
+      null
+    }
   }
 }

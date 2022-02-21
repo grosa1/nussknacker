@@ -37,6 +37,9 @@ export class NodeDetailsContent extends React.Component {
     this.initalizeWithProps(props)
     const nodeToAdjust = props.node
     const {node, unusedParameters} = adjustParameters(nodeToAdjust, this.parameterDefinitions)
+    if (!_.isEqual(node, nodeToAdjust)) {
+      props.onChange(node)
+    }
 
     this.state = {
       ...TestResultUtils.stateForSelectTestResults(null, this.props.testResults),

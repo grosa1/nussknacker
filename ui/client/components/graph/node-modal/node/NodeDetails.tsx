@@ -24,12 +24,13 @@ export function NodeDetails(props: WindowContentProps<WindowKind, NodeType> & {r
 
   const [editedNode, setEditedNode] = useState(nodeToDisplay)
 
+  /* TODO: ??
   useEffect(
     () => {
       setEditedNode(nodeToDisplay)
     },
     [nodeToDisplay],
-  )
+  ) */
 
   const dispatch = useDispatch()
 
