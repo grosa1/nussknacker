@@ -111,7 +111,7 @@ object ProcessTestData {
 
 
   val validDisplayableProcess: ValidatedDisplayableProcess = toValidatedDisplayable(validProcess)
-  val validProcessDetails: ValidatedProcessDetails = TestProcessUtil.validatedToProcess(validDisplayableProcess)
+  val validProcessDetails: ValidatedProcessDetails = TestProcessUtil.validatedToBaseProcess(validDisplayableProcess)
 
   def toValidatedDisplayable(espProcess: EspProcess): ValidatedDisplayableProcess = {
     val displayable = ProcessConverter.toDisplayable(espProcess.toCanonicalProcess, TestProcessingTypes.Streaming)

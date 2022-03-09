@@ -26,19 +26,19 @@ class DBProcessServiceSpec extends FlatSpec with Matchers with PatientScalaFutur
   private val testUser = TestFactory.userWithCategoriesReadPermission(username = "categoriesUser", categories = testCategories)
   private val testReqRespUser = TestFactory.userWithCategoriesReadPermission(username = "testReqRespUser", categories = testCategories ++ reqResCategories)
 
-  private val category1Process = createBasicProcess("category1Process", isArchived = false, category = Category1, lastAction = Some(Deploy))
-  private val category2ArchivedProcess = createBasicProcess("category2ArchivedProcess", isArchived = true, category = Category2)
-  private val testSubProcess = createSubProcess("testSubProcess", isArchived = false, category = TESTCAT)
-  private val reqRespArchivedSubProcess = createBasicProcess("reqRespArchivedSubProcess", isArchived = true, category = ReqRes)
+  private val category1Process = baseDisplayable("category1Process", category = Category1, lastAction = Some(Deploy))
+  private val category2ArchivedProcess = baseDisplayable("category2ArchivedProcess", isArchived = true, category = Category2)
+  private val testSubProcess = baseDisplayableSubprocess("testSubProcess", category = TESTCAT)
+  private val reqRespArchivedSubProcess = baseDisplayable("reqRespArchivedSubProcess", isArchived = true, category = ReqRes)
 
   private val processes: List[ProcessWithJson] = List(
     category1Process, category2ArchivedProcess, testSubProcess, reqRespArchivedSubProcess
   )
 
-  private val subprocessCategory1 = createSubProcess("subprocessCategory1", isArchived = false, category = Category1)
-  private val subprocessCategory2 = createSubProcess("subprocessCategory2", isArchived = false, category = Category2)
-  private val subprocessTest = createSubProcess("subprocessTest", isArchived = false, category = TESTCAT)
-  private val subprocessReqResp = createSubProcess("subprocessReqResp",  isArchived = false, category = ReqRes)
+  private val subprocessCategory1 = baseDisplayableSubprocess("subprocessCategory1", category = Category1)
+  private val subprocessCategory2 = baseDisplayableSubprocess("subprocessCategory2", category = Category2)
+  private val subprocessTest = baseDisplayableSubprocess("subprocessTest", category = TESTCAT)
+  private val subprocessReqResp = baseDisplayableSubprocess("subprocessReqResp", category = ReqRes)
 
   private val subprocesses = Set(
     subprocessCategory1, subprocessCategory2, subprocessTest, subprocessReqResp

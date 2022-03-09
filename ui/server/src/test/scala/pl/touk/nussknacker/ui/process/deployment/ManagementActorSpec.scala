@@ -365,7 +365,7 @@ class ManagementActorSpec extends FunSuite with Matchers with PatientScalaFuture
     } yield id
 
   private def prepareProcess(processName: ProcessName): Future[ProcessId] = {
-    val canonicalProcess = createEmptyStreamingGraph(processName.value)
+    val canonicalProcess = createEmptyCanonical(processName.value)
     val action = CreateProcessAction(processName, testCategoryName, canonicalProcess, Streaming, false)
 
     for {

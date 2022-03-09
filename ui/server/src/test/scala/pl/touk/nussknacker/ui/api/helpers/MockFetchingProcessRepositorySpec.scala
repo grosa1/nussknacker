@@ -29,23 +29,23 @@ class MockFetchingProcessRepositorySpec extends FlatSpec with Matchers with Scal
 
   private val someVersion = VersionId(666L)
 
-  private val marketingProcess = createBasicProcess("marketingProcess", category = categoryMarketing, lastAction = Some(Deploy), json = Some(json))
-  private val marketingSubprocess = createSubProcess("marketingSubprocess", category = categoryMarketing, json = Some(subJson))
-  private val marketingArchivedSubprocess = createSubProcess("marketingArchivedSubprocess", isArchived = true, category = categoryMarketing, lastAction = Some(Archive))
-  private val marketingArchivedProcess = createBasicProcess("marketingArchivedProcess", isArchived = true, category = categoryMarketing, lastAction = Some(Archive))
+  private val marketingProcess = baseDisplayable("marketingProcess", category = categoryMarketing, lastAction = Some(Deploy), json = Some(json))
+  private val marketingSubprocess = baseDisplayableSubprocess("marketingSubprocess", category = categoryMarketing, json = Some(subJson))
+  private val marketingArchivedSubprocess = baseDisplayableSubprocess("marketingArchivedSubprocess", isArchived = true, category = categoryMarketing, lastAction = Some(Archive))
+  private val marketingArchivedProcess = baseDisplayable("marketingArchivedProcess", isArchived = true, category = categoryMarketing, lastAction = Some(Archive))
 
-  private val fraudProcess = createBasicProcess("fraudProcess", category = categoryFraud, processingType = Fraud, lastAction = Some(Deploy))
-  private val fraudArchivedProcess = createBasicProcess("fraudArchivedProcess", isArchived = true, category = categoryFraudSecond, processingType = Fraud, lastAction = Some(Archive), json = Some(json))
-  private val fraudSubprocess = createSubProcess("fraudSubprocess", category = categoryFraud, processingType = Fraud, json = Some(json))
-  private val fraudArchivedSubprocess = createSubProcess("fraudArchivedSubprocess", isArchived = true, category = categoryFraud, processingType = Fraud, json = Some(subJson))
+  private val fraudProcess = baseDisplayable("fraudProcess", category = categoryFraud, processingType = Fraud, lastAction = Some(Deploy))
+  private val fraudArchivedProcess = baseDisplayable("fraudArchivedProcess", isArchived = true, category = categoryFraudSecond, processingType = Fraud, lastAction = Some(Archive), json = Some(json))
+  private val fraudSubprocess = baseDisplayableSubprocess("fraudSubprocess", category = categoryFraud, processingType = Fraud, json = Some(json))
+  private val fraudArchivedSubprocess = baseDisplayableSubprocess("fraudArchivedSubprocess", isArchived = true, category = categoryFraud, processingType = Fraud, json = Some(subJson))
 
-  private val fraudSecondProcess = createBasicProcess("fraudSecondProcess", category = categoryFraudSecond, processingType = Fraud, lastAction = Some(Cancel), json = Some(json))
-  private val fraudSecondSubprocess = createSubProcess("fraudSecondSubprocess", category = categoryFraudSecond, processingType = Fraud)
+  private val fraudSecondProcess = baseDisplayable("fraudSecondProcess", category = categoryFraudSecond, processingType = Fraud, lastAction = Some(Cancel), json = Some(json))
+  private val fraudSecondSubprocess = baseDisplayableSubprocess("fraudSecondSubprocess", category = categoryFraudSecond, processingType = Fraud)
 
-  private val secretProcess = createBasicProcess("secretProcess", category = categorySecret)
-  private val secretSubprocess = createSubProcess("secretSubprocess", category = categorySecret)
-  private val secretArchivedSubprocess = createSubProcess("secretArchivedSubprocess", isArchived = true, category = categorySecret, lastAction = Some(Archive))
-  private val secretArchivedProcess = createBasicProcess("secretArchivedProcess", isArchived = true, category = categorySecret, lastAction = Some(Archive), json = Some(json))
+  private val secretProcess = baseDisplayable("secretProcess", category = categorySecret)
+  private val secretSubprocess = baseDisplayableSubprocess("secretSubprocess", category = categorySecret)
+  private val secretArchivedSubprocess = baseDisplayableSubprocess("secretArchivedSubprocess", isArchived = true, category = categorySecret, lastAction = Some(Archive))
+  private val secretArchivedProcess = baseDisplayable("secretArchivedProcess", isArchived = true, category = categorySecret, lastAction = Some(Archive), json = Some(json))
 
   private val processes: List[ProcessDetails] = List(
     marketingProcess, marketingArchivedProcess, marketingSubprocess, marketingArchivedSubprocess,

@@ -21,7 +21,7 @@ class TestModelMigrationsSpec extends FunSuite with Matchers {
 
   test("should perform test migration") {
     val testMigration = newTestModelMigrations(new TestMigrations(1, 2))
-    val process = validatedToProcess(validDisplayableProcess)
+    val process = validatedToBaseProcess(validDisplayableProcess)
 
     val results = testMigration.testMigrations(List(process), List())
 
@@ -30,7 +30,7 @@ class TestModelMigrationsSpec extends FunSuite with Matchers {
 
   test("should perform test migration on multiple source scenario") {
     val testMigration = newTestModelMigrations(new TestMigrations(8))
-    val process = validatedToProcess(multipleSourcesValidProcess)
+    val process = validatedToBaseProcess(multipleSourcesValidProcess)
 
     val results = testMigration.testMigrations(List(process), List())
 
@@ -40,7 +40,7 @@ class TestModelMigrationsSpec extends FunSuite with Matchers {
 
   test("should perform migration that should fail on new errors") {
     val testMigration = newTestModelMigrations(new TestMigrations(6))
-    val process = validatedToProcess(validDisplayableProcess)
+    val process = validatedToBaseProcess(validDisplayableProcess)
 
     val results = testMigration.testMigrations(List(process), List())
 
@@ -51,7 +51,7 @@ class TestModelMigrationsSpec extends FunSuite with Matchers {
 
   test("should detect failed migration") {
     val testMigration = newTestModelMigrations(new TestMigrations(2, 3))
-    val process = validatedToProcess(validDisplayableProcess)
+    val process = validatedToBaseProcess(validDisplayableProcess)
 
     val results = testMigration.testMigrations(List(process), List())
 
@@ -61,7 +61,7 @@ class TestModelMigrationsSpec extends FunSuite with Matchers {
 
   test("should detect failed migration on multiple sources scenario") {
     val testMigration = newTestModelMigrations(new TestMigrations(9))
-    val process = validatedToProcess(multipleSourcesValidProcess)
+    val process = validatedToBaseProcess(multipleSourcesValidProcess)
 
     val results = testMigration.testMigrations(List(process), List())
 
@@ -71,7 +71,7 @@ class TestModelMigrationsSpec extends FunSuite with Matchers {
 
   test("should ignore failed migration when it may fail") {
     val testMigration = newTestModelMigrations(new TestMigrations(2, 4))
-    val process = validatedToProcess(validDisplayableProcess)
+    val process = validatedToBaseProcess(validDisplayableProcess)
 
     val results = testMigration.testMigrations(List(process), List())
 
@@ -91,7 +91,7 @@ class TestModelMigrationsSpec extends FunSuite with Matchers {
         .processor("processor", existingServiceId)
         .emptySink("sink", existingSinkFactory))
 
-    val process = validatedToProcess(invalidProcess)
+    val process = validatedToBaseProcess(invalidProcess)
 
     val results = testMigration.testMigrations(List(process), List())
 
@@ -109,7 +109,7 @@ class TestModelMigrationsSpec extends FunSuite with Matchers {
         .subprocessOneOut("subprocess", subprocess.id, "output", "param1" -> "'foo'")
         .emptySink("sink", existingSinkFactory))
 
-    val results = testMigration.testMigrations(List(validatedToProcess(process)), List(validatedToProcess(subprocess)))
+    val results = testMigration.testMigrations(List(validatedToBaseProcess(process)), List(validatedToBaseProcess(subprocess)))
 
     results should have size 2
     val (subprocessMigrationResult, processMigrationResult) = (results.find(_.converted.id == subprocess.id).get, results.find(_.converted.id == process.id).get)
@@ -129,7 +129,7 @@ class TestModelMigrationsSpec extends FunSuite with Matchers {
         .subprocessOneOut("subprocess", subprocess.id, "output", "param1" -> "'foo'")
         .emptySink("sink", existingSinkFactory))
 
-    val results = testMigration.testMigrations(List(validatedToProcess(process)), List(validatedToProcess(subprocess).copy(modelVersion = Some(10))))
+    val results = testMigration.testMigrations(List(validatedToBaseProcess(process)), List(validatedToBaseProcess(subprocess).copy(modelVersion = Some(10))))
 
     val processMigrationResult = results.find(_.converted.id == process.id).get
     processMigrationResult.newErrors.isOk shouldBe true

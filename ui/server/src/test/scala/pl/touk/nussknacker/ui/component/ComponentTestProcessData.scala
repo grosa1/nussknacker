@@ -46,28 +46,33 @@ object ComponentTestProcessData {
   private val canceledAction = ProcessAction(initialVersionId, LocalDateTime.now(), "user", ProcessActionType.Cancel, Option.empty, Option.empty, Map.empty)
   private val archivedAction = ProcessAction(initialVersionId, LocalDateTime.now(), "user", ProcessActionType.Archive, Option.empty, Option.empty, Map.empty)
 
-  val MarketingProcess: ProcessDetails = displayableToProcess(
-    displayable = createSimpleDisplayableProcess("marketingProcess", Streaming, SharedSourceConf, SharedSinkConf),
+  val MarketingProcess: ProcessDetails = createBaseProcess(
+    name = "marketingProcess",
+    json = createSimpleDisplayableProcess("marketingProcess", Streaming, SharedSourceConf, SharedSinkConf),
     category = CategoryMarketing
   )
 
-  val FraudProcess: ProcessDetails = displayableToProcess(
-    displayable = createSimpleDisplayableProcess("fraudProcess", Fraud, SharedSourceConf, SharedSinkConf),
+  val FraudProcess: ProcessDetails = createBaseProcess(
+    name = "fraudProcess",
+    json = createSimpleDisplayableProcess("fraudProcess", Fraud, SharedSourceConf, SharedSinkConf),
     category = CategoryFraud
   )
 
-  val FraudProcessWithNotSharedSource: ProcessDetails = displayableToProcess(
-    displayable = createSimpleDisplayableProcess("fraudProcessWithNotSharedSource", Fraud, NotSharedSourceConf, SharedSinkConf),
+  val FraudProcessWithNotSharedSource: ProcessDetails = createBaseProcess(
+    name = "fraudProcessWithNotSharedSource",
+    json = createSimpleDisplayableProcess("fraudProcessWithNotSharedSource", Fraud, NotSharedSourceConf, SharedSinkConf),
     category = CategoryFraud
   )
 
-  val FraudTestProcess: ProcessDetails = displayableToProcess(
-    displayable = createSimpleDisplayableProcess("fraudTestProcess", Fraud, SecondSharedSourceConf, SharedSinkConf),
+  val FraudTestProcess: ProcessDetails = createBaseProcess(
+    name = "fraudTestProcess",
+    json = createSimpleDisplayableProcess("fraudTestProcess", Fraud, SecondSharedSourceConf, SharedSinkConf),
     category = CategoryFraudTests
   )
 
-  val DeployedFraudProcessWith2Filters: ProcessDetails = displayableToProcess(
-    displayable = {
+  val DeployedFraudProcessWith2Filters: ProcessDetails = createBaseProcess(
+    name = DeployedFraudProcessName,
+    json = {
       val process = ScenarioBuilder
         .streaming(DeployedFraudProcessName)
         .source(DefaultSourceName, SharedSourceName)
@@ -75,13 +80,13 @@ object ComponentTestProcessData {
         .filter(SecondFilterName, "#input.id != null")
         .emptySink(DefaultSinkName, DefaultSinkName)
 
-      toDisplayable(process, processingType = Fraud)
+      toBaseDisplayable(process, processingType = Fraud)
     },
     category = CategoryFraud
   ).copy(lastAction = Some(deployedAction))
 
 
-  val CanceledFraudProcessWith2Enrichers: ProcessDetails = displayableToProcess(
+  val CanceledFraudProcessWith2Enrichers: ProcessDetails = displayableToBaseProcess(
     displayable = {
       val process = ScenarioBuilder
         .streaming(CanceledFraudProcessName)
@@ -90,12 +95,12 @@ object ComponentTestProcessData {
         .enricher(SecondCustomName, "secondCustomOut", CustomerDataEnricherName)
         .emptySink(DefaultSinkName, DefaultSinkName)
 
-      toDisplayable(process, processingType = Fraud)
+      toBaseDisplayable(process, processingType = Fraud)
     },
     category = CategoryFraud
   ).copy(lastAction = Some(canceledAction))
 
-  val ArchivedFraudProcess: ProcessDetails = displayableToProcess(
+  val ArchivedFraudProcess: ProcessDetails = displayableToBaseProcess(
     displayable = createSimpleDisplayableProcess("archivedFraudProcess", Fraud, SecondSharedSourceConf, SharedSinkConf),
     isArchived = true,
     category = CategoryFraud
@@ -111,12 +116,12 @@ object ComponentTestProcessData {
     processingType = Fraud
   )
 
-  val FraudSubprocess: ProcessDetails = createSubProcess(
+  val FraudSubprocess: ProcessDetails = baseDisplayableSubprocess(
     FraudSubprocessName, CategoryFraud, processingType = Fraud, json = Some(fraudDisplayableSubprocess)
   )
 
-  val FraudProcessWithSubprocess: ProcessDetails = displayableToProcess(
-    toDisplayable(
+  val FraudProcessWithSubprocess: ProcessDetails = displayableToBaseProcess(
+    toBaseDisplayable(
       ScenarioBuilder
         .streaming(FraudProcessWithSubprocessName)
         .source(SecondSourceName, SharedSourceName)
@@ -127,12 +132,12 @@ object ComponentTestProcessData {
       , Fraud), category = CategoryFraud
   )
 
-  val WrongCategoryProcess: ProcessDetails = displayableToProcess(
+  val WrongCategoryProcess: ProcessDetails = displayableToBaseProcess(
     displayable = createSimpleDisplayableProcess("wrongCategory", Fraud, SharedSourceConf, SharedSinkConf),
     category = "wrongCategory"
   )
 
-  private def createSimpleDisplayableProcess(id: String, processingType: String, source: NodeConf, sink: NodeConf): DisplayableProcess = toDisplayable(
+  private def createSimpleDisplayableProcess(id: String, processingType: String, source: NodeConf, sink: NodeConf): DisplayableProcess = toBaseDisplayable(
     espProcess = {
       ScenarioBuilder
         .streaming(id)

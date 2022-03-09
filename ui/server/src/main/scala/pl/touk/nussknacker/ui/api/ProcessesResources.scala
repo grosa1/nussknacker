@@ -244,7 +244,7 @@ class ProcessesResources(
           (get & processId(processName)) { processId =>
             complete {
               processService
-                .getProcess[Unit](processId)
+                .getProcess[CanonicalProcess](processId)
                 .map(resp => resp.map(processToolbarService.getProcessToolbarSettings))
                 .map(toResponseEither[ProcessToolbarSettings])
             }

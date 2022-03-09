@@ -148,7 +148,7 @@ class StandardRemoteEnvironmentSpec extends FlatSpec with Matchers with PatientS
 
       override protected def request(path: Uri, method: HttpMethod, request: MessageEntity) : Future[HttpResponse] = {
         if (path.toString().startsWith(s"$baseUri/processes/a") && method == HttpMethods.GET) {
-          Marshal(displayableToProcess(process)).to[RequestEntity].map { entity =>
+          Marshal(displayableToBaseProcess(process)).to[RequestEntity].map { entity =>
             HttpResponse(StatusCodes.OK, entity = entity)
           }
         } else {
@@ -171,7 +171,7 @@ class StandardRemoteEnvironmentSpec extends FlatSpec with Matchers with PatientS
 
       override protected def request(path: Uri, method: HttpMethod, request: MessageEntity) : Future[HttpResponse] = {
         if (path.toString().startsWith(s"$baseUri/processes/%C5%82%C3%B3d%C5%BA") && method == HttpMethods.GET) {
-          Marshal(displayableToProcess(process)).to[RequestEntity].map { entity =>
+          Marshal(displayableToBaseProcess(process)).to[RequestEntity].map { entity =>
             HttpResponse(StatusCodes.OK, entity = entity)
           }
         } else {

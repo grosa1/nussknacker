@@ -26,7 +26,7 @@ class UnionParametersMigrationSpec extends FunSuite {
         .customNode("customNode", "groupedBy", "union", "value" -> "#input")
         .emptySink("sink", existingSinkFactory))
 
-    val results = testMigration.testMigrations(List(TestProcessUtil.validatedToProcess(process)), List())
+    val results = testMigration.testMigrations(List(TestProcessUtil.validatedToBaseProcess(process)), List())
 
     results should have size 1
     val processMigrationResult = results.find(_.converted.id == process.id).get
@@ -43,7 +43,7 @@ class UnionParametersMigrationSpec extends FunSuite {
         .customNode("customNode", "groupedBy", "union-memo", "value" -> "#input")
         .emptySink("sink", existingSinkFactory))
 
-    val results = testMigration.testMigrations(List(TestProcessUtil.validatedToProcess(process)), List())
+    val results = testMigration.testMigrations(List(TestProcessUtil.validatedToBaseProcess(process)), List())
 
     results should have size 1
     val processMigrationResult = results.find(_.converted.id == process.id).get
@@ -59,7 +59,7 @@ class UnionParametersMigrationSpec extends FunSuite {
         .source("source", existingSourceFactory)
         .emptySink("sink", existingSinkFactory))
 
-    val results = testMigration.testMigrations(List(TestProcessUtil.validatedToProcess(process)), List())
+    val results = testMigration.testMigrations(List(TestProcessUtil.validatedToBaseProcess(process)), List())
 
     results should have size 1
     val processMigrationResult = results.find(_.converted.id == process.id).get

@@ -54,7 +54,7 @@ class PdfExporterSpec extends FlatSpec {
     IOUtils.write(exported, new FileOutputStream("/tmp/empty.pdf"))
   }
 
-  private def createDetails(displayable: DisplayableProcess) = TestProcessUtil.toDetails(
+  private def createDetails(displayable: DisplayableProcess) = TestProcessUtil.baseDisplayable(
     "My process",
     json = Some(displayable),
     description = Some("My fancy description, which is quite, quite, quite looooooooong. \n And it contains maaaany, maaany strange features..."),

@@ -294,7 +294,7 @@ class DefaultComponentServiceSpec extends FlatSpec with Matchers with PatientSca
     baseComponents ++ prepareSharedComponents ++ prepareMarketingComponents ++ prepareFraudComponents ++ subprocessMarketingComponents ++ subprocessFraudComponents
 
   private val subprocessFromCategories = AllCategories.flatMap(cat => categoryService.getTypeForCategory(cat).map(processingType =>
-    createSubProcess(cat, category = cat, processingType = processingType)
+    baseDisplayableSubprocess(cat, category = cat, processingType = processingType)
   )).toSet
 
   private def marketingComponent(name: String, icon: String, componentType: ComponentType, componentGroupName: ComponentGroupName, categories: List[String], componentId: Option[ComponentId] = None)(implicit user: LoggedUser) =

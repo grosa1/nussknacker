@@ -57,7 +57,7 @@ class ProcessModelMigratorSpec extends FlatSpec with BeforeAndAfterEach with Pat
 
   private def migrateByVersionsOpt(startFrom: Option[Int], migrations: Int*) : Option[MigrationResult] =
     migrator(migrations: _*).migrateProcess(
-      TestProcessUtil.displayableToProcess(ProcessTestData.validDisplayableProcess.toDisplayable).copy(modelVersion = startFrom),
+      TestProcessUtil.displayableToBaseProcess(ProcessTestData.validDisplayableProcess.toDisplayable).copy(modelVersion = startFrom),
       skipEmptyMigrations = true
     )
 

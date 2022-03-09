@@ -2,18 +2,19 @@ package pl.touk.nussknacker.ui.process
 
 import com.typesafe.config.{Config, ConfigFactory}
 import org.scalatest.{FlatSpec, Matchers}
+import pl.touk.nussknacker.engine.canonicalgraph.CanonicalProcess
 import pl.touk.nussknacker.engine.util.UriUtils
-import pl.touk.nussknacker.restmodel.process.ProcessingType
 import pl.touk.nussknacker.restmodel.processdetails.BaseProcessDetails
 import pl.touk.nussknacker.ui.api.helpers.TestProcessUtil
 import pl.touk.nussknacker.ui.config.processtoolbar._
 
 class ConfigProcessToolbarServiceSpec extends FlatSpec with Matchers {
 
+  import org.scalatest.prop.TableDrivenPropertyChecks._
   import ToolbarButtonConfigType._
   import ToolbarButtonsConfigVariant._
   import ToolbarPanelTypeConfig._
-  import org.scalatest.prop.TableDrivenPropertyChecks._
+  import TestProcessUtil._
 
   private lazy val config: Config = ConfigFactory.parseString(
     """
@@ -80,10 +81,10 @@ class ConfigProcessToolbarServiceSpec extends FlatSpec with Matchers {
   private val service = new ConfigProcessToolbarService(config, categories)
 
   it should "verify all toolbar condition cases" in {
-    val process = createProcess("process", "Category1", isSubprocess = false, isArchived = false)
-    val archivedProcess = createProcess("archived-process", "Category1", isSubprocess = false, isArchived = true)
-    val subprocess = createProcess("subprocess", "Category1", isSubprocess = true, isArchived = false)
-    val archivedSubprocess = createProcess("archived-subprocess", "Category1", isSubprocess = true, isArchived = true)
+    val process = baseCanonical("process", "Category1")
+    val archivedProcess = baseCanonical("archived-process", "Category1", isArchived = true)
+    val subprocess = baseCanonical("subprocess", "Category1", isSubprocess = true)
+    val archivedSubprocess = baseCanonical("archived-subprocess", "Category1", isSubprocess = true, isArchived = true)
 
     val testingData = Table(
       ("process", "condition", "expected"),
@@ -167,14 +168,14 @@ class ConfigProcessToolbarServiceSpec extends FlatSpec with Matchers {
       (archivedSubprocess, Some(ToolbarCondition(Some(true), Some(true), Some(ToolbarConditionType.OneOf))), true)
     )
 
-    forAll(testingData) { (process: BaseProcessDetails[_], condition:  Option[ToolbarCondition], expected: Boolean) =>
+    forAll(testingData) { (process: BaseProcessDetails[CanonicalProcess], condition:  Option[ToolbarCondition], expected: Boolean) =>
       val result = ToolbarHelper.verifyCondition(condition, process)
       result shouldBe expected
     }
   }
 
   it should "raise exception when try get get settings for not existing category" in {
-    val process = createProcess("process", "not-existing", isSubprocess = false, isArchived = false)
+    val process = baseCanonical("process", "not-existing", isSubprocess = false, isArchived = false)
 
     intercept[IllegalArgumentException] {
       service.getProcessToolbarSettings(process)
@@ -182,12 +183,12 @@ class ConfigProcessToolbarServiceSpec extends FlatSpec with Matchers {
   }
 
   it should "properly create process toolbar configuration" in {
-    val process = createProcess("process with space", "Category1", isSubprocess = false, isArchived = false)
-    val archivedProcess = createProcess("archived-process", "Category1", isSubprocess = false, isArchived = true)
-    val subprocess = createProcess("subprocess", "Category1", isSubprocess = true, isArchived = false)
-    val archivedSubprocess = createProcess("archived-subprocess", "Category1", isSubprocess = true, isArchived = true)
-    val processCategory2 = createProcess("process2", "Category2", isSubprocess = false, isArchived = false)
-    val processCategory3 = createProcess("process3", "Category3", isSubprocess = false, isArchived = false)
+    val process = baseCanonical("process with space", "Category1", isSubprocess = false, isArchived = false)
+    val archivedProcess = baseCanonical("archived-process", "Category1", isSubprocess = false, isArchived = true)
+    val subprocess = baseCanonical("subprocess", "Category1", isSubprocess = true, isArchived = false)
+    val archivedSubprocess = baseCanonical("archived-subprocess", "Category1", isSubprocess = true, isArchived = true)
+    val processCategory2 = baseCanonical("process2", "Category2", isSubprocess = false, isArchived = false)
+    val processCategory3 = baseCanonical("process3", "Category3", isSubprocess = false, isArchived = false)
 
     val testingData = Table(
       "process",
@@ -199,14 +200,14 @@ class ConfigProcessToolbarServiceSpec extends FlatSpec with Matchers {
       processCategory3
     )
 
-    forAll(testingData) { (process: BaseProcessDetails[_]) =>
+    forAll(testingData) { (process: BaseProcessDetails[CanonicalProcess]) =>
       val result = service.getProcessToolbarSettings(process)
-      val expected = createProcessToolbarSettings(process)
+      val expected = createCanonicalToolbarSettings(process)
       result shouldBe expected
     }
   }
 
-  private def createProcessToolbarSettings(process: BaseProcessDetails[_]): ProcessToolbarSettings = {
+  private def createCanonicalToolbarSettings(process: BaseProcessDetails[CanonicalProcess]): ProcessToolbarSettings = {
     val processToolbarConfig = ProcessToolbarsConfigProvider.create(config, Some(process.processCategory))
     val id = ToolbarHelper.createProcessToolbarId(processToolbarConfig, process)
 
@@ -331,7 +332,4 @@ class ConfigProcessToolbarServiceSpec extends FlatSpec with Matchers {
         ProcessToolbarSettings("not-exist", Nil, Nil, Nil, Nil)
     }
   }
-
-  private def createProcess(name: String, category: ProcessingType, isSubprocess: Boolean, isArchived: Boolean) =
-    TestProcessUtil.toDetails(name, category, isSubprocess = isSubprocess, isArchived = isArchived)
 }
