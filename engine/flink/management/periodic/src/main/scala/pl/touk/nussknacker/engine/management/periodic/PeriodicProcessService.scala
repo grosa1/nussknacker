@@ -20,6 +20,7 @@ class PeriodicProcessService(delegateDeploymentManager: DeploymentManager,
                              scheduledProcessesRepository: PeriodicProcessesRepository,
                              periodicProcessListener: PeriodicProcessListener,
                              additionalDeploymentDataProvider: AdditionalDeploymentDataProvider,
+                             executionConfig: PeriodicExecutionConfig,
                              clock: Clock)
                             (implicit ec: ExecutionContext) extends LazyLogging {
 
@@ -102,7 +103,8 @@ class PeriodicProcessService(delegateDeploymentManager: DeploymentManager,
   def handleFinished: Future[Unit] = {
 
     def handleSingleProcess(deployedProcess: PeriodicProcessDeployment): Future[Unit] = {
-      delegateDeploymentManager.findJobStatus(deployedProcess.periodicProcess.processVersion.processName).flatMap { state =>
+      val processName = deployedProcess.periodicProcess.processVersion.processName
+      delegateDeploymentManager.findJobStatus(processName).flatMap { state =>
         handleFinishedAction(deployedProcess, state)
           .flatMap { needsReschedule =>
             if (needsReschedule) reschedule(deployedProcess, state) else scheduledProcessesRepository.monad.pure(()).emptyCallback
@@ -111,9 +113,9 @@ class PeriodicProcessService(delegateDeploymentManager: DeploymentManager,
     }
 
     for {
-      deployed <- scheduledProcessesRepository.findDeployed.run
+      executed <- scheduledProcessesRepository.findDeployedOrFailedOnDeploy.run
       //we handle each job separately, if we fail at some point, we will continue on next handleFinished run
-      handled <- Future.sequence(deployed.map(handleSingleProcess))
+      handled <- Future.sequence(executed.map(handleSingleProcess))
     } yield handled.map(_ -> {})
   }
 
@@ -123,7 +125,7 @@ class PeriodicProcessService(delegateDeploymentManager: DeploymentManager,
       def needsReschedule(value: Boolean): RepositoryAction[NeedsReschedule] = a.map(_ => value)
     }
     processState match {
-      case Some(js) if js.status.isFailed => markFailedAction(deployedProcess, processState).needsReschedule(value = false)
+      case Some(js) if js.status.isFailed => markFailedAction(deployedProcess, processState).needsReschedule(executionConfig.rescheduleOnFailure)
       case Some(js) if js.status.isFinished => markFinished(deployedProcess, processState).needsReschedule(value = true)
       case None if deployedProcess.state.status == Deployed => markFinished(deployedProcess, processState).needsReschedule(value = true)
       case _ => scheduledProcessesRepository.monad.pure(()).needsReschedule(value = false)
@@ -159,6 +161,15 @@ class PeriodicProcessService(delegateDeploymentManager: DeploymentManager,
       _ <- scheduledProcessesRepository.markFinished(deployment.id)
       currentState <- scheduledProcessesRepository.findProcessData(deployment.id)
     } yield handleEvent(FinishedEvent(currentState, state))
+  }
+
+  private def markFailedOnDeployAction(deployment: PeriodicProcessDeployment, state: Option[ProcessState]): RepositoryAction[Unit] = {
+    logger.info(s"Marking ${deployment.display} as failed on deploy")
+
+    for {
+      _ <- scheduledProcessesRepository.markFailedOnDeploy(deployment.id)
+      currentState <- scheduledProcessesRepository.findProcessData(deployment.id)
+    } yield handleEvent(FailedOnDeployEvent(currentState, state))
   }
 
   private def markFailedAction(deployment: PeriodicProcessDeployment, state: Option[ProcessState]): RepositoryAction[Unit] = {
@@ -226,7 +237,7 @@ class PeriodicProcessService(delegateDeploymentManager: DeploymentManager,
       // We can recover since deployment actor watches only future completion.
       .recoverWith { case exception =>
         logger.error(s"Scenario deployment ${deployment.display} failed", exception)
-        markFailedAction(deployment, None).run
+        markFailedOnDeployAction(deployment, None).run
       }
   }
 

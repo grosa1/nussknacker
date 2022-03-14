@@ -8,7 +8,7 @@ import pl.touk.nussknacker.engine.api.process.ProcessName
 import pl.touk.nussknacker.engine.management.FlinkStateStatus
 import pl.touk.nussknacker.engine.management.periodic.db.PeriodicProcessesRepository.createPeriodicProcessDeployment
 import pl.touk.nussknacker.engine.management.periodic.model.{PeriodicProcessDeployment, PeriodicProcessDeploymentStatus}
-import pl.touk.nussknacker.engine.management.periodic.service.{AdditionalDeploymentDataProvider, DeployedEvent, FailedEvent, FinishedEvent, PeriodicProcessEvent, PeriodicProcessListener, ScheduledEvent}
+import pl.touk.nussknacker.engine.management.periodic.service.{AdditionalDeploymentDataProvider, DeployedEvent, FailedEvent, FailedOnDeployEvent, FinishedEvent, PeriodicProcessEvent, PeriodicProcessListener, ScheduledEvent}
 import pl.touk.nussknacker.test.PatientScalaFutures
 
 import java.time.temporal.{ChronoField, ChronoUnit, TemporalField}
@@ -40,10 +40,12 @@ class PeriodicProcessServiceTest extends FunSuite
       new PeriodicProcessListener {
         override def onPeriodicProcessEvent: PartialFunction[PeriodicProcessEvent, Unit] = { case k => events.append(k) }
       },
-      new AdditionalDeploymentDataProvider {
+      additionalDeploymentDataProvider = new AdditionalDeploymentDataProvider {
         override def prepareAdditionalData(runDetails: PeriodicProcessDeployment): Map[String, String] =
           additionalData + ("runId" -> runDetails.id.value.toString)
-      }, Clock.systemDefaultZone()
+      },
+      executionConfig = PeriodicExecutionConfig(),
+      clock = Clock.systemDefaultZone()
     )
   }
 
@@ -131,10 +133,10 @@ class PeriodicProcessServiceTest extends FunSuite
 
     f.periodicProcessService.deploy(toSchedule).futureValue
 
-    f.repository.deploymentEntities.loneElement.status shouldBe PeriodicProcessDeploymentStatus.Failed
+    f.repository.deploymentEntities.loneElement.status shouldBe PeriodicProcessDeploymentStatus.FailedOnDeploy
 
     val expectedDetails = createPeriodicProcessDeployment(f.repository.processEntities.loneElement, f.repository.deploymentEntities.loneElement)
-    f.events.toList shouldBe List(FailedEvent(expectedDetails, None))
+    f.events.toList shouldBe List(FailedOnDeployEvent(expectedDetails, None))
   }
 
   test("Schedule new scenario only if at least one date in the future") {

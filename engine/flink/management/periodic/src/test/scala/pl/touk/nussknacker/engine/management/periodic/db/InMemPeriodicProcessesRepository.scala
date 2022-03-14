@@ -91,10 +91,11 @@ class InMemPeriodicProcessesRepository extends PeriodicProcessesRepository {
 
   override def findToBeDeployed: Seq[PeriodicProcessDeployment]= ???
 
-  override def findDeployed: Seq[PeriodicProcessDeployment] =
+  override def findDeployedOrFailedOnDeploy: Seq[PeriodicProcessDeployment] =
     for {
       p <- processEntities if p.active
-      d <- deploymentEntities if d.periodicProcessId == p.id && d.status == PeriodicProcessDeploymentStatus.Deployed
+      d <- deploymentEntities if d.periodicProcessId == p.id &&
+        Seq(PeriodicProcessDeploymentStatus.Deployed, PeriodicProcessDeploymentStatus.FailedOnDeploy).contains(d.status)
     } yield createPeriodicProcessDeployment(p, d)
 
   override def findProcessData(id: PeriodicProcessDeploymentId): PeriodicProcessDeployment =
@@ -118,6 +119,10 @@ class InMemPeriodicProcessesRepository extends PeriodicProcessesRepository {
 
   override def markFailed(id: PeriodicProcessDeploymentId): Unit = {
     update(id)(_.copy(status = PeriodicProcessDeploymentStatus.Failed, completedAt = Some(LocalDateTime.now())))
+  }
+
+  override def markFailedOnDeploy(id: PeriodicProcessDeploymentId): Unit = {
+    update(id)(_.copy(status = PeriodicProcessDeploymentStatus.FailedOnDeploy, completedAt = Some(LocalDateTime.now())))
   }
 
   override def schedule(id: PeriodicProcessId, scheduleName: Option[String], runAt: LocalDateTime): PeriodicProcessDeployment = {

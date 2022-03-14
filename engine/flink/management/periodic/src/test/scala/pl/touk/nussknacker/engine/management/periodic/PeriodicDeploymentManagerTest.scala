@@ -31,7 +31,7 @@ class PeriodicDeploymentManagerTest extends FunSuite
   private val processName = ProcessName("test1")
   private val processVersion = ProcessVersion(versionId = 42L, processName = processName, user = "test user", modelVersion = None)
 
-  class Fixture {
+  class Fixture(executionConfig: PeriodicExecutionConfig = PeriodicExecutionConfig()) {
     val repository = new db.InMemPeriodicProcessesRepository
     val delegateDeploymentManagerStub = new DeploymentManagerStub
     val jarManagerStub = new JarManagerStub
@@ -39,8 +39,10 @@ class PeriodicDeploymentManagerTest extends FunSuite
       delegateDeploymentManager = delegateDeploymentManagerStub,
       jarManager = jarManagerStub,
       scheduledProcessesRepository = repository,
-      EmptyListener,
-      DefaultAdditionalDeploymentDataProvider, Clock.systemDefaultZone()
+      periodicProcessListener = EmptyListener,
+      additionalDeploymentDataProvider = DefaultAdditionalDeploymentDataProvider,
+      executionConfig = executionConfig,
+      clock = Clock.systemDefaultZone()
     )
     val periodicDeploymentManager = new PeriodicDeploymentManager(
       delegate = delegateDeploymentManagerStub,
@@ -236,6 +238,20 @@ class PeriodicDeploymentManagerTest extends FunSuite
     f.repository.processEntities.loneElement.active shouldBe false
     f.repository.deploymentEntities.loneElement.status shouldBe PeriodicProcessDeploymentStatus.Failed
     f.periodicDeploymentManager.findJobStatus(processName).futureValue.get.status shouldBe SimpleStateStatus.Canceled
+  }
+
+  test("should reschedule failed job after RescheduleActor handles finished when configured") {
+    val f = new Fixture(executionConfig = PeriodicExecutionConfig(rescheduleOnFailure = true))
+    f.repository.addActiveProcess(processName, PeriodicProcessDeploymentStatus.Deployed)
+    f.delegateDeploymentManagerStub.setStateStatus(FlinkStateStatus.Failed)
+
+    //this one is cyclically called by RescheduleActor
+    f.periodicProcessService.handleFinished.futureValue
+
+    val state = f.periodicDeploymentManager.findJobStatus(processName).futureValue.get
+    state.status shouldBe a[ScheduledStatus]
+    f.repository.deploymentEntities.map(_.status) shouldBe List(PeriodicProcessDeploymentStatus.Failed, PeriodicProcessDeploymentStatus.Scheduled)
+    f.repository.processEntities.loneElement.active shouldBe true
   }
 
   test("should cancel failed job before RescheduleActor handles finished") {

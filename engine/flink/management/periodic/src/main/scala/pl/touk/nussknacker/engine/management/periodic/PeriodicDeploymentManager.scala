@@ -24,6 +24,7 @@ import scala.concurrent.duration._
 import scala.concurrent.{Await, ExecutionContext, Future}
 
 object PeriodicDeploymentManager {
+
   def apply(delegate: DeploymentManager,
             schedulePropertyExtractorFactory: SchedulePropertyExtractorFactory,
             enrichDeploymentWithJarDataFactory: EnrichDeploymentWithJarDataFactory,
@@ -45,7 +46,10 @@ object PeriodicDeploymentManager {
     val scheduledProcessesRepository = new SlickPeriodicProcessesRepository(db, dbProfile, clock)
     val jarManager = FlinkJarManager(flinkConfig, periodicBatchConfig, modelData, enrichDeploymentWithJarDataFactory(originalConfig))
     val listener = listenerFactory.create(originalConfig)
-    val service = new PeriodicProcessService(delegate, jarManager, scheduledProcessesRepository, listener, additionalDeploymentDataProvider, clock)
+    val service = new PeriodicProcessService(
+      delegate, jarManager, scheduledProcessesRepository, listener, additionalDeploymentDataProvider,
+      periodicBatchConfig.executionConfig, clock
+    )
     system.actorOf(DeploymentActor.props(service, periodicBatchConfig.deployInterval))
     system.actorOf(RescheduleFinishedActor.props(service, periodicBatchConfig.rescheduleCheckInterval))
 

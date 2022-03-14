@@ -34,5 +34,5 @@ case class PeriodicProcessDeploymentId(value: Long) extends AnyVal with MappedTo
 object PeriodicProcessDeploymentStatus extends Enumeration {
   type PeriodicProcessDeploymentStatus = Value
 
-  val Scheduled, Deployed, Finished, Failed = Value
+  val Scheduled, Deployed, FailedOnDeploy, Finished, Failed = Value
 }
