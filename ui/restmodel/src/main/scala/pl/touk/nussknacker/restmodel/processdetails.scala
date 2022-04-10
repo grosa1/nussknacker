@@ -62,7 +62,18 @@ object processdetails {
   object BaseProcessDetails {
     //It's necessary to encode / decode ProcessState
     import ProcessState._
-    implicit def encoder[T](implicit shape: Encoder[T]): Encoder[BaseProcessDetails[T]] = deriveConfiguredEncoder
+
+    import io.circe.syntax.EncoderOps
+    import io.circe.Json
+
+    implicit def encoder[T](implicit shape: Encoder[T]): Encoder[BaseProcessDetails[T]] = new Encoder[BaseProcessDetails[T]] {
+      override def apply(a: BaseProcessDetails[T]): Json = {
+        val derived = deriveConfiguredEncoder[BaseProcessDetails[T]]
+        val baseJson = derived.apply(a)
+        val jsonToAdd = Map("modifiedAt" -> a.createdAt.asJson, "modifiedBy" -> a.createdBy.asJson).asJson
+        baseJson.deepMerge(jsonToAdd)
+      }
+    }
     implicit def decoder[T](implicit shape: Decoder[T]): Decoder[BaseProcessDetails[T]] = deriveConfiguredDecoder
   }
 

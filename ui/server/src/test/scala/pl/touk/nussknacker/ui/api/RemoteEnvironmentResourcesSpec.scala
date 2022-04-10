@@ -36,6 +36,14 @@ class RemoteEnvironmentResourcesSpec extends FlatSpec with ScalatestRouteTest wi
   private val processName: ProcessName = ProcessName(processId)
 
   val readWritePermissions: CategorizedPermission = testPermissionRead |+| testPermissionWrite
+
+  it should "encode base process" in {
+    import io.circe.syntax.EncoderOps
+    val str = ProcessTestData.toDetails(ProcessTestData.validDisplayableProcess).asJson.spaces2
+    str should include("\"modifiedAt\"")
+    str should include("\"modifiedBy\"")
+  }
+
   it should "fail when scenario does not exist" in {
     val remoteEnvironment = new MockRemoteEnvironment
     val route = withPermissions(new RemoteEnvironmentResources(remoteEnvironment, fetchingProcessRepository, processAuthorizer),readWritePermissions)
