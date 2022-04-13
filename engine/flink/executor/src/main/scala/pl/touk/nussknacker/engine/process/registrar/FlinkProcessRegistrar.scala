@@ -19,13 +19,14 @@ import pl.touk.nussknacker.engine.flink.api.compat.ExplicitUidInOperatorsSupport
 import pl.touk.nussknacker.engine.flink.api.process._
 import pl.touk.nussknacker.engine.flink.api.typeinformation.TypeInformationDetection
 import pl.touk.nussknacker.engine.graph.EspProcess
-import pl.touk.nussknacker.engine.graph.node.BranchEndDefinition
+import pl.touk.nussknacker.engine.graph.node.{BranchEndDefinition, Enricher, NodeData, Processor}
 import pl.touk.nussknacker.engine.process.compiler.{FlinkEngineRuntimeContextImpl, FlinkProcessCompiler, FlinkProcessCompilerData}
 import pl.touk.nussknacker.engine.process.typeinformation.TypeInformationDetectionUtils
 import pl.touk.nussknacker.engine.process.util.StateConfiguration.RocksDBStateBackendConfig
 import pl.touk.nussknacker.engine.process.{CheckpointConfig, ExecutionConfigPreparer, FlinkCompatibilityProvider}
 import pl.touk.nussknacker.engine.resultcollector.{ProductionServiceInvocationCollector, ResultCollector}
 import pl.touk.nussknacker.engine.splittedgraph.end.BranchEnd
+import pl.touk.nussknacker.engine.splittedgraph.{SplittedNodesCollector, splittednode}
 import pl.touk.nussknacker.engine.splittedgraph.splittednode.EndingNode
 import pl.touk.nussknacker.engine.testmode.{SinkInvocationCollector, TestRunId, TestServiceInvocationCollector}
 import pl.touk.nussknacker.engine.util.loader.ScalaServiceLoader
@@ -42,6 +43,8 @@ import scala.language.implicitConversions
  */
 class FlinkProcessRegistrar(compileProcess: (EspProcess, ProcessVersion, DeploymentData, ResultCollector) => ClassLoader => FlinkProcessCompilerData,
                             streamExecutionEnvPreparer: StreamExecutionEnvPreparer) extends LazyLogging {
+
+  import FlinkProcessRegistrar._
 
   implicit def millisToTime(duration: Long): Time = Time.of(duration, TimeUnit.MILLISECONDS)
 
@@ -119,7 +122,7 @@ class FlinkProcessRegistrar(compileProcess: (EspProcess, ProcessVersion, Deploym
         .sourceStream(env, nodeContext(nodeComponentInfoFrom(part), Left(ValidationContext.empty)))
         .process(new SourceMetricsFunction(part.id))(contextTypeInformation)
 
-      val asyncAssigned = registerInterpretationPart(start, part, "interpretation")
+      val asyncAssigned = registerInterpretationPart(start, part, InterpretationName)
 
       registerNextParts(asyncAssigned, part)
     }
@@ -146,7 +149,7 @@ class FlinkProcessRegistrar(compileProcess: (EspProcess, ProcessVersion, Deploym
         .transform(inputs.mapValues(_._1), nodeContext(nodeComponentInfoFrom(joinPart), Right(inputs.mapValues(_._2))))
         .map(newContextFun)(typeInformationDetection.forContext(joinPart.validationContext))
 
-      val afterSplit = registerInterpretationPart(newStart, joinPart, "branchInterpretation")
+      val afterSplit = registerInterpretationPart(newStart, joinPart, BranchInterpretationName)
       registerNextParts(afterSplit, joinPart)
     }
 
@@ -223,7 +226,7 @@ class FlinkProcessRegistrar(compileProcess: (EspProcess, ProcessVersion, Deploym
             case None => ir.context
           }
           val newStart = transformed.map(newContextFun)(typeInformationDetection.forContext(part.validationContext))
-          val afterSplit = registerInterpretationPart(newStart, part, "customNodeInterpretation")
+          val afterSplit = registerInterpretationPart(newStart, part, CustomNodeInterpretationName)
           registerNextParts(afterSplit, part)
       }
     }
@@ -241,11 +244,10 @@ class FlinkProcessRegistrar(compileProcess: (EspProcess, ProcessVersion, Deploym
       val metaData = processWithDeps.metaData
       val streamMetaData = MetaDataExtractor.extractTypeSpecificDataOrFail[StreamMetaData](metaData)
 
-      val useIOMonad = globalParameters.flatMap(_.configParameters).flatMap(_.useIOMonadInInterpreter).getOrElse(true)
-      //TODO: we should detect automatically that Interpretation has no async enrichers and invoke sync function then, as async comes with
-      //performance penalty...
+      val configParameters = globalParameters.flatMap(_.configParameters)
+      val useIOMonad = configParameters.flatMap(_.useIOMonadInInterpreter).getOrElse(true)
       val defaultAsync: DefaultAsyncInterpretationValue = DefaultAsyncInterpretationValueDeterminer.determine(asyncExecutionContextPreparer)
-      val shouldUseAsyncInterpretation = streamMetaData.useAsyncInterpretation.getOrElse(defaultAsync.value)
+      val shouldUseAsyncInterpretation = streamMetaData.useAsyncInterpretation.getOrElse(defaultAsync.value) && !ForceSyncInterpretationDeterminer(configParameters).forNode(node)
       (if (shouldUseAsyncInterpretation) {
         val asyncFunction = new AsyncInterpretationFunction(compiledProcessWithDeps, node, validationContext, asyncExecutionContextPreparer, useIOMonad)
         ExplicitUidInOperatorsSupport.setUidIfNeed(ExplicitUidInOperatorsSupport.defaultExplicitUidInStatefulOperators(globalParameters), node.id + "-$async")(
@@ -254,9 +256,10 @@ class FlinkProcessRegistrar(compileProcess: (EspProcess, ProcessVersion, Deploym
       } else {
         val ti = InterpretationResultTypeInformation.create(typeInformationDetection, outputContexts)
         stream.flatMap(new SyncInterpretationFunction(compiledProcessWithDeps, node, validationContext, useIOMonad))(ti)
-      }).name(s"${metaData.id}-${node.id}-$name")
+      }).name(s"${metaData.id}-${node.id}-$name${if (shouldUseAsyncInterpretation) "Async" else "Sync"}")
         .process(new SplitFunction(outputContexts, typeInformationDetection))(org.apache.flink.streaming.api.scala.createTypeInformation[Unit])
     }
+
   }
 
   private def nodeComponentInfoFrom(processPart: ProcessPart): NodeComponentInfo = {
@@ -267,6 +270,10 @@ class FlinkProcessRegistrar(compileProcess: (EspProcess, ProcessVersion, Deploym
 object FlinkProcessRegistrar {
 
   private[registrar] final val EndId = "$end"
+  final val InterpretationName = "interpretation"
+  final val CustomNodeInterpretationName = "customNodeInterpretation"
+  final val BranchInterpretationName = "branchInterpretation"
+
 
   import net.ceedubs.ficus.Ficus._
   import net.ceedubs.ficus.readers.ArbitraryTypeReader._
