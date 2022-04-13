@@ -6,7 +6,7 @@ import org.apache.flink.api.common.typeinfo.TypeInformation
 import org.apache.flink.streaming.api.scala.StreamExecutionEnvironment
 import pl.touk.nussknacker.engine.api.ProcessVersion
 import pl.touk.nussknacker.engine.api.component.ComponentDefinition
-import pl.touk.nussknacker.engine.api.process.{EmptyProcessConfigCreator, SinkFactory, SourceFactory}
+import pl.touk.nussknacker.engine.api.process.{EmptyProcessConfigCreator, SourceFactory}
 import pl.touk.nussknacker.engine.api.typed.typing.Typed
 import pl.touk.nussknacker.engine.deployment.DeploymentData
 import pl.touk.nussknacker.engine.flink.test.FlinkMiniClusterHolder
@@ -14,7 +14,6 @@ import pl.touk.nussknacker.engine.flink.util.source.CollectionSource
 import pl.touk.nussknacker.engine.graph.EspProcess
 import pl.touk.nussknacker.engine.process.ExecutionConfigPreparer
 import pl.touk.nussknacker.engine.process.compiler.FlinkProcessCompilerWithTestComponents
-import pl.touk.nussknacker.engine.process.helpers.SampleNodes.MockService
 import pl.touk.nussknacker.engine.process.helpers.SinkForType
 import pl.touk.nussknacker.engine.process.registrar.FlinkProcessRegistrar
 import pl.touk.nussknacker.engine.testing.LocalModelData
@@ -32,10 +31,10 @@ object testComponents {
 
 case class SinkForList[T]() extends SinkForType[List[T]]
 
-class FlinkTestScenarioRunner[T](val components: List[ComponentDefinition], val config: Config, flinkMiniCluster: FlinkMiniClusterHolder) extends TestScenarioRunner {
+class FlinkTestScenarioRunner(val components: List[ComponentDefinition], val config: Config, flinkMiniCluster: FlinkMiniClusterHolder) extends TestScenarioRunner {
   var testComponentHolder: TestComponentHolder = _
 
-  override def runWithData[T: ClassTag](scenario: EspProcess, data: List[T]): Unit = {
+  override def runWithData[T: ClassTag, Result](scenario: EspProcess, data: List[T]): List[Result] = {
 
     implicit val typeInf: TypeInformation[T] = TypeInformation.of(implicitly[ClassTag[T]].runtimeClass.asInstanceOf[Class[T]])
     val modelData = LocalModelData(config, new EmptyProcessConfigCreator)
@@ -48,9 +47,9 @@ class FlinkTestScenarioRunner[T](val components: List[ComponentDefinition], val 
     val registrar = FlinkProcessRegistrar(new FlinkProcessCompilerWithTestComponents(testComponentHolder, modelData), ExecutionConfigPreparer.unOptimizedChain(modelData))
     registrar.register(new StreamExecutionEnvironment(env), scenario, ProcessVersion.empty, DeploymentData.empty, Some(testComponentHolder.runId))
     env.executeAndWaitForFinished(scenario.id)()
+    testComponentHolder.results(testComponentHolder.runId).map((k: Any) => k.asInstanceOf[Result])
   }
 
-  override def results(): List[T] = testComponentHolder.results(testComponentHolder.runId)
 }
 
 object NuTestScenarioRunner {
