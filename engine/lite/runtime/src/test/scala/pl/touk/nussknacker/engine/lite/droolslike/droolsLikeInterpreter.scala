@@ -47,6 +47,14 @@ object model {
 
 }
 
+/*
+  to co ponizej obsluguje przypadek: "jest zdarzenie A i zdarzenie B"
+  Do wymyslenia, jak obsłużyc przypadek: "jest zdarzenie A i *nie ma* zdarzenia B
+  W szczególnosci, co w sytuacji kiedy mamy (A and(1) not B) and(2) C
+  i mamy A, jeszcze nie bylo C, w wezle and(2) mamy juz spropagowany czesciowy match z and(1), a
+  przychodzi B i match powinien sie wyzerowac... byc moze powinien byc specjalny id w #matchid, ktory
+  reprezentuje "sztuczny event" nie-ma-B? i potem odp. to obslugiwac jakos...
+*/
 object droolsLikeInterpreter {
 
   type Key = String
