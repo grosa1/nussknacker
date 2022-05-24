@@ -27,7 +27,7 @@ import pl.touk.nussknacker.engine.lite.api.utils.sinks.LazyParamSink
 import pl.touk.nussknacker.engine.lite.api.{commonTypes, customComponentTypes, interpreterTypes}
 import pl.touk.nussknacker.engine.lite.capabilities.FixedCapabilityTransformer
 import pl.touk.nussknacker.engine.lite.droolslike.components.JoinerDefinition
-import pl.touk.nussknacker.engine.lite.droolslike.droolsLikeInterpreter.{MatchId, MonadState, NodeState, PartialMatches, RecordedMatch, State, Value}
+import pl.touk.nussknacker.engine.lite.droolslike.droolsLikeInterpreter.{MatchId, MonadState, NodeState, PartialMatches, RecordedMatch, State, Value, matchIdVariable}
 import pl.touk.nussknacker.engine.lite.droolslike.model.Event
 import pl.touk.nussknacker.engine.spel.Implicits._
 import pl.touk.nussknacker.engine.testing.LocalModelData
@@ -55,7 +55,16 @@ object droolsLikeInterpreter {
 
   type Value = AnyRef
 
-  //tutaj klasy wewnetrzne na stan - dopasowania
+  //ukryta zmienna w kontekscie, za pomoca ktorej przekazujemy wiedze na podstawie jakich elementow context powstal
+  //(czyli input + dopasowane zdarzenia z joinow)
+  val matchIdVariable = "#matchid"
+
+  /*
+    tutaj klasy wewnetrzne na stan:
+    - nodes - stan dopasowan w poszczegolnych wezlach
+    - recordedMatches - jak wrzucamy zdarzenie, to patrzymy do jakis wezlow dochodzi, jesli wczesniej zdarzenie o danym id
+      jest w stanie wezla, a teraz do niego nie dochodzi - tzn. ze cos sie zmienilo, trzeba dotychczasowe dopasowanie wyrzucic ze stanu
+   */
   case class State(nodes: Map[NodeId, NodeState], recordedMatches: List[RecordedMatch])
 
   case class NodeState(partialMatches: Map[Key, PartialMatches])
@@ -81,6 +90,7 @@ object droolsLikeInterpreter {
 
 }
 
+//tu jest najprostszy join - po kluczu, bez negacji itd.
 object components {
 
   class JoinerDefinition extends CustomStreamTransformer with JoinGenericNodeTransformation[LiteJoinCustomComponent] {
@@ -148,7 +158,7 @@ object components {
     }
 
     private def invoke(branchNames: List[BranchId], state: droolsLikeInterpreter.State, branchId: BranchId, key: String, value: Value, ctx: Context): (droolsLikeInterpreter.State, DataBatch) = {
-      val ids: MatchId = ctx.apply[MatchId]("#matchid")
+      val ids: MatchId = ctx.apply[MatchId](matchIdVariable)
       val partialMatches = state.nodes.getOrElse(nodeId, NodeState(Map.empty)).partialMatches
       val partialsForKey: PartialMatches = partialMatches.getOrElse(key, PartialMatches(branchNames.map(_ -> Map.empty[MatchId, Value]).toMap))
       val noChangeMade = partialsForKey.matches(branchId).get(ids).contains(value)
@@ -184,7 +194,7 @@ object components {
       val ctxs: List[Context] = generated.map { branchToVals =>
         Context("").withVariables(Map(
           output -> branchToVals.map { case (k, (_, value)) => k.value -> value }.asJava,
-          "#matchid" -> branchToVals.values.flatMap(_._1).toSet
+          matchIdVariable -> branchToVals.values.flatMap(_._1).toSet
         ))
       }
       val newMatchesForBranch = partials.matches.getOrElse(branchId, Map.empty) + (ids -> value)
@@ -215,7 +225,7 @@ object sample {
     @MethodToInvoke
     def create(): Source = new LiteSource[Event] with ReturningType {
       override def createTransformation[F[_] : Monad](evaluateLazyParameter: CustomComponentContext[F]): Event => ValidatedNel[ErrorType, Context] =
-        input => Valid(Context(s"${input.id}-${input.version}", Map("input" -> input, "#matchid" -> Set(input.id)), None))
+        input => Valid(Context(s"${input.id}-${input.version}", Map("input" -> input, matchIdVariable -> Set(input.id)), None))
 
       override def returnType: typing.TypingResult = Typed[Event]
     }
@@ -273,7 +283,8 @@ object test extends App {
   val interpreter = sample.scenarioInterpreter(scenario)
   interpreter.open(LiteEngineRuntimeContextPreparer.noOp.prepare(JobData(scenario.metaData, ProcessVersion.empty)))
 
-
+  //tu jest glowna petla, dla kazdego zdarzenia odpalamy interpreter, potem
+  //usuwamy ze stanu te czesciowe dopasowania, ktore powstaly na podstawie danego eventu, a ktore nie zostaly dopasowane obecnie
   private def invoke(events: List[Event]): List[ResultType[EndResult[AnyRef]]] = {
     events.foldLeft((Map.empty[NodeId, NodeState], List.empty[ResultType[EndResult[AnyRef]]])) {
       case ((state, actions), event) =>
