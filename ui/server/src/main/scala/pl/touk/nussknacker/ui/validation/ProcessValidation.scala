@@ -69,6 +69,7 @@ class ProcessValidation(validators: ProcessingTypeDataProvider[ProcessValidator]
 
   def uiValidation(displayable: DisplayableProcess): ValidationResult = {
     validateIds(displayable)
+      .add(validateEmptyId(displayable))
       .add(validateDuplicates(displayable))
       .add(validateLooseNodes(displayable))
       .add(validateEdgeUniqueness(displayable))
@@ -161,7 +162,14 @@ class ProcessValidation(validators: ProcessingTypeDataProvider[ProcessValidator]
     } else {
       ValidationResult.errors(Map(), List(), List(PrettyValidationErrors.duplicatedNodeIds(uiValidationError, duplicates)))
     }
+  }
 
+  private def validateEmptyId(displayableProcess: DisplayableProcess): ValidationResult = {
+    if (displayableProcess.nodes.exists(_.id.isEmpty)) {
+      ValidationResult.errors(Map(), List(), List(PrettyValidationErrors.emptyNodeId(uiValidationError)))
+    } else {
+      ValidationResult.success
+    }
   }
 
   private def formatErrors(errors: NonEmptyList[ProcessCompilationError]): ValidationResult = {
