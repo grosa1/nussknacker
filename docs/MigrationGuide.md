@@ -53,7 +53,6 @@ To see the biggest differences please consult the [changelog](Changelog.md).
   * module `nussknacker-flink-avro-components-utils` -> `nussknacker-flink-schemed-kafka-components-utils`
   * package `pl.touk.nussknacker.engine.avro` -> `pl.touk.nussknacker.engine.schemedkafka`
   * object `KafkaAvroBaseComponentTransformer` -> `KafkaUniversalComponentTransformer`
-* [#3412](https://github.com/TouK/nussknacker/pull/3412) More strict filtering method types. Methods with parameters or result like `Collection[IllegalType]` are no longer available in SpEl.
 
 ### REST API changes
 
@@ -74,6 +73,8 @@ To see the biggest differences please consult the [changelog](Changelog.md).
 * [#3249](https://github.com/TouK/nussknacker/pull/3249)[#3250](https://github.com/TouK/nussknacker/pull/3250) Some kafka related libraries were bumped: Confluent 5.5->7.2, avro 1.9->1.11, kafka 2.4 -> 3.2. 
   It may have influence on your custom components if you depend on `kafka-components-utils` or `avro-components-utils` module
 * [#3376](https://github.com/TouK/nussknacker/pull/3376) Behavior of Flink's Kafka deserialization errors handling was changed - now instead of job failure, invalid message is omitted and configured `exceptionHandler` mechanism is used.
+* [#3370](https://github.com/TouK/nussknacker/pull/3370) Feature: scenario node category verification on validation
+    From now import scenario with nodes from other categories than scenario category will be not allowed. Downgraded from NU 1.6.
 
 ## In version 1.4.0
                  
