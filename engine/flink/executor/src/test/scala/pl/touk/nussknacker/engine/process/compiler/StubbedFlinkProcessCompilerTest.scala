@@ -5,7 +5,8 @@ import com.typesafe.config.ConfigValueFactory._
 import com.typesafe.config.{ConfigFactory, ConfigValueFactory}
 import org.apache.flink.api.common.ExecutionConfig
 import org.apache.flink.api.scala._
-import org.scalatest.{FunSuite, Matchers}
+import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.matchers.should.Matchers
 import pl.touk.nussknacker.engine.api.process.{ProcessObjectDependencies, SourceFactory, WithCategories}
 import pl.touk.nussknacker.engine.api.test.{TestData, TestDataParser}
 import pl.touk.nussknacker.engine.api.typed.typing.Typed
@@ -26,7 +27,7 @@ import pl.touk.nussknacker.engine.util.namespaces.DefaultNamespacedObjectNaming
 
 import scala.concurrent.duration._
 
-class StubbedFlinkProcessCompilerTest extends FunSuite with Matchers {
+class StubbedFlinkProcessCompilerTest extends AnyFunSuite with Matchers {
 
   private val scenarioWithSingleSource = ScenarioBuilder.streaming("test")
     .source("left-source", "test-source")

@@ -3,7 +3,9 @@ package pl.touk.nussknacker.ui.security.oauth2
 import akka.http.scaladsl.model.StatusCodes
 import akka.http.scaladsl.testkit.ScalatestRouteTest
 import de.heikoseeberger.akkahttpcirce.FailFastCirceSupport
-import org.scalatest._
+
+import org.scalatest.funspec.AnyFunSpec
+import org.scalatest.matchers.should.Matchers
 import pl.touk.nussknacker.ui.security.http.RecordingSttpBackend
 import sttp.client.Response
 import sttp.client.testing.SttpBackendStub
@@ -12,7 +14,7 @@ import sttp.model.{StatusCode, Uri}
 import scala.concurrent.Future
 import scala.language.higherKinds
 
-class OAuth2AuthenticationResourcesSpec extends FunSpec with Matchers with ScalatestRouteTest with FailFastCirceSupport {
+class OAuth2AuthenticationResourcesSpec extends AnyFunSpec with Matchers with ScalatestRouteTest with FailFastCirceSupport {
 
   val config = ExampleOAuth2ServiceFactory.testConfig
 

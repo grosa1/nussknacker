@@ -2,7 +2,9 @@ package pl.touk.nussknacker.engine.types
 
 import io.circe.Decoder
 import org.scalatest.prop.TableDrivenPropertyChecks._
-import org.scalatest.{FunSuite, Matchers, OptionValues}
+import org.scalatest.OptionValues
+import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.matchers.should.Matchers
 import pl.touk.nussknacker.engine.api.process.PropertyFromGetterExtractionStrategy.{AddPropertyNextToGetter, DoNothing, ReplaceGetterWithProperty}
 import pl.touk.nussknacker.engine.api.process._
 import pl.touk.nussknacker.engine.api.typed.typing
@@ -18,7 +20,7 @@ import scala.annotation.meta.getter
 import scala.concurrent.Future
 import scala.reflect.runtime.universe._
 
-class EspTypeUtilsSpec extends FunSuite with Matchers with OptionValues {
+class EspTypeUtilsSpec extends AnyFunSuite with Matchers with OptionValues {
 
   case class SampleClass(foo: Int, bar: String) extends SampleAbstractClass with SampleInterface {
     def returnContext: Context = null

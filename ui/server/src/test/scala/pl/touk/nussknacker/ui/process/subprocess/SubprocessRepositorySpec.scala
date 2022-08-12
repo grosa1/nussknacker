@@ -2,7 +2,9 @@ package pl.touk.nussknacker.ui.process.subprocess
 
 import akka.http.scaladsl.model.StatusCodes
 import akka.http.scaladsl.testkit.ScalatestRouteTest
-import org.scalatest.{BeforeAndAfterEach, FlatSpec, Matchers}
+import org.scalatest.{BeforeAndAfterEach}
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers
 import pl.touk.nussknacker.engine.api.process.VersionId
 import pl.touk.nussknacker.test.VeryPatientScalaFutures
 import pl.touk.nussknacker.ui.api.helpers.{EspItTest, ProcessTestData, TestProcessingTypes}
@@ -10,7 +12,7 @@ import pl.touk.nussknacker.ui.process.marshall.ProcessConverter
 
 import scala.language.higherKinds
 
-class SubprocessRepositorySpec extends FlatSpec with ScalatestRouteTest with Matchers with BeforeAndAfterEach with EspItTest with VeryPatientScalaFutures {
+class SubprocessRepositorySpec extends AnyFlatSpec with ScalatestRouteTest with Matchers with BeforeAndAfterEach with EspItTest with VeryPatientScalaFutures {
 
   import pl.touk.nussknacker.ui.api.helpers.TestFactory.testCategoryName
   it should "fetches fragment by its version" in {

@@ -1,7 +1,9 @@
 package pl.touk.nussknacker.ui.security.oauth2
 
 import io.circe.Json
-import org.scalatest.{FlatSpec, Matchers, Suite}
+import org.scalatest.Suite
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers
 import pl.touk.nussknacker.test.PatientScalaFutures
 import pl.touk.nussknacker.ui.security.oauth2.ExampleOAuth2ServiceFactory.{TestAccessTokenResponse, TestProfileClearanceResponse, TestProfileResponse}
 import pl.touk.nussknacker.ui.security.oauth2.OAuth2ErrorHandler.{OAuth2CompoundException, OAuth2ServerError}
@@ -12,7 +14,7 @@ import sttp.model.{StatusCode, Uri}
 import java.net.URI
 import scala.concurrent.{ExecutionContext, Future}
 
-class ExampleOAuth2ServiceFactorySpec extends FlatSpec with Matchers with PatientScalaFutures with Suite  {
+class ExampleOAuth2ServiceFactorySpec extends AnyFlatSpec with Matchers with PatientScalaFutures with Suite  {
   import io.circe.syntax._
 
   import ExecutionContext.Implicits.global

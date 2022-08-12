@@ -1,6 +1,7 @@
 package pl.touk.nussknacker.ui.process.migrate
 
-import org.scalatest.{FunSuite, Matchers}
+import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.matchers.should.Matchers
 import pl.touk.nussknacker.engine.api.context.ProcessCompilationError.RedundantParameters
 import pl.touk.nussknacker.engine.build.ScenarioBuilder
 import pl.touk.nussknacker.engine.canonize.ProcessCanonizer
@@ -17,7 +18,7 @@ import pl.touk.nussknacker.ui.api.helpers.TestProcessingTypes._
 
 import scala.reflect.ClassTag
 
-class TestModelMigrationsSpec extends FunSuite with Matchers {
+class TestModelMigrationsSpec extends AnyFunSuite with Matchers {
 
   test("should perform test migration") {
     val testMigration = newTestModelMigrations(new TestMigrations(1, 2))

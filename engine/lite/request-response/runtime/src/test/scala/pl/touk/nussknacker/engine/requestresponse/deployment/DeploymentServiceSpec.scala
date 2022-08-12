@@ -1,7 +1,8 @@
 package pl.touk.nussknacker.engine.requestresponse.deployment
 
 import com.typesafe.config.ConfigFactory
-import org.scalatest.{FlatSpec, Matchers}
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers
 import pl.touk.nussknacker.engine.api.ProcessVersion
 import pl.touk.nussknacker.engine.api.process.ProcessName
 import pl.touk.nussknacker.engine.build.ScenarioBuilder
@@ -13,7 +14,7 @@ import pl.touk.nussknacker.engine.testing.LocalModelData
 
 import java.nio.file.Files
 
-class DeploymentServiceSpec extends FlatSpec with Matchers {
+class DeploymentServiceSpec extends AnyFlatSpec with Matchers {
 
   import spel.Implicits._
 

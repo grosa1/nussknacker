@@ -9,8 +9,10 @@ import cats.syntax.semigroup._
 import com.typesafe.config.Config
 import com.typesafe.scalalogging.LazyLogging
 import io.circe.{Encoder, Json, parser}
-import org.scalatest._
+import io.dropwizard.metrics5.MetricRegistry
+import org.scalatest.{Assertion, BeforeAndAfterEach, Suite}
 import org.scalatest.concurrent.ScalaFutures
+import org.scalatest.matchers.should.Matchers
 import pl.touk.nussknacker.engine.api.CirceUtil.humanReadablePrinter
 import pl.touk.nussknacker.engine.api.deployment._
 import pl.touk.nussknacker.engine.api.process.{ProcessId, ProcessName, VersionId}

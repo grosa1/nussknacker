@@ -5,10 +5,11 @@ import cats.data.Validated.{Invalid, Valid}
 import cats.data.{NonEmptyList, Validated, ValidatedNel}
 import cats.effect.IO
 import com.typesafe.config.ConfigFactory
+import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.matchers.should.Matchers
 
 import javax.annotation.Nullable
 import javax.validation.constraints.NotBlank
-import org.scalatest.{FunSuite, Matchers}
 import org.springframework.expression.spel.standard.SpelExpression
 import pl.touk.nussknacker.engine.InterpreterSpec.{DynamicEagerService, _}
 import pl.touk.nussknacker.engine.api.async.DefaultAsyncInterpretationValueDeterminer
@@ -22,7 +23,7 @@ import pl.touk.nussknacker.engine.api.test.InvocationCollectors
 import pl.touk.nussknacker.engine.api.typed.typing
 import pl.touk.nussknacker.engine.api.typed.typing.{Typed, TypingResult}
 import pl.touk.nussknacker.engine.api.{Service, _}
-import pl.touk.nussknacker.engine.build.{ScenarioBuilder, GraphBuilder}
+import pl.touk.nussknacker.engine.build.{GraphBuilder, ScenarioBuilder}
 import pl.touk.nussknacker.engine.canonicalgraph.canonicalnode.FlatNode
 import pl.touk.nussknacker.engine.canonicalgraph.{CanonicalProcess, canonicalnode}
 import pl.touk.nussknacker.engine.canonize.ProcessCanonizer
@@ -48,7 +49,7 @@ import pl.touk.nussknacker.engine.util.{LoggingListener, SynchronousExecutionCon
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Success, Try}
 
-class InterpreterSpec extends FunSuite with Matchers {
+class InterpreterSpec extends AnyFunSuite with Matchers {
 
   import pl.touk.nussknacker.engine.util.Implicits._
   import pl.touk.nussknacker.engine.spel.Implicits._

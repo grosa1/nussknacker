@@ -2,7 +2,8 @@ package pl.touk.nussknacker.engine.lite.util.test
 
 import com.typesafe.config.ConfigValueFactory.fromAnyRef
 import com.typesafe.config.{Config, ConfigFactory}
-import org.scalatest.{FunSuite, Matchers}
+import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.matchers.should.Matchers
 import pl.touk.nussknacker.engine.api.component.{ComponentDefinition, ComponentProvider, NussknackerVersion}
 import pl.touk.nussknacker.engine.api.process.ProcessObjectDependencies
 import pl.touk.nussknacker.engine.api.{MethodToInvoke, ParamName, Service}
@@ -12,7 +13,7 @@ import pl.touk.nussknacker.engine.spel.Implicits._
 import java.util
 import scala.concurrent.Future
 
-class LiteTestScenarioRunnerSpec extends FunSuite with Matchers {
+class LiteTestScenarioRunnerSpec extends AnyFunSuite with Matchers {
 
   test("should test custom component with lite") {
 

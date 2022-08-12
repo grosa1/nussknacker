@@ -5,7 +5,9 @@ import io.circe.parser.parse
 import io.circe.syntax.EncoderOps
 import io.circe.{Decoder, Encoder, Json, Printer}
 import org.apache.commons.io.IOUtils
-import org.scalatest.{FunSuite, Inside, Matchers}
+import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.{Inside}
 import org.springframework.util.ClassUtils
 import pl.touk.nussknacker.engine.ModelData
 import pl.touk.nussknacker.engine.api.typed.typing.{TypedClass, TypingResult}
@@ -14,7 +16,7 @@ import pl.touk.nussknacker.engine.definition.ProcessDefinitionExtractor
 import pl.touk.nussknacker.engine.definition.TypeInfos.{ClazzDefinition, MethodInfo, Parameter}
 import pl.touk.nussknacker.engine.api.CirceUtil._
 
-trait ClassExtractionBaseTest extends FunSuite with Matchers with Inside {
+trait ClassExtractionBaseTest extends AnyFunSuite with Matchers with Inside {
 
   protected def model: ModelData
 

@@ -2,10 +2,11 @@ package pl.touk.nussknacker.openapi.parser
 
 import org.apache.commons.io.IOUtils
 import org.scalatest.prop.TableDrivenPropertyChecks._
-import org.scalatest.{FunSuite, Matchers}
+import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.matchers.should.Matchers
 import pl.touk.nussknacker.openapi.{HeaderParameter, _}
 
-class SwaggerParserTest extends FunSuite with BaseOpenAPITest with Matchers {
+class SwaggerParserTest extends AnyFunSuite with BaseOpenAPITest with Matchers {
 
   test("reads swagger 2.0") {
 

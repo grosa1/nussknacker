@@ -4,9 +4,10 @@ import cats.data.NonEmptyList
 import com.typesafe.config.ConfigFactory
 import com.typesafe.config.ConfigValueFactory.fromAnyRef
 import org.apache.flink.streaming.api.scala._
-import org.scalatest.{FunSuite, Inside, Matchers}
-import pl.touk.nussknacker.engine.api.process.{EmptyProcessConfigCreator, _}
-import pl.touk.nussknacker.engine.api.typed.typing
+import org.scalatest.Inside
+import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.matchers.should.Matchers
+import pl.touk.nussknacker.engine.api.process._
 import pl.touk.nussknacker.engine.api.typed.typing.Typed
 import pl.touk.nussknacker.engine.api.{ProcessListener, ProcessVersion}
 import pl.touk.nussknacker.engine.build.ScenarioBuilder
@@ -25,7 +26,7 @@ import pl.touk.nussknacker.engine.testmode.{ResultsCollectingListener, ResultsCo
 import java.time.Duration
 import java.util.UUID
 
-class ForEachTransformerSpec extends FunSuite with FlinkSpec with Matchers with Inside {
+class ForEachTransformerSpec extends AnyFunSuite with FlinkSpec with Matchers with Inside {
 
   private val sinkId = "end"
   private val resultVariableName = "resultVar"

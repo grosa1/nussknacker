@@ -2,7 +2,9 @@ package pl.touk.nussknacker.engine.process.functional
 
 import java.util.Date
 import org.apache.flink.configuration.Configuration
-import org.scalatest.{BeforeAndAfterEach, FunSuite, Matchers}
+import org.scalatest.BeforeAndAfterEach
+import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.matchers.should.Matchers
 import org.scalatest.LoneElement._
 import pl.touk.nussknacker.engine.build.{GraphBuilder, ScenarioBuilder}
 import pl.touk.nussknacker.engine.graph.node.Case
@@ -11,8 +13,7 @@ import pl.touk.nussknacker.engine.process.helpers.SampleNodes.{MockService, Simp
 import pl.touk.nussknacker.engine.spel
 import pl.touk.nussknacker.test.VeryPatientScalaFutures
 
-class MetricsSpec extends FunSuite with Matchers with VeryPatientScalaFutures with ProcessTestHelpers with BeforeAndAfterEach {
-
+class MetricsSpec extends AnyFunSuite with Matchers with VeryPatientScalaFutures with ProcessTestHelpers with BeforeAndAfterEach {
   import spel.Implicits.asSpelExpression
 
   override protected def beforeEach(): Unit = {
