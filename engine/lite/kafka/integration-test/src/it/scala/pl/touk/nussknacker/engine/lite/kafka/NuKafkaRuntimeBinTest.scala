@@ -1,7 +1,8 @@
 package pl.touk.nussknacker.engine.lite.kafka
 
 import com.typesafe.scalalogging.LazyLogging
-import org.scalatest.{FunSuite, Matchers}
+import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.matchers.should.Matchers
 import org.springframework.util.StreamUtils
 import pl.touk.nussknacker.engine.kafka.KafkaSpec
 import pl.touk.nussknacker.engine.kafka.KafkaTestUtils.richConsumer
@@ -13,7 +14,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.util.control.NonFatal
 
-class NuKafkaRuntimeBinTest extends FunSuite with KafkaSpec with NuKafkaRuntimeTestMixin with Matchers with LazyLogging with VeryPatientScalaFutures {
+class NuKafkaRuntimeBinTest extends AnyFunSuite with KafkaSpec with NuKafkaRuntimeTestMixin with Matchers with LazyLogging with VeryPatientScalaFutures {
 
   override protected def kafkaBoostrapServer: String = kafkaServer.kafkaAddress
 

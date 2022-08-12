@@ -4,8 +4,8 @@ import cats.data.Validated.{Invalid, Valid}
 import cats.data.{NonEmptyList, Validated, ValidatedNel}
 import cats.implicits.catsSyntaxValidatedId
 import org.apache.avro.generic.GenericData
-import org.scalatest.Inside.inside
-import org.scalatest.{FunSuite, Matchers}
+import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.matchers.should.Matchers
 import pl.touk.nussknacker.engine.TypeDefinitionSet
 import pl.touk.nussknacker.engine.api.context.ValidationContext
 import pl.touk.nussknacker.engine.api.dict.embedded.EmbeddedDictDefinition
@@ -39,7 +39,7 @@ import scala.collection.immutable.ListMap
 import scala.language.implicitConversions
 import scala.reflect.runtime.universe._
 
-class SpelExpressionSpec extends FunSuite with Matchers with ValidatedValuesDetailedMessage {
+class SpelExpressionSpec extends AnyFunSuite with Matchers {
 
   private implicit class ValidatedExpressionOps[E](validated: Validated[E, TypedExpression]) {
     def validExpression: Expression = validated.validValue.expression

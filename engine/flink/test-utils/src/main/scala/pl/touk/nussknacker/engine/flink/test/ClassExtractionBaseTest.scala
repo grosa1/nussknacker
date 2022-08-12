@@ -9,7 +9,9 @@ import io.circe.syntax.EncoderOps
 import io.circe.{Decoder, Encoder, HCursor, Json, Printer}
 import io.circe.syntax._
 import org.apache.commons.io.{FileUtils, IOUtils}
-import org.scalatest.{FunSuite, Inside, Matchers}
+import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.{Inside}
 import org.springframework.util.ClassUtils
 import pl.touk.nussknacker.engine.ModelData
 import pl.touk.nussknacker.engine.api.typed.typing.{TypedClass, TypingResult}
@@ -22,7 +24,7 @@ import java.io.File
 import java.nio.charset.StandardCharsets
 import pl.touk.nussknacker.engine.api.CirceUtil._
 
-trait ClassExtractionBaseTest extends FunSuite with Matchers with Inside {
+trait ClassExtractionBaseTest extends AnyFunSuite with Matchers with Inside {
 
   protected def model: ModelData
 
