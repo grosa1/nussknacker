@@ -2,14 +2,16 @@ package pl.touk.nussknacker.engine.types
 
 import cats.data.{NonEmptyList, ValidatedNel}
 import cats.implicits.catsSyntaxValidatedId
-import org.scalatest.{FunSuite, Matchers, OptionValues}
+import org.scalatest.OptionValues
+import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.matchers.should.Matchers
 import pl.touk.nussknacker.engine.api.generics.{GenericFunctionTypingError, GenericType, MethodTypeInfo, Parameter, TypingFunction}
 import pl.touk.nussknacker.engine.api.process.ClassExtractionSettings
 import pl.touk.nussknacker.engine.api.typed.typing.{Typed, TypingResult, Unknown}
 
 import scala.annotation.varargs
 
-class GenericFunctionStaticParametersSpec extends FunSuite with Matchers with OptionValues{
+class GenericFunctionStaticParametersSpec extends AnyFunSuite with Matchers with OptionValues{
   implicit val classExtractionSettings: ClassExtractionSettings = ClassExtractionSettings.Default
 
   test("should accept valid static parameters") {

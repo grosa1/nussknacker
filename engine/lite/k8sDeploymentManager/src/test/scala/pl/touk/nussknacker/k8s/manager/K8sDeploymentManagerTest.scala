@@ -5,6 +5,8 @@ import com.typesafe.config.ConfigValueFactory.{fromAnyRef, fromIterable, fromMap
 import com.typesafe.config.{Config, ConfigFactory}
 import com.typesafe.scalalogging.LazyLogging
 import org.scalatest.Inspectors.forAll
+import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.matchers.should.Matchers
 import org.scalatest.{Assertion, BeforeAndAfterAll, OptionValues}
 import org.scalatest.tags.Network
 import pl.touk.nussknacker.engine.api.ProcessVersion
@@ -35,8 +37,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.language.reflectiveCalls
 import scala.util.Random
-import org.scalatest.funsuite.AnyFunSuite
-import org.scalatest.matchers.should.Matchers
+
 
 // we use this tag to mark tests using external dependencies
 @Network

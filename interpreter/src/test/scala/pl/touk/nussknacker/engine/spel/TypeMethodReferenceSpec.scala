@@ -3,7 +3,8 @@ package pl.touk.nussknacker.engine.spel
 import cats.data.{NonEmptyList, Validated}
 import cats.implicits.catsSyntaxValidatedId
 import org.scalatest.Inside.inside
-import org.scalatest.{FunSuite, Matchers}
+import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.matchers.should.Matchers
 import pl.touk.nussknacker.engine.api.generics.GenericFunctionTypingError.OtherError
 import pl.touk.nussknacker.engine.api.generics.{ExpressionParseError, GenericFunctionTypingError, GenericType, Signature, TypingFunction}
 import pl.touk.nussknacker.engine.api.process.ClassExtractionSettings
@@ -11,7 +12,7 @@ import pl.touk.nussknacker.engine.api.typed.typing.{Typed, TypingResult}
 import pl.touk.nussknacker.engine.spel.SpelExpressionParseError.ArgumentTypeError
 import pl.touk.nussknacker.engine.spel.typer.TypeMethodReference
 
-class TypeMethodReferenceSpec extends FunSuite with Matchers {
+class TypeMethodReferenceSpec extends AnyFunSuite with Matchers {
   private case class Helper() {
     def simpleFunction(a: Int): Int = ???
 

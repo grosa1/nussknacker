@@ -1,10 +1,13 @@
 package pl.touk.nussknacker.engine.requestresponse.http
 
 import com.typesafe.config.ConfigFactory
+import io.circe.generic.JsonCodec
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 import pl.touk.nussknacker.engine.api.ProcessVersion
 import pl.touk.nussknacker.engine.api.process.ProcessName
+import pl.touk.nussknacker.engine.api.{LazyParameter, LazyParameterInterpreter, MethodToInvoke, ParamName, ProcessVersion}
+import pl.touk.nussknacker.engine.api.process.{EmptyProcessConfigCreator, ProcessName, ProcessObjectDependencies, Sink, SinkFactory, SourceFactory, WithCategories}
 import pl.touk.nussknacker.engine.build.ScenarioBuilder
 import pl.touk.nussknacker.engine.deployment.DeploymentData
 import pl.touk.nussknacker.engine.lite.api.runtimecontext.LiteEngineRuntimeContextPreparer

@@ -6,6 +6,11 @@ import org.scalatest.funsuite.AnyFunSuite
 import org.scalatest.matchers.should.Matchers
 import pl.touk.nussknacker.engine.api.typed.TypedMap
 import pl.touk.nussknacker.openapi._
+import pl.touk.nussknacker.engine.json.swagger.{extractor, _}
+import pl.touk.nussknacker.engine.json.swagger.extractor.JsonToObject
+
+import java.time.format.DateTimeFormatter
+import java.time.{LocalDateTime, ZoneId, ZonedDateTime}
 
 class JsonToObjectTest extends AnyFunSuite
   with Matchers {

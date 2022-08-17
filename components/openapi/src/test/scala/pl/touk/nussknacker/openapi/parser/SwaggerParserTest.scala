@@ -3,7 +3,9 @@ package pl.touk.nussknacker.openapi.parser
 import org.scalatest.prop.TableDrivenPropertyChecks._
 import org.scalatest.funsuite.AnyFunSuite
 import org.scalatest.matchers.should.Matchers
-import pl.touk.nussknacker.openapi.{HeaderParameter, _}
+import pl.touk.nussknacker.engine.json.swagger
+import pl.touk.nussknacker.engine.json.swagger.{SwaggerArray, SwaggerBool, SwaggerLong, SwaggerObject, SwaggerString}
+import pl.touk.nussknacker.openapi._
 
 class SwaggerParserTest extends AnyFunSuite with BaseOpenAPITest with Matchers {
 

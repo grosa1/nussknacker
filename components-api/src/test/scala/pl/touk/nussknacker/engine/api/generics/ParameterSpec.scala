@@ -1,9 +1,10 @@
 package pl.touk.nussknacker.engine.api.generics
 
-import org.scalatest.{FunSuite, Matchers}
+import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.matchers.should.Matchers
 import pl.touk.nussknacker.engine.api.typed.typing.{Typed, TypingResult, Unknown}
 
-class ParameterSpec extends FunSuite with Matchers {
+class ParameterSpec extends AnyFunSuite with Matchers {
   private def checkConversions(args: List[TypingResult], varArg: Option[TypingResult]) = {
     val noVarArgParameters = args.zipWithIndex.map{ case (typ, i) => Parameter(i.toString, typ) }
     val varArgParameterFull = varArg.map(x => Parameter("v", Typed.genericTypeClass[Array[Object]](x :: Nil)))

@@ -2,7 +2,7 @@ package pl.touk.nussknacker.engine.api.typed
 
 import org.scalatest.funsuite.AnyFunSuite
 import org.scalatest.matchers.should.Matchers
-import pl.touk.nussknacker.engine.api.typed.typing.{AdditionalDataValue, Typed, TypedObjectTypingResult, TypedUnion, Unknown}
+import pl.touk.nussknacker.engine.api.typed.typing.{AdditionalDataValue, Typed, TypedNull, TypedObjectTypingResult, TypedObjectWithValue, TypedUnion, Unknown}
 
 import scala.collection.immutable.ListMap
 

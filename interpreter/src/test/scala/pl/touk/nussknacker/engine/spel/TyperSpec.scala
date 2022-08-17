@@ -2,8 +2,10 @@ package pl.touk.nussknacker.engine.spel
 
 import cats.data.Validated.Valid
 import cats.data.ValidatedNel
+import org.scalatest.prop.TableDrivenPropertyChecks.forAll
 import org.scalatest.funsuite.AnyFunSuite
 import org.scalatest.matchers.should.Matchers
+import org.scalatest.prop.TableDrivenPropertyChecks._
 import org.springframework.expression.common.TemplateParserContext
 import pl.touk.nussknacker.engine.TypeDefinitionSet
 import pl.touk.nussknacker.engine.api.context.ValidationContext

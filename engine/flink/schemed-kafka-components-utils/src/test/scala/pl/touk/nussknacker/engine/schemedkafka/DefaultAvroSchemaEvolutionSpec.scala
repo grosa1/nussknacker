@@ -2,7 +2,7 @@ package pl.touk.nussknacker.engine.schemedkafka
 
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers
-import pl.touk.nussknacker.engine.avro.schema._
+import pl.touk.nussknacker.engine.schemedkafka.schema._
 
 class DefaultAvroSchemaEvolutionSpec extends AnyFunSpec with Matchers {
 

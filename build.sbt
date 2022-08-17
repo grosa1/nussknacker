@@ -978,6 +978,7 @@ lazy val liteKafkaComponents = (project in lite("components/kafka")).
     libraryDependencies ++= {
       Seq(
         "org.scalacheck" %% "scalacheck" % scalaCheckV % "test",
+        "org.scalatestplus" %% s"scalacheck-$scalaCheckVshort" % scalaTestPlusV % "test"
       )
     },
     //TODO: avroUtils brings kafkaUtils to assembly, which is superfluous, as we already have it in engine...

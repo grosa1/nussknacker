@@ -15,6 +15,7 @@ import pl.touk.nussknacker.engine.graph.EspProcess
 import pl.touk.nussknacker.engine.process.helpers.ProcessTestHelpers
 import pl.touk.nussknacker.engine.process.helpers.SampleNodes._
 import pl.touk.nussknacker.engine.spel
+import java.util.{Date, UUID}
 
 class ProcessSpec extends AnyFunSuite with Matchers with ProcessTestHelpers {
 

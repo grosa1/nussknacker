@@ -1,13 +1,14 @@
 package pl.touk.nussknacker.engine.types
 
 import cats.implicits.catsSyntaxValidatedId
-import org.scalatest.{FunSuite, Matchers}
+import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.matchers.should.Matchers
 import org.scalatest.prop.TableDrivenPropertyChecks._
 import pl.touk.nussknacker.engine.api.generics.{Parameter, MethodTypeInfo}
 import pl.touk.nussknacker.engine.api.typed.typing.{Typed, TypedObjectTypingResult, TypingResult, Unknown}
 import pl.touk.nussknacker.test.ValidatedValuesDetailedMessage
 
-class MethodTypeInfoSubclassCheckerSpec extends FunSuite with Matchers with ValidatedValuesDetailedMessage {
+class MethodTypeInfoSubclassCheckerSpec extends AnyFunSuite with Matchers with ValidatedValuesDetailedMessage {
   private def check(subclassNoVarArgs: List[TypingResult],
                     subclassVarArg: Option[TypingResult],
                     superclassNoVarArgs: List[TypingResult],

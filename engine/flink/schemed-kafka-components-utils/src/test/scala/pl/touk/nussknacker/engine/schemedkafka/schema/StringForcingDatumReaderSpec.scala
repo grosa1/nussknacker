@@ -6,7 +6,7 @@ import org.apache.avro.io.{DecoderFactory, EncoderFactory}
 import org.apache.avro.util.Utf8
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers
-import pl.touk.nussknacker.engine.avro.{AvroStringSettingsInTests, AvroUtils, LogicalTypesGenericRecordBuilder}
+import pl.touk.nussknacker.engine.schemedkafka.{AvroStringSettingsInTests, AvroUtils, LogicalTypesGenericRecordBuilder}
 
 import java.io.{ByteArrayInputStream, ByteArrayOutputStream}
 

@@ -1,8 +1,8 @@
 package pl.touk.nussknacker.k8s.manager
 
 import cats.data.Validated.{Invalid, Valid}
-import org.scalatest.funsuite.AnyFunSuite
 import org.scalatest.matchers.should.Matchers.convertToAnyShouldWrapper
+import org.scalatest.funsuite.AnyFunSuite
 import pl.touk.nussknacker.k8s.manager.K8sPodsResourceQuotaChecker.{ResourceQuotaExceededException, podsResourceQuota}
 import skuber.Resource.Quota
 import skuber.{ListResource, Resource}

@@ -1,7 +1,8 @@
 package pl.touk.nussknacker.engine.schemedkafka.sink.flink
 
 import io.confluent.kafka.schemaregistry.client.SchemaRegistryClient
-import org.scalatest.{FunSuite, Matchers}
+import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.matchers.should.Matchers
 import pl.touk.nussknacker.engine.ModelData
 import pl.touk.nussknacker.engine.api.process.{EmptyProcessConfigCreator, ProcessObjectDependencies, SinkFactory, WithCategories}
 import pl.touk.nussknacker.engine.schemedkafka.KafkaUniversalComponentTransformer
@@ -19,7 +20,7 @@ import pl.touk.nussknacker.engine.graph.EspProcess
 import pl.touk.nussknacker.engine.process.runner.TestFlinkRunner
 import pl.touk.nussknacker.engine.spel.Implicits._
 
-class KafkaUniversalSinkExceptionHandlingSpec extends FunSuite with FlinkSpec with Matchers with SchemaRegistryMixin with KafkaAvroSinkSpecMixin with CorrectExceptionHandlingSpec {
+class KafkaUniversalSinkExceptionHandlingSpec extends AnyFunSuite with FlinkSpec with Matchers with SchemaRegistryMixin with KafkaAvroSinkSpecMixin with CorrectExceptionHandlingSpec {
 
   private val topic = "topic1"
 

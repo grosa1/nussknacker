@@ -16,9 +16,10 @@ import pl.touk.nussknacker.engine.deployment.ExternalDeploymentId
 import pl.touk.nussknacker.engine.management.{FlinkProcessStateDefinitionManager, FlinkStateStatus}
 import pl.touk.nussknacker.restmodel.process.ProcessIdWithName
 import pl.touk.nussknacker.test.PatientScalaFutures
-import pl.touk.nussknacker.ui.api.helpers.TestFactory.{MockDeploymentManager, mapProcessingTypeDataProvider, newActionProcessRepository, newDBRepositoryManager, newFetchingProcessRepository, newProcessActivityRepository, newWriteProcessRepository, processResolving, testCategoryName}
+import pl.touk.nussknacker.ui.api.helpers.TestFactory.{ mapProcessingTypeDataProvider, newActionProcessRepository, newDBRepositoryManager, newFetchingProcessRepository, newProcessActivityRepository, newWriteProcessRepository, processResolving}
 import pl.touk.nussknacker.ui.api.helpers._
-import pl.touk.nussknacker.ui.listener.ProcessChangeListener
+import pl.touk.nussknacker.ui.listener.ProcessChangeEvent.OnDeployActionSuccess
+import pl.touk.nussknacker.ui.process.repository.DeploymentComment
 import pl.touk.nussknacker.ui.process.repository.ProcessRepository.CreateProcessAction
 import pl.touk.nussknacker.ui.process.{ConfigProcessCategoryService, DBProcessService, NewProcessPreparer}
 import pl.touk.nussknacker.ui.security.api.LoggedUser
