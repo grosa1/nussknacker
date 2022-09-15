@@ -10,15 +10,8 @@ object ValidationMode {
   //Requires providing only required fields, without optional fields, with redundant fields
   val lax: ValidationMode = ValidationMode("lax", "Lax mode")
 
-  val allowOptional: ValidationMode = ValidationMode("allowOptional", "Allow missing optional parameters")
+  val values: List[ValidationMode] = List(strict, lax)
 
-  val allowRedundantAndOptional: ValidationMode = ValidationMode("allowRedundantAndOptional", "Allow missing optional and redundant parameters")
-
-  val values: List[ValidationMode] = List(strict, lax, allowOptional, allowRedundantAndOptional)
-
-  def byName(name: String): Option[ValidationMode] = values.find(_.name == name).map {
-    case `allowOptional` | `allowRedundantAndOptional` => lax
-    case other => other
-  }
+  def byName(name: String): Option[ValidationMode] = values.find(_.name == name)
 
 }
