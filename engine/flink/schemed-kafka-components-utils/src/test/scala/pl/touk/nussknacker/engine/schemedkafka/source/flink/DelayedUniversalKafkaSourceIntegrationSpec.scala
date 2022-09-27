@@ -1,13 +1,13 @@
 package pl.touk.nussknacker.engine.schemedkafka.source.flink
 
 import org.apache.avro.generic.GenericRecord
-import org.scalatest.BeforeAndAfter
-import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.{BeforeAndAfter, FunSuite}
 import pl.touk.nussknacker.engine.api.CustomStreamTransformer
 import pl.touk.nussknacker.engine.api.process._
 import pl.touk.nussknacker.engine.build.ScenarioBuilder
 import pl.touk.nussknacker.engine.canonicalgraph.CanonicalProcess
 import pl.touk.nussknacker.engine.flink.test.RecordingExceptionConsumer
+import pl.touk.nussknacker.engine.graph.EspProcess
 import pl.touk.nussknacker.engine.kafka.generic.FlinkKafkaDelayedSourceImplFactory
 import pl.touk.nussknacker.engine.kafka.source.delayed.DelayedKafkaSourceFactory.{DelayParameterName, TimestampFieldParamName}
 import pl.touk.nussknacker.engine.process.compiler.FlinkProcessCompiler
@@ -26,7 +26,7 @@ import pl.touk.nussknacker.engine.testing.LocalModelData
 
 import java.time.Instant
 
-class DelayedUniversalKafkaSourceIntegrationSpec extends AnyFunSuite with KafkaAvroSpecMixin with BeforeAndAfter  {
+class DelayedUniversalKafkaSourceIntegrationSpec extends FunSuite with KafkaAvroSpecMixin with BeforeAndAfter  {
 
   private lazy val creator: ProcessConfigCreator = new DelayedKafkaUniversalProcessConfigCreator {
     override protected def schemaRegistryClientFactory = new MockConfluentSchemaRegistryClientFactory(schemaRegistryMockClient)
@@ -74,7 +74,7 @@ class DelayedUniversalKafkaSourceIntegrationSpec extends AnyFunSuite with KafkaA
     }.getMessage should include ("LowerThanRequiredParameter(This field value has to be a number greater than or equal to 0,Please fill field with proper number,delayInMillis,start)")
   }
 
-  private def runAndVerify(topicConfig: TopicConfig, process: CanonicalProcess, givenObj: AnyRef): Unit = {
+  private def runAndVerify(topicConfig: TopicConfig, process: EspProcess, givenObj: AnyRef): Unit = {
     kafkaClient.createTopic(topicConfig.input, partitions = 1)
     pushMessage(givenObj, topicConfig.input)
     run(process) {
