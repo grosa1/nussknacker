@@ -8,6 +8,8 @@ import org.scalatest.Inside.inside
 import org.scalatest.funsuite.AnyFunSuite
 import org.scalatest.matchers.should.Matchers
 import pl.touk.nussknacker.engine.api.component.{ComponentType, NodeComponentInfo}
+import pl.touk.nussknacker.engine.api.context.OutputVar
+import pl.touk.nussknacker.engine.api.context.ProcessCompilationError.OverwrittenVariable
 import pl.touk.nussknacker.engine.api.exception.NuExceptionInfo
 import pl.touk.nussknacker.engine.api.process.ComponentUseCase
 import pl.touk.nussknacker.engine.api.runtimecontext.IncContextIdGenerator
@@ -15,8 +17,12 @@ import pl.touk.nussknacker.engine.api.typed.typing.{Typed, TypedObjectTypingResu
 import pl.touk.nussknacker.engine.api.{Context, NodeId, ProcessVersion}
 import pl.touk.nussknacker.engine.build.{GraphBuilder, ScenarioBuilder}
 import pl.touk.nussknacker.engine.canonicalgraph.CanonicalProcess
+import pl.touk.nussknacker.engine.canonicalgraph.canonicalnode.FlatNode
+import pl.touk.nussknacker.engine.compile.SubprocessResolver
+import pl.touk.nussknacker.engine.graph.node.SubprocessOutputDefinition
 import pl.touk.nussknacker.engine.lite.api.commonTypes.ErrorType
 import pl.touk.nussknacker.engine.lite.api.runtimecontext.LiteEngineRuntimeContextPreparer
+import pl.touk.nussknacker.engine.lite.components.requestresponse.jsonschema.sinks.JsonRequestResponseSink.{SinkRawEditorParamName, SinkRawValueParamName}
 import pl.touk.nussknacker.engine.lite.metrics.dropwizard.DropwizardMetricsProviderFactory
 import pl.touk.nussknacker.engine.requestresponse.FutureBasedRequestResponseScenarioInterpreter.InterpreterType
 import pl.touk.nussknacker.engine.resultcollector.ProductionServiceInvocationCollector
@@ -321,6 +327,46 @@ class RequestResponseInterpreterSpec extends AnyFunSuite with Matchers with Pati
 
   }
 
+  test("collect elements after for-each - ") {
+
+    val schema =
+      """{
+        |  "type": "object",
+        |  "properties": {
+        |    "age": { "type": "integer" }
+        |  },
+        |  "required": ["age"]
+        |}
+        |""".stripMargin
+
+    val scenarioWithFragmentWithSink = ScenarioBuilder
+      .requestResponse("scenario1")
+      .additionalFields(properties = Map(
+        "inputSchema" -> schema,
+        "outputSchema" -> schema
+      ))
+      .source("id1", "request")
+      .split("split",
+        GraphBuilder.emptySink("sink123", "response", SinkRawEditorParamName -> "true", SinkRawValueParamName -> "{age: 33}"),
+        GraphBuilder.subprocessOneOut("sample", "fragWithSink", "output1", "output").processorEnd("end", "monitor")
+      )
+
+    val fragmentWithValidSinkSchema = ScenarioBuilder
+      .fragment("fragWithSink")
+      .emptySink("sink", "response", SinkRawEditorParamName -> "true", SinkRawValueParamName -> "{age: 33}")
+
+    val fragmentWithInvalidSinkSchema = ScenarioBuilder
+      .fragment("fragWithSink")
+      .emptySink("sink", "response", SinkRawEditorParamName -> "true", SinkRawValueParamName -> "{age: 'old'}")
+
+    val resolverWithValid = SubprocessResolver(Set(fragmentWithValidSinkSchema))
+    val resolverWithInvalid = SubprocessResolver(Set(fragmentWithInvalidSinkSchema))
+
+    resolverWithValid.resolve(scenarioWithFragmentWithSink).andThen(validateScenario(_).result) shouldBe 'valid
+    resolverWithInvalid.resolve(scenarioWithFragmentWithSink).andThen(validateScenario(_).result) shouldBe 'invalid
+
+  }
+
   test("collect elements after nested for-each") {
 
     val numberOfElements = 3
@@ -344,6 +390,12 @@ class RequestResponseInterpreterSpec extends AnyFunSuite with Matchers with Pati
       case resp: SeqWrapper[_] => resp.underlying should contain allElementsOf(validElementList ++ validElementList ++ validElementList )
     }
 
+  }
+
+  def validateScenario(scenario: CanonicalProcess) = {
+    val creator = new RequestResponseConfigCreator
+    val simpleModelData = LocalModelData(ConfigFactory.load(), creator)
+    simpleModelData.prepareValidatorForCategory(None).validate(scenario)
   }
 
   def runProcess(process: CanonicalProcess,
