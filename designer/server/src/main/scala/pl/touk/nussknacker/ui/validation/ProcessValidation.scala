@@ -8,6 +8,7 @@ import pl.touk.nussknacker.engine.api.context.ProcessCompilationError.{DisabledN
 import pl.touk.nussknacker.engine.api.expression.ExpressionParser
 import pl.touk.nussknacker.engine.canonicalgraph.CanonicalProcess
 import pl.touk.nussknacker.engine.compile.{NodeTypingInfo, ProcessValidator}
+import pl.touk.nussknacker.engine.definition.SubprocessDefinitionExtractor
 import pl.touk.nussknacker.engine.graph.node.{Disableable, NodeData, Source, SubprocessInputDefinition}
 import pl.touk.nussknacker.engine.util.cache.{CacheConfig, DefaultCache}
 import pl.touk.nussknacker.engine.util.validated.ValidatedSyntax._
@@ -59,7 +60,7 @@ class ProcessValidation(modelData: ProcessingTypeDataProvider[ModelData],
   def withAdditionalPropertiesConfig(additionalPropertiesConfig: ProcessingTypeDataProvider[Map[String, AdditionalPropertyConfig]]) =
     new ProcessValidation(modelData, additionalPropertiesConfig, additionalValidators, subprocessResolver, None)
 
-  def validate(displayable: DisplayableProcess, category: Category): ValidationResult = {
+  def validate(displayable: DisplayableProcess, category: Category, subprocessDefinitionExtractor: SubprocessDefinitionExtractor): ValidationResult = {
     val uiValidationResult = uiValidation(displayable)
 
     //there is no point in further validations if ui process structure is invalid
@@ -67,16 +68,16 @@ class ProcessValidation(modelData: ProcessingTypeDataProvider[ModelData],
     if (uiValidationResult.saveAllowed) {
       val canonical = ProcessConverter.fromDisplayable(displayable)
       uiValidationResult
-        .add(processingTypeValidationWithTypingInfo(canonical, displayable.processingType, category))
+        .add(processingTypeValidationWithTypingInfo(canonical, displayable.processingType, category, subprocessDefinitionExtractor))
     } else {
       uiValidationResult
     }
   }
 
-  def processingTypeValidationWithTypingInfo(canonical: CanonicalProcess, processingType: ProcessingType, category: Category): ValidationResult = {
+  def processingTypeValidationWithTypingInfo(canonical: CanonicalProcess, processingType: ProcessingType, category: Category, subprocessDefinitionExtractor: SubprocessDefinitionExtractor): ValidationResult = {
     (modelData.forType(processingType), additionalValidators.forType(processingType)) match {
       case (Some(model), Some(validators)) =>
-        validateUsingTypeValidator(canonical, model, validators, category)
+        validateUsingTypeValidator(canonical, model, validators, category, subprocessDefinitionExtractor)
       case _ =>
         ValidationResult.errors(Map(), List(), List(PrettyValidationErrors.noValidatorKnown(processingType)))
     }
@@ -95,9 +96,10 @@ class ProcessValidation(modelData: ProcessingTypeDataProvider[ModelData],
   private def validateUsingTypeValidator(canonical: CanonicalProcess,
                                          modelData: ModelData,
                                          additionalValidators: List[CustomProcessValidator],
-                                         category: Category): ValidationResult = {
+                                         category: Category,
+                                         subprocessDefinitionExtractor: SubprocessDefinitionExtractor): ValidationResult = {
     val processValidator = processValidatorCache.getOrCreate(ValidatorKey(modelData, category)) {
-      val modelCategoryValidator = modelData.prepareValidatorForCategory(Some(category))
+      val modelCategoryValidator = modelData.prepareValidatorForCategory(Some(category), subprocessDefinitionExtractor)
 
       expressionParsers
         .map(modelCategoryValidator.withExpressionParsers)

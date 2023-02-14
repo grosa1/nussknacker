@@ -36,7 +36,8 @@ object NodeDataValidator {
 
 
 
-  def validate(nodeData: NodeData, modelData: ModelData,
+  def validate(nodeData: NodeData,
+               modelData: ModelData,
                validationContext: ValidationContext,
                branchContexts: Map[String, ValidationContext],
                getFragment: String => Option[CanonicalProcess],

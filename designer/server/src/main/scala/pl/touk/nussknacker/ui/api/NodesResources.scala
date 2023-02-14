@@ -19,6 +19,7 @@ import pl.touk.nussknacker.engine.api.typed.TypingResultDecoder
 import pl.touk.nussknacker.engine.api.typed.typing.TypingResult
 import pl.touk.nussknacker.engine.compile.nodecompilation.NodeDataValidator.OutgoingEdge
 import pl.touk.nussknacker.engine.compile.nodecompilation.{NodeDataValidator, ValidationNotPerformed, ValidationPerformed}
+import pl.touk.nussknacker.engine.definition.SubprocessDefinitionExtractor
 import pl.touk.nussknacker.engine.graph.NodeDataCodec._
 import pl.touk.nussknacker.engine.graph.node.NodeData
 import pl.touk.nussknacker.engine.util.Implicits.RichScalaMap
@@ -69,7 +70,9 @@ class NodesResources(val processRepository: FetchingProcessRepository[Future],
           implicit val requestDecoder: Decoder[NodeValidationRequest] = NodesResources.prepareNodeRequestDecoder(modelData)
           entity(as[NodeValidationRequest]) { nodeData =>
             complete {
-              nodeValidator.validate(nodeData, modelData, process.id, subprocessRepository)
+              val subprocesses = subprocessRepository.loadSubprocesses(Map.empty, process.processCategory).map(_.canonical)
+              val subprocessDefinitionExtractor = SubprocessDefinitionExtractor(subprocesses, ...)
+              nodeValidator.validate(nodeData, modelData, process.id, subprocessDefinitionExtractor)
             }
           }
         }
@@ -88,7 +91,9 @@ class NodesResources(val processRepository: FetchingProcessRepository[Future],
           entity(as[PropertiesValidationRequest]) { properties =>
             complete {
               val scenario = DisplayableProcess(processName, properties.processProperties, Nil, Nil, process.processingType, Some(process.processCategory))
-              val result = processValidation.validate(scenario, process.processCategory)
+              val subprocesses = subprocessRepository.loadSubprocesses(Map.empty, process.processCategory).map(_.canonical)
+              val subprocessDefinitionExtractor = SubprocessDefinitionExtractor(subprocesses, ...)
+              val result = processValidation.validate(scenario, process.processCategory, subprocessDefinitionExtractor)
               NodeValidationResult(
                 parameters = None,
                 expressionType = None,
@@ -135,6 +140,7 @@ class NodeValidator {
     val branchCtxs = nodeData.branchVariableTypes.getOrElse(Map.empty).mapValuesNow(prepareValidationContext(modelData))
 
     val edges = nodeData.outgoingEdges.getOrElse(Nil).map(e => OutgoingEdge(e.to, e.edgeType))
+    val subprocesses = subprocessRepository.loadSubprocesses(Map.empty. category).map(_.canonical)
     NodeDataValidator.validate(nodeData.nodeData, modelData, validationContext, branchCtxs, k => subprocessRepository.get(k).map(_.canonical), edges) match {
       case ValidationNotPerformed => NodeValidationResult(parameters = None, expressionType = None, validationErrors = Nil, validationPerformed = false)
       case ValidationPerformed(errors, parameters, expressionType) =>
