@@ -173,6 +173,7 @@ class ProcessesResources(
                       subprocessesConfig  = subprocessesConfig,
                       classLoader         = classLoader
                     )
+                    // mapa z parametrami podprocesów potrzebna do walidacji(kompilacji) procesu przez interpreter
                     val subprocessesDefinition = subprocessDefinitionExtractor.extract
                     validateAndReverseResolve(enrichDetailsWithProcessState(process))
                   }
