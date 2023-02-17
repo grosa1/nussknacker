@@ -71,8 +71,8 @@ class NodesResources(val processRepository: FetchingProcessRepository[Future],
           entity(as[NodeValidationRequest]) { nodeData =>
             complete {
               val subprocesses = subprocessRepository.loadSubprocesses(Map.empty, process.processCategory).map(_.canonical)
-              val subprocessDefinitionExtractor = SubprocessDefinitionExtractor(subprocesses, ...)
-              nodeValidator.validate(nodeData, modelData, process.id, subprocessDefinitionExtractor)
+              val subprocessDefinitionExtractor = SubprocessDefinitionExtractor()
+              nodeValidator.validate(nodeData, modelData, process.id, subprocessRepository)
             }
           }
         }
@@ -92,8 +92,9 @@ class NodesResources(val processRepository: FetchingProcessRepository[Future],
             complete {
               val scenario = DisplayableProcess(processName, properties.processProperties, Nil, Nil, process.processingType, Some(process.processCategory))
               val subprocesses = subprocessRepository.loadSubprocesses(Map.empty, process.processCategory).map(_.canonical)
-              val subprocessDefinitionExtractor = SubprocessDefinitionExtractor(subprocesses, ...)
+              val subprocessDefinitionExtractor = SubprocessDefinitionExtractor()
               val result = processValidation.validate(scenario, process.processCategory, subprocessDefinitionExtractor)
+
               NodeValidationResult(
                 parameters = None,
                 expressionType = None,
@@ -140,7 +141,7 @@ class NodeValidator {
     val branchCtxs = nodeData.branchVariableTypes.getOrElse(Map.empty).mapValuesNow(prepareValidationContext(modelData))
 
     val edges = nodeData.outgoingEdges.getOrElse(Nil).map(e => OutgoingEdge(e.to, e.edgeType))
-    val subprocesses = subprocessRepository.loadSubprocesses(Map.empty. category).map(_.canonical)
+//    val subprocesses = subprocessRepository.loadSubprocesses(Map.empty, p.category).map(_.canonical)
     NodeDataValidator.validate(nodeData.nodeData, modelData, validationContext, branchCtxs, k => subprocessRepository.get(k).map(_.canonical), edges) match {
       case ValidationNotPerformed => NodeValidationResult(parameters = None, expressionType = None, validationErrors = Nil, validationPerformed = false)
       case ValidationPerformed(errors, parameters, expressionType) =>

@@ -11,6 +11,7 @@ import pl.touk.nussknacker.engine.api.deployment.ProcessActionType.ProcessAction
 import pl.touk.nussknacker.engine.api.deployment.{ProcessActionType, ProcessState}
 import pl.touk.nussknacker.engine.api.process.ProcessName
 import pl.touk.nussknacker.engine.canonicalgraph.CanonicalProcess
+import pl.touk.nussknacker.engine.definition.SubprocessDefinitionExtractor
 import pl.touk.nussknacker.engine.marshall.ProcessMarshaller
 import pl.touk.nussknacker.restmodel.displayedgraph.{DisplayableProcess, ValidatedDisplayableProcess}
 import pl.touk.nussknacker.restmodel.process._
@@ -292,7 +293,7 @@ class DBProcessService(managerActor: ActorRef,
   }
 
   private def validateInitialScenarioProperties(canonicalProcess: CanonicalProcess, processingType:ProcessingType, category: String) = {
-    val validationResult = processValidation.processingTypeValidationWithTypingInfo(canonicalProcess, processingType, category)
+    val validationResult = processValidation.processingTypeValidationWithTypingInfo(canonicalProcess, processingType, category, SubprocessDefinitionExtractor())
     validationResult.errors.processPropertiesErrors
 
   }

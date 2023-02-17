@@ -11,6 +11,7 @@ import io.circe.syntax._
 import net.ceedubs.ficus.Ficus._
 import pl.touk.nussknacker.engine.ModelData
 import pl.touk.nussknacker.engine.api.deployment.ProcessState
+import pl.touk.nussknacker.engine.definition.SubprocessDefinitionExtractor
 import pl.touk.nussknacker.engine.util.Implicits.RichScalaMap
 import pl.touk.nussknacker.engine.version.BuildInfo
 import pl.touk.nussknacker.restmodel.displayedgraph.{DisplayableProcess, ValidatedDisplayableProcess}
@@ -144,7 +145,7 @@ class AppResources(config: Config,
   private def processesWithValidationErrors(implicit ec: ExecutionContext, user: LoggedUser): Future[List[String]] = {
     processRepository.fetchProcessesDetails[DisplayableProcess](FetchProcessesDetailsQuery.unarchivedProcesses).map { processes =>
       val processesWithErrors = processes
-        .map(process => new ValidatedDisplayableProcess(process.json, processValidation.validate(process.json, process.processCategory)))
+        .map(process => new ValidatedDisplayableProcess(process.json, processValidation.validate(process.json, process.processCategory, SubprocessDefinitionExtractor())))
         .filter(process => !process.validationResult.errors.isEmpty)
       processesWithErrors.map(_.id)
     }

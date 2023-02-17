@@ -2,6 +2,7 @@ package pl.touk.nussknacker.ui.uiresolving
 
 import pl.touk.nussknacker.engine.api.expression.ExpressionTypingInfo
 import pl.touk.nussknacker.engine.canonicalgraph.CanonicalProcess
+import pl.touk.nussknacker.engine.definition.SubprocessDefinitionExtractor
 import pl.touk.nussknacker.engine.dict.ProcessDictSubstitutor
 import pl.touk.nussknacker.engine.spel.SpelExpressionParser
 import pl.touk.nussknacker.restmodel.displayedgraph.{DisplayableProcess, ValidatedDisplayableProcess}
@@ -23,7 +24,7 @@ class UIProcessResolving(validation: ProcessValidation, substitutorByProcessingT
     val v = validation.withExpressionParsers {
       case spel: SpelExpressionParser => spel.typingDictLabels
     }
-    v.validate(displayable, category)
+    v.validate(displayable, category, SubprocessDefinitionExtractor())
   }
 
   def resolveExpressions(displayable: DisplayableProcess, typingInfo: Map[String, Map[String, ExpressionTypingInfo]]): CanonicalProcess = {
@@ -34,7 +35,7 @@ class UIProcessResolving(validation: ProcessValidation, substitutorByProcessingT
   }
 
   def validateBeforeUiReverseResolving(canonical: CanonicalProcess, processingType: ProcessingType, category: Category): ValidationResult =
-    validation.processingTypeValidationWithTypingInfo(canonical, processingType, category)
+    validation.processingTypeValidationWithTypingInfo(canonical, processingType, category, SubprocessDefinitionExtractor())
 
   def reverseResolveExpressions(canonical: CanonicalProcess, processingType: ProcessingType, category: Category, validationResult: ValidationResult): ValidatedDisplayableProcess = {
     val substituted = substitutorByProcessingType.forType(processingType)

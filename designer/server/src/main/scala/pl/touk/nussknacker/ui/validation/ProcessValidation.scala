@@ -74,6 +74,7 @@ class ProcessValidation(modelData: ProcessingTypeDataProvider[ModelData],
     }
   }
 
+
   def processingTypeValidationWithTypingInfo(canonical: CanonicalProcess, processingType: ProcessingType, category: Category, subprocessDefinitionExtractor: SubprocessDefinitionExtractor): ValidationResult = {
     (modelData.forType(processingType), additionalValidators.forType(processingType)) match {
       case (Some(model), Some(validators)) =>

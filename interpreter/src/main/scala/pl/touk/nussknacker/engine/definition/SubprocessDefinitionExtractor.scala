@@ -2,30 +2,48 @@ package pl.touk.nussknacker.engine.definition
 
 import pl.touk.nussknacker.engine.api.component.{ParameterConfig, SingleComponentConfig}
 import pl.touk.nussknacker.engine.api.definition.Parameter
-import pl.touk.nussknacker.engine.api.process.ProcessObjectDependencies
 import pl.touk.nussknacker.engine.api.typed.typing.{Typed, Unknown}
+import pl.touk.nussknacker.engine.api.{FragmentSpecificData, MetaData}
 import pl.touk.nussknacker.engine.canonicalgraph.CanonicalProcess
-import pl.touk.nussknacker.engine.component.ComponentsUiConfigExtractor
+import pl.touk.nussknacker.engine.canonicalgraph.canonicalnode.FlatNode
 import pl.touk.nussknacker.engine.definition.DefinitionExtractor.ObjectDefinition
+import pl.touk.nussknacker.engine.definition.SubprocessDefinitionExtractor.extractSubprocessParam
 import pl.touk.nussknacker.engine.definition.parameter.ParameterData
 import pl.touk.nussknacker.engine.definition.parameter.defaults.{DefaultValueDeterminerChain, DefaultValueDeterminerParameters}
 import pl.touk.nussknacker.engine.definition.parameter.editor.EditorExtractor
 import pl.touk.nussknacker.engine.definition.parameter.validator.{ValidatorExtractorParameters, ValidatorsExtractor}
+import pl.touk.nussknacker.engine.graph.node.SubprocessInputDefinition
 import pl.touk.nussknacker.engine.graph.node.SubprocessInputDefinition.SubprocessParameter
 
-class SubprocessDefinitionExtractor(processObjectDependencies: ProcessObjectDependencies) {
+case class SubprocessDetails(canonical: CanonicalProcess, category: String)
+
+class SubprocessDefinitionExtractor(category:String, subprocessesDetails:Set[SubprocessDetails], subprocessesConfig:Map[String, SingleComponentConfig], classLoader: ClassLoader) {
 
   def extract: Map[String, ObjectDefinition] = {
-    val componentsUiConfig = ComponentsUiConfigExtractor.extract(processObjectDependencies.config)
-    Map.empty
+    val subprocessInputs = subprocessesDetails.collect {
+      case SubprocessDetails(CanonicalProcess(MetaData(id, FragmentSpecificData(docsUrl), _, _), FlatNode(SubprocessInputDefinition(_, parameters, _)) :: _, _), category) =>
+        val config = subprocessesConfig.getOrElse(id, SingleComponentConfig.zero).copy(docsUrl = docsUrl)
+        val typedParameters = parameters.map(extractSubprocessParam(classLoader, config))
+        val objectDefinition = new ObjectDefinition(typedParameters, Typed[java.util.Map[String, Any]], Some(List(category)), config)
+        (id, objectDefinition)
+    }.toMap
+    subprocessInputs
   }
-
 }
 
 object SubprocessDefinitionExtractor {
 
-  def apply(subprocesses: Iterable[CanonicalProcess]): SubprocessDefinitionExtractor = {
-    new SubprocessDefinitionExtractor(subprocesses)
+  def apply(category:String, subprocessesDetails:Set[SubprocessDetails], subprocessesConfig :Map[String, SingleComponentConfig], classLoader:ClassLoader): SubprocessDefinitionExtractor = {
+    new SubprocessDefinitionExtractor(
+      category = category,
+      subprocessesDetails = subprocessesDetails,
+      subprocessesConfig  = subprocessesConfig,
+      classLoader = classLoader
+    )
+  }
+
+  def apply(): SubprocessDefinitionExtractor = {
+    new SubprocessDefinitionExtractor(???, ???, ???, ???)
   }
 
   def extractSubprocessParam(classLoader: ClassLoader, componentConfig: SingleComponentConfig)(p: SubprocessParameter): Parameter = {
@@ -50,5 +68,4 @@ object SubprocessDefinitionExtractor {
       javaOptionalParameter = false
     )
   }
-
 }

@@ -61,7 +61,7 @@ object NodeCompiler {
 }
 
 class NodeCompiler(definitions: ProcessDefinition[ObjectWithMethodDef],
-                   subprocessDefinitionExtractor: SubprocessDefinitionExtractor,
+//                   subprocessDefinitionExtractor: SubprocessDefinitionExtractor,
                    objectParametersExpressionCompiler: ExpressionCompiler,
                    classLoader: ClassLoader,
                    resultCollector: ResultCollector,
