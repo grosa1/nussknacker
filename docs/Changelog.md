@@ -1,6 +1,10 @@
 
 # Changelog
 
+esp-1.8.1-adds
+------------------------
+* [#4127](https://github.com/TouK/nussknacker/pull/4127) ResourceLoader and bumps commons io 2.4 -> to 2.6
+
 1.8.1 (28 Feb 2023)
 ------------------------
 * [#4018](https://github.com/TouK/nussknacker/pull/4018) Fix for: generate test data mechanism didn't work for json messages with defined schema id 
