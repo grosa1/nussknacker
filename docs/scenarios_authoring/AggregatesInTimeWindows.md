@@ -119,7 +119,7 @@ In the example below, a sum of field `#input.transfer` will be computed  in the 
 
 The sliding-window 'slides' the aggregation window over the events and emits an aggregate whenever a new event arrives ("enters the window"). This is different from the tumbling-window, where new window starts regardless of whether event arrived or not. 
 
-If you set `emitWhenEventLeft` window property to `true`, an additional aggregate event will be generated when because of the passage of time the an event is no longer in the currently active window. In this configuration the computed aggregate is an equivalent of a function in a moving window which we commonly apply to time series events - like moving average or moving sum. 
+If you set `emitWhenEventLeft` window property to `true`, an additional aggregate event will be generated at the moment when as the result of the passage of time the an event which was 'seen some time ago will no longer be in the currently active window (it *left* the window in other words.`). In this configuration the computed aggregate is an equivalent of a function over a moving window which we commonly apply to time series events - like moving average or moving sum. 
 
 Let's use the following example in case the above explanation is not clear. Imagine that you stand on the flyover over a motorway tasked with counting Porsches in 1 hour sliding window - you are asked to give a separate aggregate for each Porsche color. For simplicity, we will focus only on red Porsches and assume that throughout the whole day only two red Porsches passed our observation point - at 9.25am and at 9.45am. The following table shows aggregates emitted by the sliding-window in each configuration option.
 
