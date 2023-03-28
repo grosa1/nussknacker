@@ -34,6 +34,9 @@ To see the biggest differences please consult the [changelog](Changelog.md).
   which provide the same interface as the previous one, with only method name changed.
   Especially, when you use 'PeriodicDeploymentManagerProvider', `delegate` should already return `DeploymentManager` wrapped by caching mechanism.
 * [#4131](https://github.com/TouK/nussknacker/pull/4131) `Parameter.defaultValue` now holds `Option[Expression]` instead of `Option[String]`. You have to wrap a `String` with `Expression.spel()`
+* [#4190](https://github.com/TouK/nussknacker/pull/4190) Tumbling aggregates with daily windows are now aware of timezone. Before they were aligned to UTC timezone - each window started at 00:00:00 in UTC timezone. 
+  If you want to keep this behaviour and your deployment is in non-UTC timezone, set `FLINK_DAILY_WINDOW_TIMEZONE_ID=UTC` to required zoneId (format is described [here](https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/time/ZoneId.html)). If this variable is absent timezone is taken from JVM timezone (which is `user.timezone` jvm property
+  or platform timezone if not set) 
 
 
 ### Other changes
