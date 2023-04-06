@@ -21,6 +21,7 @@ import scala.util.{Failure, Try}
 object Serializers extends LazyLogging {
 
   def registerSerializers(modelData: ModelData, config: ExecutionConfig): Unit = {
+    ChillScalaSerializersRegistrar.registerIn(config)
     (CaseClassSerializer :: SpelHack :: SpelMapHack :: Nil).map(_.registerIn(config))
     ScalaServiceLoader.load[SerializersRegistrar](getClass.getClassLoader).foreach(_.register(modelData.processConfig, config))
     TimeSerializers.addDefaultSerializers(config)
